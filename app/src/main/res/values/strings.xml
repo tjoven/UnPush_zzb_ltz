@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, MainActivity!</string>
+    <string name="app_name">不忘初心</string>
+    <string name="app_url">服务器地址设置</string>
+    <string name="SETTING_INFOS">setting_infos2</string>
+    <string name="inputUrl">请您输入服务器地址：</string>
+    <string name="example">例如：www.xxx.com:8080/oa/wap</string>
+    <string name="goodfellowship">1、如果软件无法打开页面，请查看手机是否联网。</string>
+    <string name="goodfellowshipTwo">2、如果服务器地址变更，请您在该应用程序中按【菜单键】，点击【设置】修改服务器地址。</string>
+    <string name="goodfellowshipThree">3、如果弹出【网络连接出错】提示信息，请您检查手机是否处于联网状态或检查服务器地址是否正确。</string>
+    <string name="login">首页</string>
+    <string name="menu1">产品</string>
+    <string name="menu1_url">./crm/cpgl/cpfl.js</string>
+    <string name="menu2">客户</string>
+    <string name="menu2_url">./crm/kh/list.js</string>
+    <string name="menu3">营销</string>
+    <string name="menu3_url">./crm/dxfs/send.js</string>
+    <string name="menu4">商务通</string>
+    <string name="menu4_url">商务通</string>
+    <string name="cancel">退出</string>
+    <string name="network_Invalid">不能正常连接网络</string>
+    
+     <!-- 正式的 -->
+     <!--  
+     <string name="url">http://123.125.127.131:8081</string>
+     <string name="url_new2">http://123.125.127.131:8081</string>  -->
+     
+
+     <string name="url">https://123.125.127.131:9123</string>
+     <string name="url_new2">https://123.125.127.131:9123</string>
+     
+     <!-- <string name="url">https://10.192.16.141:9123</string>
+     <string name="url_new2">https://10.192.16.141:9123</string> -->
+
+    
+   <!--  <string name="url">http://172.16.5.41:8090/ltzfwpt</string>
+    <string name="url_new2">http://172.16.5.41:8090/ltzfwpt</string> -->
+    
+    
+<!--     <string name="url_new2">http://192.168.191.1:8080/ltzfwpt</string> -->
+<!--     <string name="url_new2">http://172.16.5.68:8080/ltzfwpt</string> -->
+<!--     <string name="url_new2">http://172.16.17.24:8080/ltzfwpt</string> -->
+<!--     <string name="url_new2">http://172.16.5.81:8080/</string> -->
+ 
+    
+    <!-- 
+    http://124.133.15.90:8480/djypt
+    http://172.16.8.214:8080/djypt
+      http://119.188.162.184:80/djypt
+    栖霞党建 http://222.135.141.95:8080/qxdj
+    东平党建http://119.188.168.49:8081/dpdj
+    http://124.133.15.90:8480/djypt
+    http://119.188.162.184/djypt
+    -->
+    <!-- 默认apn 默认不开启 -->
+    <string name="apn">JYXXH.YDOA.HAAPN</string>
+    <string name="apnname"></string>
+    <string name="apnFlag">0</string>
+    <string name="remind">本机版本号是android 4.0以上，请点击按钮跳转到系统界面进行切换。</string>
+    <string name="iremind">本机版本号是android 4.0以下，可以自动切换接入点。</string>
+    <string name="remember">记忆外网切换</string>
+    <string name="wndpanel_exit">您确定要退出系统?</string>
+    <string name="wndpanel_exit_yes">确定</string>
+    <string name="wndpanel_exit_no">取消</string>
+    <string name="photo_failure">拍照返回失败！</string>
+    <string name="clearCacheSummary">点击清除当前缓存数据，共</string>
+    <!-- IsopenZlsj开启增量升级，1为开启，0为不开启 -->
+    <string name="IsopenZlsj">1</string>
+    <string name="noticeUrl">/main.html</string>
+    <string name="scan_text">请将方框对准签到的二维码扫描</string>
+     <string name="versionUrl">/verUpgrade/default.do?method=getVersion&amp;package_name=com.unicom.sywq</string>
+</resources>

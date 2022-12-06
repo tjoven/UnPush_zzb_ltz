@@ -1,0 +1,40 @@
+-optimizationpasses 5
+-dontusemixedcaseclassnames
+-dontskipnonpubliclibraryclasses
+-dontpreverify
+-verbose
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+
+-keep public class * extends android.app.Activity{*;}
+-keep public class * extends android.app.Application{*;}
+-keep public class * extends android.app.Service{*;}
+-keep public class * extends android.content.BroadcastReceiver{*;}
+-keep public class * extends android.content.ContentProvider{*;}
+-keep public class * extends android.app.backup.BackupAgentHelper{*;}
+-keep public class * extends android.preference.Preference{*;}
+-keep public class com.android.vending.licensing.ILicensingService{*;}
+-keep class com.artifex.mupdfdemo.** { *; }
+
+-keep class com.smileback.** { *; }
+-keep class com.sx.crypto.** { *; }
+-keep class com.sxpaykeyboard.** { *; }
+-keep class com.iflytek.** { *; }
+-keep class com.baidu.** { *; }
+-keep class org.apache.** { *; }
+-keep class com.loopj.** { *; }
+-keep class com.google.dexmaker.** { *; }
+-keep class com.sgcc.epri.iscp.** { *; }
+
+-dontwarn org.bouncycastle.**
+-keep class org.bouncycastle.** { *; }
+  
+-dontwarn okhttp3.**
+-keep class okhttp3.**{*;}
+-keep interface okhttp3.**{*;}
+ 
+-dontwarn java.nio.file.*
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+-dontwarn okio.**
+-keep class okio.**{*;}
+-keep interface okio.**{*;}
+ 

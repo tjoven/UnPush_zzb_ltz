@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:keepScreenOn="true" 
+    android:background="#FFFFFF"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/nar_bg"
+        android:scaleType="fitXY" >
+
+        <ImageButton
+            android:id="@+id/exitBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/tuichu"
+            android:clickable="true" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Apn切换"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:textStyle="bold" >
+        </TextView>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout0"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/relativeLayout1"
+        android:background="@drawable/bgg"
+        android:scaleType="fitXY" >
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="当前接入点："
+            android:textColor="#0000FF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginLeft="10dp" />
+
+        <TextView
+            android:id="@+id/textApn"
+            android:layout_toRightOf="@id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="apn"
+            android:textColor="#0000FF"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/layout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+
+        <TextView
+            android:id="@+id/remind"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/remind"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            android:textColor="#000000" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+
+        <TextView
+            android:id="@+id/iremind"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/iremind"
+            android:textSize="15dp"
+            android:textStyle="bold" 
+            android:textColor="#000000"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+
+        <ImageButton
+            android:id="@+id/inBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/qiehuan" />
+
+        <ImageButton
+            android:id="@+id/outBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/qiehuanw" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+
+        <ImageButton
+            android:id="@+id/allBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/qieh" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone" >
+
+        <TableLayout
+            android:id="@+id/TableLayout01"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20.0px"
+            android:layout_marginRight="20.0px"
+            android:layout_marginTop="20dp"
+            android:stretchColumns="1" >
+
+            <TableRow>
+
+                <CheckBox
+                    android:id="@+id/savestatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/remember" 
+                    android:textColor="#000000"/>
+            </TableRow>
+        </TableLayout>
+    </LinearLayout>
+
+</LinearLayout>

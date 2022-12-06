@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/a1"
+    android:keepScreenOn="true" >
+
+    <RelativeLayout
+        android:id="@+id/id_layout_top"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/c_toolbar_header"
+        android:scaleType="fitXY" >
+
+        <ImageButton
+            android:id="@+id/id_btn_return"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/wnd_return"
+            android:clickable="true" />
+
+        <TextView
+            android:id="@+id/id_tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="设置"
+            android:textColor="#ffffff"
+            android:textStyle="bold"
+            android:textSize="22dp"
+             >
+        </TextView>
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/id_layout_top"
+        android:background="@drawable/wap_main_product_table" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/id_config_serUrl"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/wnd_config_item"
+                android:gravity="center_vertical"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="服务器地址设置"
+                android:textColor="#3c566d"
+                android:textSize="18dp" />
+            
+			<EditText android:id="@+id/url_edit"
+				android:layout_width="fill_parent" 
+				android:layout_height="wrap_content"
+				android:inputType="textUri"
+				android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+				android:textSize="15dp">
+			</EditText>
+			
+            <TextView
+                android:id="@+id/id_config_openpush"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/wnd_config_item"
+                android:clickable="true"
+                android:drawableRight="@drawable/wnd_login_btn2"
+                android:gravity="center_vertical"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="开启消息推送"
+                android:textColor="#3c566d"
+                android:textSize="18dp" />
+
+            <TextView
+                android:id="@+id/id_config_update"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@drawable/wnd_config_item"
+                android:clickable="true"
+                android:gravity="center_vertical"
+                android:paddingLeft="20dp"
+                android:text="检查版本"
+                android:textColor="#3c566d"
+                android:textSize="18dp" />
+
+            <TextView
+                android:id="@+id/id_config_uplog"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@drawable/wnd_config_item"
+                android:clickable="true"
+                android:gravity="center_vertical"
+                android:paddingLeft="20dp"
+                android:text="日志上传"
+                android:textColor="#3c566d"
+                android:textSize="18dp" />
+			
+			<RelativeLayout 
+			    android:gravity="center_vertical" 
+			    android:layout_gravity="center_vertical" 
+			    android:id="@+id/systemsetting_clearCache" 
+			    android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+			    android:layout_width="fill_parent" 
+			    android:clickable="true"
+			    android:background="@drawable/wnd_config_item"
+			    android:layout_height="wrap_content">
+			    
+                    <TextView android:textSize="12dp" 
+                        android:textColor="#9b9b9b" 
+                        android:id="@+id/id_config_CacheSize" 
+                        android:layout_width="wrap_content" 
+                        android:layout_height="wrap_content" 
+                        android:paddingLeft="20dp"
+                        android:paddingTop="6dp"
+                        android:text="点击清除当前缓存数据，共" 
+                        android:layout_centerVertical="true" />
+
+                    <TextView
+                        android:id="@+id/id_config_clear"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:clickable="true"
+                        android:gravity="left|top"
+                        android:paddingLeft="20dp"
+                        android:text="清除缓存"
+                        android:textColor="#3c566d"
+                        android:textSize="18dp" />
+                    
+                    <TextView
+                        android:id="@+id/id_config_checkbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="fill_parent"
+                        android:layout_alignParentRight="true"
+                        android:layout_gravity="center_vertical"
+                        android:clickable="true"
+                  		android:paddingTop="7dp"
+                        android:drawableRight="@drawable/wnd_login_btn2"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="20dp"
+                        android:paddingBottom="5dp"
+                        android:paddingRight="20dp" />
+                    
+                </RelativeLayout>
+                
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

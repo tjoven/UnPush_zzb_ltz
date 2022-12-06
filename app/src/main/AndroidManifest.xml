@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.unicom.sywq"
+    android:versionCode="30"
+    android:versionName="3.0(131)" >
+
+    <uses-sdk
+        android:minSdkVersion="16"
+        android:targetSdkVersion="16" />
+
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.BAIDU_LOCATION_SERVICE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.WRITE_APN_SETTINGS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_CONFIGURATION" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.RESTART_PACKAGES" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+   	<!-- 下载权限 -->
+   	<uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER" />
+    <!-- 录音权限 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"></uses-permission>
+    <!-- 读取通讯录 -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <!-- 访问有关GSM网络信息 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- 允许程序访问Wi-Fi网络状态信息 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" >
+    </uses-permission>
+    <!-- 允许程序改变Wi-Fi连接状态 -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DEVICE_POWER" />
+    <!-- Gps定位权限 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.READ_LOGS" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" >
+    </uses-permission>
+    <!-- 相机 -->
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+    
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" ></uses-permission>
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true" />
+
+    <application
+        android:icon="@drawable/icon"
+        android:label="@string/app_name" 
+        android:name="com.iflytek.voicedemo.SpeechApp"
+        >
+        <activity
+            android:name="com.unicom.baseoa.MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <!-- 定位异步 -->
+        <service
+            android:name="com.baidu.location.f"
+            android:enabled="true"
+            android:permission="android.permission.BAIDU_LOCATION_SERVICE"
+            android:process=":remote" >
+            <intent-filter>
+                <action android:name="com.baidu.location.service_v2.9" >
+                </action>
+            </intent-filter>
+        </service>
+
+        <activity
+            android:name="com.unicom.baseoa.Settings"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name="com.unicom.config.WndConfig"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <!-- android:screenOrientation="portrait" -->
+        <activity
+            android:name="com.unicom.baseoa.WebViewWnd"
+            android:configChanges="orientation"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize" 
+            android:fitsSystemWindows="true"
+        	android:clipToPadding="true"
+            >
+        </activity>
+        <activity
+            android:name="com.unicom.baseoa.NewWebViewWnd"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" >
+        </activity>
+         <activity
+            android:name="com.unicom.baseoa.BrowserWnd"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:hardwareAccelerated="true"
+            
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustResize" >
+            
+             <action android:name="android.intent.action.VIEW" />  
+<category android:name="android.intent.category.DEFAULT" />  
+<data android:mimeType="*/*" />  
+             
+        </activity>
+        
+          <activity
+            android:name="com.unicom.baseoa.detailwnd.DetailWnd"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:hardwareAccelerated="true"
+            
+            android:windowSoftInputMode="stateHidden|adjustResize" >
+        </activity>
+         
+        <activity
+            android:name="com.unicom.baseoa.LockScreenActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.sdunisi.oa.im.WndNotice"
+            android:label="@string/app_url"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.unicom.baseoa.splash.WndSplash"
+            android:theme="@style/Theme"
+            android:screenOrientation="portrait" >
+        </activity>
+        <!-- 二维码activity -->
+        <activity
+            android:name="com.zxing.activity.CaptureActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:windowSoftInputMode="stateAlwaysHidden" >
+        </activity>
+         <activity
+            android:name="com.unicom.mRecorder.MovieMainActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:windowSoftInputMode="stateAlwaysHidden" >
+        </activity>
+
+        <service android:name="com.sdunisi.oa.service.ImCoreService" />
+
+        <receiver android:name="com.sdunisi.oa.service.ImCoreRecevicer" >
+            <intent-filter>
+                <action android:name="com.sdunisi.oa.service.IM_BASE_CORE_ACTION" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.sdunisi.oa.service.NetworkChangeReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.sdunisi.oa.service.ImLocationReceiver" >
+            <intent-filter>
+                <action android:name="com.sdunisi.oa.service.IM_Location_CORE_ACTION" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.sdunisi.oa.service.ImWarningReceiver"
+            android:process=":push" >
+            <intent-filter>
+                <action android:name="com.sdunisi.oa.service.IM_WARNING_ACTION" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.sdunisi.oa.service.ImBootCompletedReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" >
+                </action>
+            </intent-filter>
+        </receiver>
+        
+       
+        <!-- 移动统计分析 -->
+        <meta-data
+            android:name="IFLYTEK_APPKEY"
+            android:value="'5b078b28'" />
+        <meta-data
+            android:name="IFLYTEK_CHANNEL"
+            android:value="Android_Demo" />
+        
+        <!-- app升级所需 -->
+        <provider 
+        android:name="android.support.v4.content.FileProvider"
+        android:authorities="com.unicom.sywq.fileprovider"
+        android:exported="false"
+        android:grantUriPermissions="true">
+        <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/provider_paths" />
+        </provider>
+        
+    </application>
+	
+</manifest>

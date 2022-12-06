@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"  
+  android:layout_height="fill_parent"  
+  android:id="@+id/topRelativeLayout"
+ >
+   <LinearLayout
+        android:id="@+id/navigation"
+        android:visibility="gone"
+        android:layout_width="fill_parent"
+        android:layout_height="50dip"
+        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/navigation_bg"
+        android:baselineAligned="false"
+        android:orientation="horizontal" >
+
+       <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dip"
+            android:layout_marginTop="4dip" 
+            android:layout_weight="1"
+            >
+
+            <Button
+                android:id="@+id/homeBtn"
+                android:layout_width="25dip"
+                android:layout_height="25dip"
+                android:layout_gravity="center"
+                android:background="@drawable/home" >
+            </Button>
+
+            <TextView
+                android:id="@+id/homeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/homeBtn"
+                android:text="@string/login" >
+            </TextView>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:layout_marginTop="4dip" 
+          android:layout_weight="1">
+
+            <Button
+                android:id="@+id/menu1Btn"
+                android:layout_width="25dip"
+                android:layout_height="25dip"
+                android:layout_gravity="center"
+                android:background="@drawable/menu1" >
+            </Button>
+
+            <TextView
+                android:id="@+id/menu1TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_below="@+id/menu1Btn"
+                android:text="@string/menu1" >
+            </TextView>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:layout_marginTop="4dip"
+            android:layout_weight="1" >
+
+            <Button
+                android:id="@+id/menu2Btn"
+                android:layout_width="25dip"
+                android:layout_height="25dip"
+                android:layout_gravity="center"
+                android:background="@drawable/menu2" >
+            </Button>
+
+            <TextView
+                android:id="@+id/menu2TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                 android:layout_gravity="center"
+                android:layout_below="@+id/menu2Btn"
+                android:text="@string/menu2" >
+            </TextView>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:layout_marginTop="4dip"
+            android:layout_weight="1" >
+
+            <Button
+                android:id="@+id/menu3Btn"
+                android:layout_width="25dip"
+                android:layout_height="25dip"
+                android:layout_gravity="center"
+                android:background="@drawable/menu3" >
+            </Button>
+
+            <TextView
+                android:id="@+id/menu3TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                 android:layout_gravity="center"
+                android:layout_below="@+id/menu3Btn"
+                android:text="@string/menu3" >
+            </TextView>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/menu4Layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dip"
+            android:layout_marginTop="4dip"
+            android:visibility="gone"
+            android:layout_weight="1" >
+
+            <TextView
+                android:id="@+id/menu4TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/menu4Btn"
+                android:layout_gravity="center"
+                android:text="@string/menu4" />
+
+            <Button
+                android:id="@+id/menu4Btn"
+                android:layout_width="25dip"
+                android:layout_height="25dip"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/fresh" />
+
+        </RelativeLayout>
+        
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:layout_marginTop="4dip" 
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/cancelBtn"
+                android:layout_width="25dip"
+                android:layout_height="25dip"
+                android:layout_gravity="center"
+                android:background="@drawable/cancel_l">
+            </Button>
+
+            <TextView
+                android:id="@+id/cancelTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/cancelBtn"
+                android:text="@string/cancel">
+            </TextView>
+        </RelativeLayout>
+    </LinearLayout>
+      <WebView android:id="@+id/webview"
+    android:scrollbars="none"
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent"
+    android:layout_above="@+id/navigation"
+    />
+    <WebView android:id="@+id/webview2"
+    android:scrollbars="none"
+    android:visibility="invisible"
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent"
+    />
+    </RelativeLayout>

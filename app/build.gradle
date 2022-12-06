@@ -1,0 +1,38 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 22
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        applicationId "com.unicom.sywq"
+        minSdkVersion 16
+        targetSdkVersion 16
+
+        ndk {
+            moduleName "mp3lame"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:22.+'
+    compile files('libs/android-async-http-1.4.4.jar')
+    compile files('libs/android-viewbadger.jar')
+    compile files('libs/asmack-2010.05.07.jar')
+    compile files('libs/httpclient-4.3.6.jar')
+    compile files('libs/httpmime-4.1.1.jar')
+    compile files('libs/locSDK_3.3.jar')
+    compile files('libs/Msc.jar')
+    compile files('libs/okhttp-3.4.1.jar')
+    compile files('libs/okio-1.11.0.jar')
+    compile files('libs/Sunflower.jar')
+    compile files('libs/zxing.jar')
+}
