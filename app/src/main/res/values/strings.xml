@@ -22,12 +22,12 @@
     <string name="cancel">退出</string>
     <string name="network_Invalid">不能正常连接网络</string>
     
-     <!-- 正式的 -->
-     <!--  
+
+     <!--
      <string name="url">http://123.125.127.131:8081</string>
      <string name="url_new2">http://123.125.127.131:8081</string>  -->
-     
 
+    <!-- 正式的 -->
      <string name="url">https://123.125.127.131:9123</string>
      <string name="url_new2">https://123.125.127.131:9123</string>
      

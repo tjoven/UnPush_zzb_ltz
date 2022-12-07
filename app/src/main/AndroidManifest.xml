@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.unicom.sywq"
-    android:versionCode="30"
-    android:versionName="3.0(131)" >
+    android:versionCode="31"
+    android:versionName="3.1(132)" >
 
-    <uses-sdk
-        android:minSdkVersion="16"
-        android:targetSdkVersion="16" />
 
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
@@ -125,11 +122,11 @@
             
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" >
-            
+             <intent-filter>
              <action android:name="android.intent.action.VIEW" />  
-<category android:name="android.intent.category.DEFAULT" />  
-<data android:mimeType="*/*" />  
-             
+                <category android:name="android.intent.category.DEFAULT" />
+                 <data android:mimeType="*/*" />
+             </intent-filter>
         </activity>
         
           <activity

@@ -13,7 +13,6 @@ public class DbHelper extends SQLiteOpenHelper {
 	private final static int DATABASE_VERSION = 1;
 	public final static String TABLE_MENU_NAME="menu";
 
-	//menu表
 	public final static String MENUTABLE_FIELD_ID="id";
 	public final static String MENUTABLE_FIELD_TITLE = "title";
 	public final static String MENUTABLE_FIELD_REQUESTURL = "requestUrl";
@@ -40,7 +39,6 @@ public class DbHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 
-		//创建area表
 		String sql="create table "+TABLE_MENU_NAME+"("
 		+MENUTABLE_FIELD_ID+" INTEGER PRIMARY KEY AUTOINCREMENT,"
 		+MENUTABLE_FIELD_TITLE+" text,"

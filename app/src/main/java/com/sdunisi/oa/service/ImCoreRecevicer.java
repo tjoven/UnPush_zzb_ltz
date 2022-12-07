@@ -17,8 +17,7 @@ public class ImCoreRecevicer extends BroadcastReceiver
 	{
 		boolean b = intent.getBooleanExtra("bAlarm", false);
 //		boolean isServiceRunning = false; 
-//	    //¼ì²éService×´Ì¬ 
-//	    ActivityManager manager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE); 
+//	    ActivityManager manager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
 //	    for (RunningServiceInfo service :manager.getRunningServices(Integer.MAX_VALUE)) { 
 //		    if("com.sdunisi.oa.service.XmglImCoreService".equals(service.service.getClassName())) { 
 //		    	isServiceRunning = true; 

@@ -28,10 +28,6 @@ import com.google.zxing.DecodeHintType;
 import com.google.zxing.ResultPointCallback;
 import com.zxing.activity.CaptureActivity;
 
-/**
- * This thread does all the heavy lifting of decoding the images.
- * ½âÂëÏß³Ì
- */
 final class DecodeThread extends Thread {
 
   public static final String BARCODE_BITMAP = "barcode_bitmap";
