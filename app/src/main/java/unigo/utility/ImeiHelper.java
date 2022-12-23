@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 
 public class ImeiHelper
 {
@@ -33,7 +34,10 @@ public class ImeiHelper
 		{
 			TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 			String imei = tm.getSimSerialNumber();//sim卡序列号
-			str = imei.trim();
+			if(!TextUtils.isEmpty(imei)){
+				str = imei.trim();
+			}
+
 		}
 		catch (Exception e)
 		{

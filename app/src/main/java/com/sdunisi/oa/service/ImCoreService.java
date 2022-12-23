@@ -114,8 +114,8 @@ public class ImCoreService extends Service
 				{
 					try
 					{
-						Thread.sleep(3000);
-						loginIm();
+//						Thread.sleep(3000);
+//						loginIm();
 						//isLogin();
 					}
 					catch (Exception e)

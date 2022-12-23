@@ -1527,14 +1527,10 @@ public class WebViewWnd extends Activity implements OnHttpDocDownListener,BDLoca
 		  return false;
 	  }
 
-	  //修改之前的getHostUrl方法
-//	public String getHostUrl(){
-//		String url = Utility.iURL;
-//		if(url!=null&&!url.startsWith("http://")){
-//			url = "http://"+url;
-//		}
-//		return url;
-//	}
+	public String getRecorderUrl(){
+		String url = getString(R.string.url_playVoice);
+		return url;
+	}
 	  //修改后的新的getHostUrl方法
 		public String getHostUrl(){
 			String url = Utility.iURL;
@@ -4264,6 +4260,11 @@ public class WebViewWnd extends Activity implements OnHttpDocDownListener,BDLoca
 			 * 播放录音	wangzl
 			 */
 			public void playRecording(String filePath){
+				Log.e("playRecording before",filePath);
+				if(filePath.startsWith(getString(R.string.url))){
+					filePath = filePath.replace(getString(R.string.url),getString(R.string.url_playVoice));
+				}
+				Log.e("playRecording after ",filePath);
 				if(s.get()!=null){
 					if(s.get().isPlaying()){
 						s.get().stop();
@@ -4275,7 +4276,7 @@ public class WebViewWnd extends Activity implements OnHttpDocDownListener,BDLoca
 					 mediaPlayer.setDataSource(filePath);
 					 mediaPlayer.prepare();
 					 mediaPlayer.start();
-					 
+
 				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
 				} catch (IllegalStateException e) {

@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -92,10 +93,13 @@ public class HttpMultipartPostData extends AsyncTask<String, Integer, String> {
 			uploadSuccess = true;//上传成功
 			serverResponse = EntityUtils.toString(response.getEntity());
 			Log.e("HttpMultiPartPostData", "serverResponse="+serverResponse);
-			JSONObject jsons = new JSONObject(serverResponse);
-			 zid = jsons.optString("zid");
-			 filepath = jsons.optString("filepath");
-			 guid=jsons.optString("guid");
+			if(!TextUtils.isEmpty(serverResponse)){
+				JSONObject jsons = new JSONObject(serverResponse);
+				zid = jsons.optString("zid");
+				filepath = jsons.optString("filepath");
+				guid=jsons.optString("guid");
+			}
+
 	         //file.delete();    
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -30,7 +30,8 @@
     <!-- 正式的 -->
      <string name="url">https://123.125.127.131:9123</string>
      <string name="url_new2">https://123.125.127.131:9123</string>
-     
+     <string name="url_playVoice">http://123.125.127.131:8081</string>
+
      <!-- <string name="url">https://10.192.16.141:9123</string>
      <string name="url_new2">https://10.192.16.141:9123</string> -->
 
