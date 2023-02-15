@@ -1,0 +1,302 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>我的生活</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+<script type="text/javascript">
+	sys_addMeun = true;
+	var nm = getQueryStringRegExp("nm");
+	$(function() {
+		//生成toolbar
+		$('#toolbar').toolbar();
+		$("#toolbar h1").text("我的生活");
+		var _height = getListHeight();
+		$("#sys_innerscoll").height(window.innerHeight - _height);
+		var innerscroll = new iScroll("sys_innerscoll", {
+			click : true
+		});
+		if (nm == '') {
+			nm = 0;
+		}
+		$(".c_tabs_text").eq(nm).addClass("c_tabs_active");
+	});
+	function gotoPageIn(param) {
+		if (isAndriod) {
+			window.webview.loadurl_embed(param);
+		} else if (isIphone) {
+			window.location.href = 'obj-c://outside//' + param;
+		} else {
+			var iTop = (window.screen.availHeight - 30 - 365) / 2;
+			var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+			window.open(param, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+		}
+		return;
+	}
+	function gotoPageOut(param) {
+		if (isAndriod) {
+			window.webview.loadurl_new(param);
+		} else if (isIphone) {
+			window.location.href = 'obj-c://outside//' + param;
+		} else {
+			var iTop = (window.screen.availHeight - 30 - 365) / 2;
+			var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+			window.open(param, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+		}
+		return;
+	}
+	function go_back() {
+		sys_goURL("../../main.html");
+	}
+	// 点击tab页刷新画面显示相应tab页内容一览list
+	function getNm(dm) {
+		if (dm == "gzcx") {
+			sys_goURL("gzylj.html?nm=0");
+		} else if (dm == "dfjn") {
+			sys_goURL("/wopay/wopay.html?nm=1");
+		} else if (dm == "yyfbx") {
+			sys_goURL("yyfbx.html?nm=2");
+		}else if (dm == "cgj") {
+			sys_goURL("../events/entryAndExit/entryAndExit.html");
+		}
+	}
+	
+	
+	//window.webview.loadurl_embed(url)  app嵌入
+	//window.webview.loadurl_new(url);  外边打开
+</script>
+<style>
+.ui-toolbar-wrap {
+	border: 0px;
+}
+
+
+#head div {
+	display: inline-block;
+	width: 46%;
+}
+
+span {
+	display: table-row;
+	text-align: center;
+}
+
+#head img {
+	margin-top: 5px;
+	/*height: 50px;*/
+	width: 100%;
+}
+
+nav ul li {
+	width: 19%;
+	/*padding: 3%;*/
+	display: inline-block;
+	margin-left: 4%;
+	margin-bottom: 25px;
+	vertical-align: middle;
+}
+
+nav ul li img {
+	height: 40px;
+}
+</style>
+	<style>
+		.mainbox{
+			padding: 0px 0px 0px 0px;
+		}
+		/**小图标**/
+		.main_item{
+			display:-webkit-box;
+		}
+		.main_item>div{
+			width:25%;
+			height:80px;
+			display:-webkit-box;
+			-webkit-box-pack:center;
+			/* margin-top: 10px; */
+		}
+		.item_smallButton{
+			display:-webkit-box;
+			-webkit-box-orient:vertical;
+			-webkit-box-align:center;
+		}
+		.item_smallButton_img{
+			height:35px;
+			width:35px;
+			background-repeat:round;
+			background-size:cover;
+			margin-top: 13px;
+		}
+		.item_smallButton_text{
+			color:#222222;
+			font-size:13px;
+			margin-top:10px;
+		}
+		.item_gasq{
+			background-image: url("../../img/live/gasq.png");
+		}
+		.item_sf{
+			background-image: url("../../img/live/sf.png");
+		}
+		.item_ckd{
+			background-image: url("../../img/live/ckd.png");
+		}
+		.item_bdwm{
+			background-image: url("../../img/live/bdwm.png");
+		}
+		.item_ddky{
+			background-image: url("../../img/live/ddky.png");
+		}
+		.item_12306{
+			background-image: url("../../img/live/12306.png");
+		}
+		.item_sqyc{
+			background-image: url("../../img/live/sqyc.png");
+		}
+		.item_dd{
+			background-image: url("../../img/live/dd.png");
+		}
+		.div_longImgBut>div{
+			display:-webkit-box;
+			-webkit-box-orient:horizontal;
+		}
+		.div_list>div{
+			margin-bottom:5px;
+		}
+		.item_list_data_img img{
+			width:50px;
+			height:50px;
+		}
+	</style>
+</head>
+<body>
+<div id="toolbar">
+	<i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+	<h1 class="toolbar_title">我的生活</h1>
+</div>
+<div class="c_tabs div_other_40" id="div_tabs">
+	<div id='div_list0'>
+		<div class='c_tabs_text' onclick=getNm('gzcx')>工资查询</div>
+	</div>
+	<div id='div_list1' >
+		<div class='c_tabs_text' onclick=getNm('dfjn')>党费交纳</div>
+	</div>
+	<div id='div_list2'>
+		<div class='c_tabs_text' onclick=getNm('yyfbx')>医疗报销</div>
+	</div>
+	<div id='div_list3'>
+		<div class='c_tabs_text' onclick=getNm('cgj')>出国（境）</div>
+	</div>
+</div>
+	<div id="sys_innerscoll" style="height: 455px;">
+		<header>
+			<div id="head" style="padding-top: 10px;padding-bottom: 10px;">
+				<div style="margin-left: 3%;"
+					onclick="gotoPageOut('http://www.cncaprc.gov.cn/')">
+					<span><img src="../../img/live/llw.png"></span> <span>全国老龄委网站</span>
+				</div>
+				<div style="float: right;margin-right: 3%;"
+					onclick="gotoPageOut('http://www.chinalegalaid.gov.cn')">
+					<span><img src="../../img/live/lay.png"></span> <span>中国法律援助网</span>
+				</div>
+			</div>
+
+			<!-- 小图标 start-->
+			<div class="mainbox">
+				<div class="main_item border_top">
+					<div class="" onclick="gotoPageIn('https://www.guoanshequ.com/')">
+						<div class="item_smallButton">
+							<!-- <div class="item_djdt item_smallButton_img"></div>-->
+							<div class="item_gasq item_smallButton_img"></div>
+							<div class="item_smallButton_text">国安社区</div>
+						</div>
+					</div>
+					<div onclick="gotoPageIn('http://waimai.baidu.com/mobile/waimai?qt=confirmcity&')">
+						<div class="item_smallButton">
+							<div class="item_bdwm item_smallButton_img"></div>
+							<div class="item_smallButton_text">百度外卖</div>
+						</div>
+					</div>
+					<div onclick="gotoPageIn('http://m.kuaidi.com/?from=baidu_ala')">
+						<div class="item_smallButton">
+							<!-- <div class="item_tzgg item_smallButton_img" onclick="gourl('tzgg')"></div> -->
+							<div class="item_ckd item_smallButton_img"></div>
+							<div class="item_smallButton_text">查快递</div>
+						</div>
+					</div>
+					<div onclick="gotoPageIn('http://www.sf-express.com/mobile/cn/sc/index.html')">
+						<div class="item_smallButton" >
+							<div class="item_sf item_smallButton_img"></div>
+							<div class="item_smallButton_text">顺丰快递</div>
+						</div>
+					</div>
+
+				</div>
+				<div class="main_item border_top" style="border-bottom: 0px solid #e6e6e6;height:90px;">
+					<div class="" onclick="gotoPageIn('http://m.ddky.com/?source=wapbaiduzone_bt')">
+						<div class="item_smallButton">
+							<div class="item_ddky item_smallButton_img"></div>
+							<div class="item_smallButton_text">叮当快药</div>
+						</div>
+					</div>
+
+					<div class="" onclick="gotoPageOut('http://www.12306.cn/mormhweb/')">
+						<div class="item_smallButton">
+							<div class="item_12306 item_smallButton_img"></div>
+							<div class="item_smallButton_text">12306</div>
+						</div>
+					</div>
+
+					<div class="" onclick="gotoPageIn('http://webapp.diditaxi.com.cn/?channel=55455')">
+						<div class="item_smallButton">
+							<div class="item_dd item_smallButton_img"></div>
+							<div class="item_smallButton_text">滴滴出行</div>
+						</div>
+					</div>
+
+					<div class="" onclick="gotoPageOut('http://www.01zhuanche.com/web/phone')">
+						<div class="item_smallButton">
+							<!-- <div class="item_djdt item_smallButton_img"></div>-->
+							<div class="item_sqyc item_smallButton_img"></div>
+							<div class="item_smallButton_text">首汽约车</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--<nav style="margin-top: 10px;">
+				<ul style="width: 100%;">
+					<li onclick="gotoPageIn('https://www.guoanshequ.com/')"><span
+						style="width: 20%;"><img src="../../img/live/gasq.png"></span><span style="font-size: 14px;">国安社区</span></li>
+					<li
+						onclick="gotoPageIn('http://waimai.baidu.com/mobile/waimai?qt=confirmcity&')"><span
+						style="width: 20%;"><img src="../../img/live/bdwm.png"></span><span style="font-size: 14px;">百度外卖</span></li>
+					<li onclick="gotoPageIn('http://m.kuaidi.com/?from=baidu_ala')"><span
+						style="width: 20%;"><img src="../../img/live/ckd.png"></span><span style="font-size: 14px;">&nbsp;&nbsp;查快递&nbsp;&nbsp;</span></li>
+					<li
+						onclick="gotoPageIn('http://www.sf-express.com/mobile/cn/sc/index.html')"><span
+						style="width: 20%;"><img src="../../img/live/sf.png"></span><span style="font-size: 14px;">顺丰快递</span></li>
+					<li
+						onclick="gotoPageIn('http://m.ddky.com/?source=wapbaiduzone_bt')"><span
+						style="width: 20%;"><img src="../../img/live/ddky.png"></span><span style="font-size: 14px;">叮当快药</span></li>
+					<li onclick="gotoPageOut('http://www.12306.cn/mormhweb/')"><span
+						style="width: 20%;"><img src="../../img/live/12306.png"></span><span style="font-size: 14px;">&nbsp;&nbsp;12306&nbsp;&nbsp;</span></li>
+					<li
+						onclick="gotoPageIn('http://webapp.diditaxi.com.cn/?channel=55455')"><span
+						style="width: 20%;"><img src="../../img/live/dd.png"></span><span style="font-size: 14px;">滴滴出行</span></li>
+					<li onclick="gotoPageOut('http://www.01zhuanche.com/web/phone')"><span
+						style="width: 20%;"><img src="../../img/live/sqyc.png"></span><span style="font-size: 14px;">首汽约车</span></li>
+				</ul>
+			</nav>-->
+		</header>
+	</div>
+</body>
+</html>

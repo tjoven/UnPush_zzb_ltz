@@ -1,0 +1,301 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>我的信息</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript">
+    sys_addMeun = true;
+	var yh_id = getQueryStringRegExp("yhid");	
+	$(function() {
+		$('#toolbar').toolbar();
+		getPerson();
+
+		$("#btn_bak").click(function() {
+			sys_goURL("../../oa/system/grzx.html");
+		});
+	});
+
+	function getPerson() {
+		sys_ajaxGet("/ltz/wapPerson/default.do?method=showPerson", function(json) {
+			bind(json);
+			innerscoll();
+		});
+	}
+	function innerscoll() {
+		var _height = getListHeight();
+		$("#sys_innerscoll").height(window.innerHeight - _height );
+		innerscroll = new iScroll("sys_innerscoll", {
+			click : true
+		});
+		sys_autoTextarea(innerscroll);
+	}
+
+	function closeDivpic() {
+		var mask = $("#sys_mask_lyfk");
+		mask.css('display', 'none');
+		var div = $("#div_lyfk");
+		div.hide();
+		//$(div).css("bottom", '-251px');
+	}
+	function openDiv() {
+		window.event.stopPropagation();
+		var mask = $("#sys_mask_lyfk");
+		if (mask.length == 0) {
+			var maskHTML = '<div id="sys_mask_lyfk" onclick="closeDivpic();"></div>';
+			$("body").append(maskHTML);
+		}
+		mask.css('display', '-webkit-box');
+		var div = $("#div_lyfk");
+		$(div).show();
+
+		$("#div_lyfk").width(window.innerWidth);
+		
+		var bottom_height = $("#div_bottomMenu").eq(0).height();
+		$(div).css("bottom", bottom_height+'px');
+	}
+	function submit_msg() {
+		if ($.trim($("#gznr").val()) == "") {
+			sys_alert("请输入需要更正的信息");return;
+		}
+		sys_ajaxPost("/ltz/wapPerson/default.do?method=saveXxgg", {
+			gznr : $("#gznr").val()
+		},
+			function(msg) {
+				if (msg.result == true) {
+					sys_alert(msg.msg);
+					closeDivpic();
+					$("#gznr").val("");
+					innerscroll.refresh();
+				} else {
+					sys_alert(msg.msg);
+				}
+			});
+	}
+	
+</script>
+<style type="text/css">
+.ui-toolbar-wrap { //
+	background-color: #FFB73E;
+	border: none !important;
+}
+
+.bx {
+	color: red;
+}
+
+ .form_cell_label {
+	width: 80px;
+}
+
+
+#sys_mask_lyfk {
+	position: fixed;
+	bottom: 0px;
+	top: 0px;
+	width: 100%;
+	z-index: 98;
+	background: #878787;
+	opacity: 0.5;
+	display: -webkit-box;
+	-webkit-box-pack: center;
+	-webkit-box-align: center;
+}
+
+#div_lyfk {
+	position: absolute;
+	width: 90%;
+	height: 250px;
+	bottom: -250px;
+	background: #ffffff;
+	z-index: 99;
+	/*display: none;*/
+	opacity: 0.9;
+	/*color: #f94600;*/
+	font-size: 16px;
+	font-family: "微软雅黑";
+	-webkit-transition-property: bottom;
+	-webkit-transition-duration: 0.5s;
+}
+
+.c_div_nr {
+	margin: 20px;
+}
+
+#gznr {
+	width: 100%;
+	border: 1px solid #ddd;
+	height: 150px;
+	color: #737373;
+	border-radius: 4px;
+}
+
+.div_submit {
+	width: 80%;
+	height: 35px;
+	line-height: 35px;
+	margin: 15px auto 0px auto;
+	-webkit-border-radius: 4px;
+	background-color: #E41213;
+	font-family: 微软雅黑;
+	color: white;
+	font-size: 18px; //
+	font-weight: bold;
+	text-align: center;
+}
+.order {
+	height: 60px;
+	line-height: 60px !important;
+	text-align: center;
+	width:100% !important;
+}
+
+.order .line {
+	display: inline-block;
+	width: 100%
+	border-top: 1px solid #c90404;
+}
+
+.order .txt {
+	color: #c90404;
+	vertical-align: middle;
+	margin: 0 auto;
+    display: block;
+}
+/*form表单区域css*/
+.c_form_show1>div{
+	border-bottom: 1px solid #eaeaea;
+	display: -webkit-box;
+	-webkit-box-align: center;
+	color: #151515;
+	min-height: 50px;
+}
+</style>
+</head>
+<body>
+	<div id="toolbar">
+		<span id="btn_bak" class="btn_bak"></span>
+		<h1 class="toolbar_title">我的信息</h1>
+		<span id="btn_msg" class="btn_toolbar_font"
+			style="font-size: 16px;color: #FFFFFF;"  onclick="sys_goURL('correctInfo.html');">更正</span>
+	</div>
+
+	<div id="sys_innerscoll">
+		<div>
+			
+				<input type="hidden" name="guid" id="guid" />
+				<div class="c_form_show1" id="jbxx">
+					<div>
+						<div class="form_cell_label">姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：</div>
+						<div class="form_cell_item">
+							<div id="xm"></div>
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别：</div>
+						<div class="form_cell_item">
+							<div id="sex"></div>
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">民&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;族：</div>
+						<div class="form_cell_item">
+							<div id="mz"></div>
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">籍&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;贯：</div>
+						<div class="form_cell_item">
+							<span id="jg"></span>
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">出生日期：</div>
+						<div class="form_cell_item">
+							<span id="birthday"></span>
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;龄：</div>
+						<div class="form_cell_item">
+							<div id="age"></div>
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">文化程度：</div>
+						<div class="form_cell_item">
+							<div id="xl"></div>
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">政治面貌：</div>
+						<div class="form_cell_item">
+							<div id="zzmm"></div>
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">家庭住址：</div>
+						<div class="form_cell_item">
+							<div id="home"></div>
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">常住地址：</div>
+						<div class="form_cell_item">
+							<div id="address"></div>
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">固定电话：</div>
+						<div class="form_cell_item">
+							<div id="phone1"></div>
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">手机号码：</div>
+						<div class="form_cell_item">
+							<div id="sj"></div>
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">婚姻状况：</div>
+						<div class="form_cell_item">
+							<div id="marriage"></div>
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">合同医院：</div>
+						<div class="form_cell_item">
+							<div id="assignedhospital"></div>
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">就近医院：</div>
+						<div class="form_cell_item">
+							<div id="nearhospital"></div>
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">医疗照顾：</div>
+						<div class="form_cell_item">
+							<div id="medical_care"></div>
+						</div>
+					</div>
+				</div>
+		
+		</div>
+	</div>
+	<div class='div_lyfk' id="div_lyfk" style="display: none">
+		<div class='c_div_nr'>
+			<textarea id='gznr' name='gznr' placeholder='请输入需要更正的信息'></textarea>
+		</div>
+		<div class='div_submit' onclick='submit_msg()'>提 交</div>
+	</div>
+</body>
+</html>

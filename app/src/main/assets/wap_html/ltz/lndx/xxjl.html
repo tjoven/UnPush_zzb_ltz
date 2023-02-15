@@ -1,0 +1,228 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+    <title>学习交流</title>
+    <link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/list.css" />
+    <script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+    <script type="text/javascript" src="../../js/ict.js"></script>
+    <script type="text/javascript" src="../../js/local.js"></script>
+    <script type="text/javascript" src="../../js/list.js"></script>
+    <script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+    <script type="text/javascript">
+        sys_addMeun = true;
+        var list = {};
+        var mbid = getQueryStringRegExp("guid");
+        var yhid = window.localStorage.getItem("yhid");
+        var cx_bmid = window.localStorage.getItem("bmid");
+        var server_url =  window.location.protocol + "//" + window.location.host + "/";
+        // slider控件
+        var slider;
+        // slider末位置
+        var lastLoacl;
+        // slider上次滑动位置（初始为0）
+        var slideIndex = getQueryStringRegExp("slideIndex");
+        if (slideIndex == null || slideIndex == '') {
+            slideIndex = "0"
+        }
+        $(function() {
+            //生成toolbar
+            $('#toolbar').toolbar();
+            $("#toolbar h1").text("我的大学");
+
+            sys_renderList('table_list', '/ltz/lndx/default.do?method=getXxjlList&page_size=10&&page_goto=', {server_url:server_url}, list);
+
+            //跳转新增页
+            $("#btn_add").click(function(){
+                sys_goURL("xxjlAdd.html");
+            });
+
+
+            // 刷新时选中刷新前选中的tab页
+            $(".c_tabs_text").eq(2).addClass("c_tabs_active");
+            // 创建slider
+            slider = new TouchSlider('div_tabs', {
+                auto : false,
+                align : 'left',
+                mousewheel : false,
+                mouse : true,
+                fullsize : false,
+                after : doSlideAfter
+            });
+            // 设定slider展示宽度为页面宽度
+            var clientWidth = document.body.clientWidth;
+            $(".div_tabs").css("width", clientWidth + "px");
+            $(".slideritem").css("width", (clientWidth / 4) + "px");
+            // 取得slider末index
+            lastLoacl = slider.length - 2;
+            // slider滑动到上次滑动位置
+            slider.slide(parseInt(slideIndex), 0);
+        });
+
+        // tab左右滑动后记录滑动位置(末屏未填满时滚动填满)
+        function doSlideAfter(newIndex, newSlide) {
+            slideIndex = newIndex;
+            if (lastLoacl <= 0) {
+                slider.slide(0);
+                slideIndex = 0;
+            } else if (newIndex > lastLoacl && lastLoacl > 0) {
+                slider.slide(lastLoacl);
+                slideIndex = lastLoacl;
+            }
+        }
+        function getNm(num){
+            if(num==0){
+                sys_goURL("kcxx.html");
+            }else if (num == 1){
+                sys_goURL("kcap.html");
+            } else if (num == 2) {
+                sys_goURL("xxjl.html");
+            } else if (num == 3) {
+                sys_goURL("fczs.html");
+            }
+        }
+        function callback_trclick_table_list(param) {
+            //alert(param);
+            // sys_goURL("jlhf.html?guid="+param);
+            //显示明细
+            sys_showDetail("/ltz/lndx/jlhf.html?guid="+param);
+        }
+        function go_back() {
+            sys_goURL("../../main.html");
+        }
+        function goGjkfdx(param) {
+            if(isAndriod){
+                window.webview.loadurl_new(param);
+            }else if(isIphone){
+                window.location.href='obj-c://outside//'+param;
+            }else{
+                var iTop = (window.screen.availHeight - 30 - 365) / 2;
+                var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+                window.open(param, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+            }
+            return;
+        }
+    </script>
+
+    <style type="text/css">
+        .ui-toolbar-wrap {
+            border: none !important;
+        }
+
+        li {
+            list-style-type: none;
+        }
+
+        .c_tabs {
+            height: 40px;
+            width: 100%;
+            background-color: white !important;
+            display: block;
+            border-bottom: #dddddd solid 1px
+        }
+
+        .c_tabs>div {
+            -webkit-box-flex: 1;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            font-size: 15px;
+            font-family: "微软雅黑";
+            /* display:none; */
+            color: #4B5052;
+        }
+
+        .c_tabs_active {
+            color: #FF4854;
+            border-bottom: 2px solid #FF4854;
+            height: 39px !important;
+        }
+
+        .c_tabs_text {
+            display: inline-block;
+        }
+
+        .swipe {
+            /* margin-bottom:20px; */
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            width: 337px;
+        }
+
+        .swipe div {
+            overflow: hidden;
+        }
+        #div_tabs{
+            width: 100% !important;
+            left: 0 !important;
+        }
+        .add{
+            width:50px;
+            height: 50px;
+            background:url("../../img/jiahao.png") no-repeat;
+            background-position: center center;
+            background-size: 28px 28px;
+            border: 0px !important;
+        }
+    </style>
+
+</head>
+<body>
+<div id="toolbar">
+    <i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+    <h1 class="toolbar_title">我的大学</h1>
+    <span class="add" id="btn_add"></span>
+</div>
+
+<div class="c_tabs div_other_40" id="div_tabs" >
+    <div class="slideritem" id="div_list1"
+         style="display: block; width:150px;">
+        <div class="c_tabs_text" onclick="getNm(0)">课程报名</div>
+    </div>
+    <div class="slideritem" id="div_list2"
+         style="display: block; width:150px;">
+        <div class="c_tabs_text" onclick="getNm(1)">课程安排</div>
+    </div>
+    <div class="slideritem" id="div_list3"
+         style="display: block; width:150px;">
+        <div class="c_tabs_text" onclick="getNm(2)">学习交流</div>
+    </div>
+    <div class="slideritem" id="div_list4"
+         style="display: block; width:150px;">
+        <div class="c_tabs_text" onclick="getNm(3)">风采展示</div>
+    </div>
+</div>
+<div class="ui-refresh" id="div_table_list">
+
+    <ul class="data-list" id="table_list" style="list-style-type:none">
+        <li style="display: none;">
+            <div style="display: none;">{guid}</div> <!-- 点击行的参数 -->
+            <div class="list_row_con"
+                 style="height:75px;background-color: #ffffff;">
+                <!-- <div class="list_row_slt" style="margin-top:7px;margin-left: 3px;">
+                    <img src="{slt}" style="height: 75px;width:100px" />
+                </div> -->
+                <div class="list_row_col2" style="margin-top:8px;margin-left:18px;">
+                    <div class="list_row_col2_1 overflow">{theme}</div>
+                    <div class="list_row_col2_2" style="top:4px;clear:none;width: 100%;float: left;">
+                        <span style="right: 5px;float: left;">{fbr}</span>
+                        <span style="float: right;margin-right: 5%;">{cjsj}</span>
+                    </div>
+                </div>
+                <div class="list_row_col3"></div>
+            </div>
+        </li>
+    </ul>
+    <div class="ui-refresh-down"></div>
+</div>
+<div style="background-color:#fff;height:50px;position:fixed;bottom:52px;left:0px;width:100%;text-align: center" class="div_other_40" onclick="goGjkfdx('http://lndx.fanya.chaoxing.com/portal')">
+    <img alt="" src="../../img/gjkfdx.png" height="40px;" style="margin-top:5px;">
+</div>
+
+</body>
+</html>

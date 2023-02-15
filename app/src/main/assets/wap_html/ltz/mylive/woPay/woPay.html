@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>沃支付</title>
+<link rel="stylesheet" type="text/css" href="../../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+
+<script type="text/javascript" src="../../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../../js/ict.js"></script>
+<script type="text/javascript" src="../../../js/local.js"></script>
+<script type="text/javascript" src="../../../js/list.js"></script>
+<script type="text/javascript">
+  
+	var url = "/woPay.do?method=wapGetToken&reBind=0"
+	$(function() {
+		//生成toolbar
+		loading();
+		 if (isAndriod) { //打包时需要放开
+			var payYhid = window.webview.getYhid();
+			getYhid(payYhid);
+		} else if (isIphone) {
+			window.location.href = "obj-c://getyhid";
+		} else{
+			 getYhid("");
+		}
+		
+	});
+
+	function getYhid(payYhid) {
+		url += "&payYhid=" + payYhid;
+		sys_ajaxGet(url,"", function(data) {
+				if (data.result == true) {
+						$("#param").val(data.param);
+						$("#woCheckUser").submit();
+					}
+			});
+	}
+
+	function go_back() {
+		sys_goURL("../main.html");
+	}
+
+	function loading() {
+		var defaults = {
+			opacity : 1,
+			//loading页面透明度
+			backgroundColor : "#fff",
+			//loading页面背景色
+			borderColor : "#bbb",
+			//提示边框颜色
+			borderWidth : 1,
+			//提示边框宽度
+			borderStyle : "solid",
+			//提示边框样式
+			loadingTips : "正在加载沃支付页面。。。",
+			//提示文本
+			TipsColor : "#666",
+			//提示颜色
+			delayTime : 1000,
+			//页面加载完成后，加载页面渐出速度
+			zindex : 999,
+			//loading页面层次
+			sleep : 0
+			//设置挂起,等于0时则无需挂起
+
+		}
+		var options = $.extend(defaults, options);
+
+		//获取页面宽高
+		var _PageHeight = document.documentElement.clientHeight,
+			_PageWidth = document.documentElement.clientWidth;
+
+		//在页面未加载完毕之前显示的loading Html自定义内容
+		var _LoadingHtml = '<div id="loadingPage" style="top:70px;position:fixed;left:0;_position: absolute;width:100%;height:' + _PageHeight / 2 + 'px;opacity:' + options.opacity + ';filter:alpha(opacity=' + options.opacity * 100 + ');z-index:' + options.zindex + ';"><div id="loadingTips" style="position: absolute; cursor1: wait; width: auto;border-color:' + options.borderColor + ';border-style:' + options.borderStyle + ';border-width:' + options.borderWidth + 'px; height:80px; line-height:80px; padding-left:80px; padding-right: 5px;border-radius:10px;  background: ' + options.backgroundColor + ' url(../img/loading.gif) no-repeat 5px center; color:' + options.TipsColor + ';font-size:18px;">' + options.loadingTips + '</div></div>';
+
+		//呈现loading效果
+		$("body").append(_LoadingHtml);
+
+		//获取loading提示框宽高
+		var _LoadingTipsH = document.getElementById("loadingTips").clientHeight,
+			_LoadingTipsW = document.getElementById("loadingTips").clientWidth;
+
+		//计算距离，让loading提示框保持在屏幕上下左右居中
+		var _LoadingTop = _PageHeight > _LoadingTipsH ? (_PageHeight - _LoadingTipsH) / 2 : 0,
+			_LoadingLeft = _PageWidth > _LoadingTipsW ? (_PageWidth - _LoadingTipsW) / 2 : 0;
+
+		$("#loadingTips").css({
+			"left" : _LoadingLeft + "px",
+			"top" : _LoadingTop - 70 + "px"
+		});
+
+	}
+</script>
+
+<style type="text/css">
+.ui-toolbar-wrap { //
+	background-color: #FFB73E;
+	border: none !important;
+}
+</style>
+</head>
+<body>
+
+	<div class="ui-refresh" id="div_table_list"
+		style="background: white !important;">
+		<form id="woCheckUser" style="display: none;"
+			action="http://123.125.97.94:8301/comwfrontdj/control/userLogin/getToken"
+			method="post" target="_self">
+			<input type="text" name="param" id="param">
+		</form>
+	</div>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>晚枫苑</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript">
+	var list = {};
+	var lb_dm = getQueryStringRegExp("lb_dm");
+	var issn = getQueryStringRegExp("issn");
+	var title = getQueryStringRegExp("title");
+	var time = getQueryStringRegExp("time");
+	sys_addMeun = true;
+	$(function() {
+
+		$('#toolbar').toolbar();
+        $("#title").html(title);
+        $("#time").html(time);
+		if (lb_dm == "01") {
+			$("#title_h1").html("晚枫苑");
+			document.getElementById("myImg").src = "img/wfyt.png";
+		} else if (lb_dm == "02") {
+			$("#title_h1").html("学习参考");
+			document.getElementById("myImg").src = "img/xxckt.png";
+		}
+		sys_renderList('table_list', '/ltz/wfy/default.do?method=waplist&page_size=20&page_goto=', {lb_dm:lb_dm,issn:issn}, list);
+
+		$('#btn_search').click(function() {
+			search();
+		});
+	});
+	function callback_trclick_table_list(param) {
+		sys_showDetail("/ltz/publication/show.html?guid=" + param+"&lb_dm=" + lb_dm + "&issn="+issn);
+	}
+	function go_back() {
+		sys_goURL("issnList.html?lb_dm="+lb_dm);
+	}
+
+</script>
+
+<style type="text/css">
+.ui-toolbar-wrap {
+	border: none !important;
+}
+
+.search {
+	width: 590px;
+	height: 50px;
+	background: url("../img/search.png") no-repeat;
+	background-size: 28px 28px;
+	border: 0px !important;
+	position: absolute;
+	margin-left: 86%;
+	margin-top: -44px;
+}
+
+.add {
+	width: 50px;
+	height: 50px;
+	background: url("../img/jiahao.png") no-repeat;
+	background-position: center center;
+	background-size: 28px 28px;
+	border: 0px !important;
+	margin-top: 20px;
+}
+.data-list li {
+    border-bottom: 0px solid #e7e7e7;
+}
+	#title{
+		font-size: 25px;
+		padding: 18px;
+		font-weight: bold;
+	}
+	#time{
+		padding-left: 18px;
+		color: #b1b1b1;
+	}
+</style>
+</head>
+<body>
+	<div id="toolbar">
+		<span class="btn_bak" onclick="go_back();"></span>
+		<h1 class="toolbar_title" id="title_h1"></h1>
+	</div>
+	<div class="div_other_50" style="width: 100%; height: 64px;">
+		<img id="myImg" src="" width="100%;">
+	</div>
+	<div class="ui-refresh " id="div_table_list" style="background: white !important;">
+		<h1 id="title"></h1>
+		<h3 id="time"></h3>
+		<hr style="    border-color: #ffffff;" />
+		<h2 style="text-align: center;font-size: 22px;padding: 5px;">目录</h2>
+		<ul class="data-list" id="table_list">
+			<li style="display: none;height:45px;">
+				<div style="display: none;">{guid}</div>
+				<div class="list_row_con" style="height:45px;min-height:35px;display: table-cell;vertical-align: middle;">
+					<div class="list_row_col2" style="margin-top:10px;margin-left:8px;">
+						<div class="list_row_col2_1"
+							style="font-size:16px;text-align: left;margin-left:10px;margin-right:10px;">{title} &nbsp;&nbsp;&nbsp;{author}</div>
+					</div>
+				</div>
+			</li>
+		</ul>
+		<div class="ui-refresh-down"></div>
+	</div>
+
+
+</body>
+</html>

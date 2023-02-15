@@ -1,0 +1,1861 @@
+<!doctype html>
+<html>
+<head>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+<title>个人聊天</title>
+	<link rel="stylesheet" type="text/css" href="../../css/mui.min.css" />
+<link rel="stylesheet" type="text/css" href="css/oa.css" />
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="./css/chat.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="js/touch.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="js/custom.js"></script>
+<script type="text/javascript" src="js/datadumper.js"></script>
+<script type="text/javascript" src="./js/getPath.js"></script>
+
+
+<link rel="stylesheet" type="text/css" href="./css/scrollbar.css">
+<script type="application/javascript" src="./js/iscroll.js"></script>
+<script type="application/javascript" src="./js/reconnecting-websocket_1.0.0_reconnecting-websocket.js"></script>
+	<!--标准mui.css-->
+	<link rel="stylesheet" href="../../css/mui.jstx.css">
+	<link rel="stylesheet" href="css/mul.main.css">
+<style type="text/css">
+	body{
+		background-color: #F2F1F6;
+	}
+	.box{
+		position: fixed;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        z-index:3000;
+        display: none;
+        top: 0;
+	}
+	.file{
+		position: fixed;
+        width: 100%;
+        height: 100%;
+        background-color: #fff;
+        z-index:3000;
+        display: none;
+        top: 0;
+		overflow-y: auto;
+	}
+   	.inputBox{
+   		-webkit-box-flex:3;
+   		background-color:#FFF;
+   		margin-left: 6px;
+   		min-height: 33px;
+   	}
+   	.gundong{
+   		height: 200;
+   		overflow-y:auto;
+   		bottom: 0;
+   		display: none;
+   		background-color: #fff;
+   		position:relative;
+   	}
+   	.phiz{
+   		height: auto;
+   		bottom: 0;
+   		background-color: #fff;
+   	}
+   	.recording{
+   		height: 150px;
+   		bottom: 0;
+   		display: none;
+   		background-color: #fff;
+   	}
+   	/* .chatContent{
+   		overflow-y: auto;
+   		min-height: 30px;
+   	} */
+   	.sendPortion{
+   		width:100%;
+   		position:fixed;
+   		bottom:0px;
+   	}
+   	.sendButton{
+   		height:33px;
+        background-color:#14B6F7;
+   		width:70px;
+   		bottom: 2px;
+   		left: 6px;
+        color:white;
+        text-align:center;
+        line-height: 33px;
+   	}
+   	.img{
+   		-webkit-box-flex:1;
+   		width: 1px;
+   		text-align: center;
+   		padding-top: 3px;
+   	}
+   	.rightChatBox{
+   		margin-top:5px;
+   		float:right;
+		width:0px;
+		height:0;
+		border-top:8px solid #F2F1F6;
+		border-right:8px solid #F2F1F6;
+		border-bottom:8px solid #F2F1F6;
+		border-left:8px solid #A6D4F2;
+	}
+	.leftChatBox{
+   		margin-top:5px;
+   		float:left;
+		width:0px;
+		height:0;
+		border-top:8px solid #F2F1F6;
+		border-right:8px solid #fff;
+		border-bottom:8px solid #F2F1F6;
+		border-left:8px solid #F2F1F6;
+	}
+	
+	.copydivleft{
+		position:absolute;
+		margin-top:-40px;
+		background-color:#222222;
+		height:35px;
+		border-radius:5px;
+		text-align:center;
+		line-height:35px;
+		overflow:hidden; 
+		left:60px;
+		
+	}
+	
+	.copydivright{
+		position:absolute;
+		margin-top:-40px;
+		background-color:#222222;
+		height:35px;
+		border-radius:5px;
+		text-align:center;
+		line-height:35px;
+		overflow:hidden; 
+		right:60px;
+		
+	}
+	
+	.line{
+		float:left;
+	 	height: 35px;
+    	width: 1px;
+    	background: white;
+    	margin-left:50px;
+    	position:absolute;
+    	margin-top:-35px;
+    	}
+    	    		.line2{
+		float:left;
+	 	height: 35px;
+    	width: 1px;
+    	background: white;
+    	margin-left:100px;
+    	position:absolute;
+    	margin-top:-35px;
+    	}
+    	.ui-toolbar-button{
+    		border:none;
+    	}
+ 
+
+.ui-toolbar-wrap { //
+	background-color: #D58900;
+	border: none !important;
+}
+
+.content_top{
+	margin-top:13px;
+}
+#imgzoom{
+	width: auto;height: 80px;
+}
+</style>
+<script type="text/javascript">
+	sys_addMeun = false;
+	var backTarget = getQueryStringRegExp("backTarget");
+	var senderId = getQueryStringRegExp("yhid");
+	var sender_photo = "";
+	var senderName = "";
+	var receiverId = getQueryStringRegExp("guid");
+	var receiverName = "";
+	var guid = getQueryStringRegExp("guid");
+	var myScroll, pullDownEl, pullDownOffset;
+	var from = getQueryStringRegExp("from");
+	var py = getQueryStringRegExp("py");
+    var gundong_from=null;
+    var curid=window.localStorage.getItem("yhid");
+	$(function(){
+	
+		//sys_ajaxPost("/jstx/default.do?method=updateReadStatus&senderId="+senderId+"&receiverId="+receiverId+"&groupMessageSenderId=0&yhid="+curid,function(json){
+			
+		//});
+		
+		sys_ajaxPost("/jstx/default.do?method=getUsername&senderId="+senderId+
+				"&receiverId="+receiverId,function(json){
+			senderName = json.senderName;
+			receiverName = json.receiverName;
+			sender_photo = json.sender_photo;
+			$(".chat_name").html(receiverName);
+		});
+		//生成toolbar
+	  	$('#toolbar').toolbar({
+	        fixed : true
+	    });
+		//设置内滚动
+	  	$("#chatBox").height(window.innerHeight - 130);
+	  	recordHeight = window.innerHeight;
+	  	my_chooseUploadFile_callback();
+	  	$("#inputBox").html(window.localStorage.getItem("chatContent"));
+	});
+	
+	//返回上一步
+	function goback(){
+        if(from=="listtochat"){
+            sys_goURL("lxr.html");
+        }else if(from=="messagetochat"){
+            sys_goURL("message.html");
+        }else if(from.indexOf("search")>0 || from=="openwin" || from == "show_ios"){
+            sys_goURL("../address/show.html?guid=" + guid +"&bzxx=chat&from="+from+"&py="+getQueryStringRegExp("py"));
+        }else if(from == "searchgroup"){
+			sys_goURL("searchgroup.html?py="+py+"&from=message");
+		}else{
+            sys_goURL("lxr.html");
+        }
+	}
+	
+	var is_mui_opened = false;
+	function close_mui(){
+		if(is_mui_opened){
+			mui.previewImage().close();
+			is_mui_opened = false;
+		}else{
+			window.history.go(-1);
+		}
+	}
+	
+	//页面中，点击显示图标后的innerHeight
+	var recordHeight = null;
+	//生成图片选择窗口
+	function showPhiz(ob){
+		if(undefined != ob && null == recordHeight){
+			$("#chatBox").css("max-height",recordHeight);
+		}
+		if($("#phiz > img").length == 0){
+			var string = "";
+			for(var i = 1 ; i <= 60;i++){
+				string += "<img src='./image/"+i+".gif' style='padding:7px 7px;' onclick='showImg(this);'>";
+			}
+			$("#phiz").append(string);
+		}else{
+			if($("#gundong").css("display") == "none"){
+				if($("#recording").css("display") != "none"){
+					$("#recording").hide();
+				}
+				$("#gundong").show();
+				$("#chatBox").height(recordHeight - 350);
+				$("#gundong").animate({right: "0px"}, "slow");
+			}else{
+				$("#gundong").hide();
+				$("#chatBox").height(recordHeight - 142);
+			}
+		}
+		myScroll.refresh();
+		if($("#chatContent").height() >= $("#chatBox").height()){
+			myScroll.scrollToElement("#chatContent > div:last-child", 500);
+		}
+        //设置内滚动
+        if(gundong_from!=null){
+            gundong_from.refresh();
+        }else{
+            $("#gundong").height(200);
+            gundong_from = new iScroll("gundong",{click:false});
+            sys_autoTextarea(gundong_from);
+        }
+	};
+	
+	//将聊天表情添加到信息发送窗口
+	function showImg(ob){
+		var src = "./"+ob.src.substring(ob.src.indexOf("image"));
+		var before = $("#inputBox");
+		before.append("<img src="+src+"></img>");
+	};
+	
+	//将复制的聊天表情添加到信息发送窗口
+	function copyImg(url){
+		var before = $("#inputBox");
+		before.append("<img src="+url+"></img>");
+	};
+	//输入框获取焦点，显示键盘，改变聊天框高度
+	function showKeyboard(){
+        if(isIphone){
+            if($("#gundong").css("display") != "none"){
+                $("#gundong").hide();
+            }
+            if($("#recording").css("display") != "none"){
+                $("#recording").hide();
+            }
+            $("#chatBox").height(recordHeight - 130);
+            
+        }else{
+            if($("#gundong").css("display") != "none"){
+                $("#gundong").hide();
+            }
+            if($("#recording").css("display") != "none"){
+                $("#recording").hide();
+            }
+            $("#chatBox").height(recordHeight - 400);
+        }
+		
+		myScroll.refresh();
+		myScroll.scrollToElement("#chatContent > div:last-child", 500);
+	}
+	
+	//隐藏下方显示的，自己写的功能
+	function hideShow(){
+		var divs = document.getElementsByName("copydiv");
+		for(var i=0; i<divs.length; i++)
+		{
+			divs[i].style.display='none';
+		}
+		
+		if($("#gundong").css("display") != "none"){
+			$("#gundong").hide();
+		}
+		if($("#recording").css("display") != "none"){
+			$("#recording").hide();
+		}
+		$("#chatBox").height(recordHeight - 130);
+    if(isIphone){
+        //点击聊天区域后，关闭键盘，但添加后，影响语音功能
+        //window.location.href='obj-c://closercord';
+    }else if(isAndriod){
+    	window.webview.closeRcord();
+    }
+    myScroll.refresh();
+	}
+
+	/**
+	 * 下拉刷新 （自定义实现此方法）
+	 * myScroll.refresh();		// 数据加载完成后，调用界面更新方法
+	 */
+	function pullDownAction() {
+		
+		setTimeout(function() { // <-- Simulate network congestion, remove setTimeout from production!
+			var temp = $("#chatContent > div:first-child").text();
+			var str_before = temp.split('-')[0];  
+		    var str_after = temp.split('-')[1]; 
+		    var str_end = temp.split('-')[2]; 
+			var aa=(str_before.substring(str_before.length-4));
+			var bb=(str_after);
+			var cc = (str_end.substring(0,11));
+			var sendTime = aa+'-'+bb+'-'+cc;
+			
+			sys_ajaxPost("/jstx/default.do?method=loadRecord&senderId="+senderId+"&receiverId="+receiverId+"&sendTime="+sendTime,function(json){
+				if(json.length > 0){
+					for (var i = 0; i < json.length; i++) {
+						
+						json[i].send_content = changeToHref(json[i].send_content);
+						
+						if(senderId == json[i].sender_id){
+							if(json[i].guid!=null && json[i].guid!=undefined)
+							{
+								if((json[i].send_content).indexOf("img src=")>0 && (json[i].send_content).indexOf("showRealImage")>0)
+								{
+									var sendcontent = (json[i].send_content).split("'")[1];
+									$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' src='"+sys_ctxStr()+json[i].sender_photo+"?size=150*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + rightTitle +  "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + rightContent+"<div id="+json[i].guid+" ontouchstart='copytouchstart(\""+json[i].guid+"\",\""+sendcontent+"\",\"rightflag\",\"pictrue\")'  ontouchend='copytouchend(\""+json[i].guid+"\",\""+sendcontent+"\",\"rightflag\",\"pictrue\")' style='float:right;background-color:none;border-radius:5px;padding:2px 2px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + json[i].send_content + "</div></div></div><div style='clear:both;'></div>");
+								}else if((json[i].send_content).indexOf("downloadFile")>0 && (json[i].send_content).indexOf("http")>0)
+								{
+									var url = (json[i].send_content).split("\"")[1];
+									var filename = (json[i].send_content).split("\"")[3];
+									$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' src='"+sys_ctxStr()+json[i].sender_photo+"?size=150*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + rightTitle +  "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + rightContent+"<div onselectstart='return false' id="+json[i].guid+" ontouchstart='copytouchstart(\""+json[i].guid+"\",\""+url+"\",\"rightflag\",\"filetype\",\""+filename+"\")'  ontouchend='copytouchend(\""+json[i].guid+"\",\""+url+"\",\"rightflag\",\"filetype\",\""+filename+"\")' style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + json[i].send_content + "</div></div></div><div style='clear:both;'></div>");
+								}else if((json[i].send_content).indexOf("img src=")>0 &&(json[i].send_content).indexOf("image")>0&&(json[i].send_content).indexOf("gif")>0)
+					    		{
+					    			var contentstr =  (json[i].send_content).replace(/\<.*?\>/g,'');
+					    			if(contentstr!=null && !""==contentstr)
+					    			{
+					    				$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' src='"+sys_ctxStr()+json[i].sender_photo+"?size=150*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + rightTitle +  "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + rightContent+"<div id="+json[i].guid+" ontouchstart='copytouchstart(\""+json[i].guid+"\",\""+contentstr+"\",\"rightflag\")'  ontouchend='copytouchend(\""+json[i].guid+"\",\""+contentstr+"\",\"rightflag\")' style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + json[i].send_content + "</div></div></div><div style='clear:both;'></div>");
+					    			}else{
+					    				$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' src='"+sys_ctxStr()+json[i].sender_photo+"?size=150*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + rightTitle +  "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + rightContent+"<div id="+json[i].guid+" style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + json[i].send_content + "</div></div></div><div style='clear:both;'></div>");
+					    			}
+					    			
+					    		}else if((json[i].send_content).indexOf("onclick='playRecording(")>0 &&(json[i].send_content).indexOf("sound.png")>0){
+									$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px'  id=\""+json[i].sender_id+"\" src='"+sys_ctxStr()+json[i].sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + rightTitle + json[i].sender_name + "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + rightContent+"<div id="+json[i].guid+" ontouchstart='copytouchstart(\""+json[i].guid+"\",\"\",\"rightflag\",\"recording\")'  ontouchend='copytouchend(\""+json[i].guid+"\",\"\",\"rightflag\",\"recording\")'   style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + json[i].send_content + "</div></div></div><div style='clear:both;'></div>");
+								}else{
+									$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' src='"+sys_ctxStr()+json[i].sender_photo+"?size=150*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + rightTitle +  "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + rightContent+"<div id="+json[i].guid+" ontouchstart='copytouchstart(\""+json[i].guid+"\",\""+json[i].send_content+"\",\"rightflag\")'  ontouchend='copytouchend(\""+json[i].guid+"\",\""+json[i].send_content+"\",\"rightflag\")' style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + json[i].send_content + "</div></div></div><div style='clear:both;'></div>");
+								}
+								
+							}else{
+								json[i].send_content = json[i].send_content.replace('./image/leftSound.png','./image/sound.png');
+								$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' src='"+sys_ctxStr()+json[i].sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + rightTitle +  "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + rightContent +"<div style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>"+ json[i].send_content + "</div></div></div><div style='clear:both;'></div>");
+							}
+						    
+						}else{
+							if(json[i].guid!=null && json[i].guid!=undefined){
+								if((json[i].send_content).indexOf("img src=")>0 && (json[i].send_content).indexOf("showRealImage")>0)
+								{
+									var sendcontent = (json[i].send_content).split("'")[1];
+									$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:10px'><div style='float:left;width:10%;'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json[i].sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + leftTitle + "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + leftContent +"<div id="+json[i].guid+" ontouchstart='copytouchstart(\""+json[i].guid+"\",\""+sendcontent+"\",\"leftflag\",\"pictrue\")'  ontouchend='copytouchend(\""+json[i].guid+"\",\""+sendcontent+"\",\"leftflag\",\"pictrue\")'  style='float:left;margin-right:-2px;background-color:none;border-radius:5px;padding:2px 2px;max-width:70%;word-wrap:break-word;font-size:19px;'>"+ json[i].send_content.replace("float:right","").replace("70%","100%") + "</div></div></div><div style='clear:both;'></div>");
+								}else if((json[i].send_content).indexOf("downloadFile")>0 && (json[i].send_content).indexOf("http")>0)
+								{
+									var url = (json[i].send_content).split("\"")[1];
+									var filename = (json[i].send_content).split("\"")[3];
+									$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:10px'><div style='float:left;width:10%;'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json[i].sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + leftTitle + "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + leftContent +"<div onselectstart='return false' id="+json[i].guid+" ontouchstart='copytouchstart(\""+json[i].guid+"\",\""+url+"\",\"leftflag\",\"filetype\",\""+filename+"\")'  ontouchend='copytouchend(\""+json[i].guid+"\",\""+url+"\",\"leftflag\",\"filetype\",\""+filename+"\")'  style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>"+ json[i].send_content.replace("float:right","").replace("70%","100%") + "</div></div></div><div style='clear:both;'></div>");
+								}else if((json[i].send_content).indexOf("img src=")>0 &&(json[i].send_content).indexOf("image")>0&&(json[i].send_content).indexOf("gif")>0)
+					    		{
+					    			var contentstr =  (json[i].send_content).replace(/\<.*?\>/g,'');
+					    			if(contentstr!=null && !""==contentstr)
+					    			{
+					    				$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:10px'><div style='float:left;width:10%;'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json[i].sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + leftTitle + "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + leftContent +"<div id="+json[i].guid+" ontouchstart='copytouchstart(\""+json[i].guid+"\",\""+contentstr+"\",\"leftflag\")'  ontouchend='copytouchend(\""+json[i].guid+"\",\""+contentstr+"\",\"leftflag\")'  style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>"+ json[i].send_content.replace("float:right","").replace("70%","100%") + "</div></div></div><div style='clear:both;'></div>");
+					    			}else{
+					    				$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:10px'><div style='float:left;width:10%;'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json[i].sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + leftTitle + "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + leftContent +"<div id="+json[i].guid+"   style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>"+ json[i].send_content.replace("float:right","").replace("70%","100%") + "</div></div></div><div style='clear:both;'></div>");
+					    			}
+					    			
+					    		}else if((json[i].send_content).indexOf("playRecording")>0) {
+					    			json[i].send_content = json[i].send_content.replace('./image/sound.png','./image/leftSound.png');
+					    			if(json[i].ext_two=='1')
+					    			{
+					    				$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:10px'><div style='float:left;width:10%;'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json[i].sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + leftTitle + "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + leftContent +"<div style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>"+ json[i].send_content.replace("float:right","").replace("70%","100%") + "</div></div></div><div style='clear:both;'></div>");
+					    			}else{
+					    				var idstr = (json[i].send_content).split(',')[0];
+						    			var one = idstr.lastIndexOf("/");
+						    			var ids = idstr.substring(one+1,idstr.length-1);
+						    			var id = ids.split('.')[0];
+					    				$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:10px'><div style='float:left;width:10%;'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json[i].sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + leftTitle + "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + leftContent +"<div style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>"+ json[i].send_content.replace("float:right","").replace("70%","100%") + "</div><div id = '"+id+"' style='margin-left:125px;margin-top:8px'><img src='image/tips.png'/></div></div></div><div style='clear:both;'></div>");
+					    			}
+					    			
+					    		}else{
+									$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:10px'><div style='float:left;width:10%;'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json[i].sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + leftTitle + "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + leftContent +"<div id="+json[i].guid+" ontouchstart='copytouchstart(\""+json[i].guid+"\",\""+json[i].send_content+"\",\"leftflag\")'  ontouchend='copytouchend(\""+json[i].guid+"\",\""+json[i].send_content+"\",\"leftflag\")'  style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>"+ json[i].send_content.replace("float:right","").replace("70%","100%") + "</div></div></div><div style='clear:both;'></div>");
+								}
+								
+							}else{
+								json[i].send_content = json[i].send_content.replace('./image/sound.png','./image/leftSound.png');
+								
+								if((json[i].send_content).indexOf("playRecording")>0)
+					    		{
+					    			if(json[i].ext_two=='1')
+					    			{
+					    				$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:10px'><div style='float:left;width:10%;'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json[i].sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + leftTitle + "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + leftContent +"<div style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>"+ json[i].send_content.replace("float:right","").replace("70%","100%") + "</div></div></div><div style='clear:both;'></div>");
+					    			}else{
+					    				var idstr = (json[i].send_content).split(',')[0];
+						    			var one = idstr.lastIndexOf("/");
+						    			var ids = idstr.substring(one+1,idstr.length-1);
+						    			var id = ids.split('.')[0];
+					    				$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:10px'><div style='float:left;width:10%;'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json[i].sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + leftTitle + "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + leftContent +"<div style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>"+ json[i].send_content.replace("float:right","").replace("70%","100%") + "</div><div id = '"+id+"' style='margin-left:125px;margin-top:8px'><img src='image/tips.png'/></div></div></div><div style='clear:both;'></div>");
+					    			}
+					    			
+					    		}else{
+					    			$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:10px'><div style='float:left;width:10%;'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json[i].sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + leftTitle + "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + leftContent +"<div style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>"+ json[i].send_content.replace("float:right","").replace("70%","100%") + "</div></div></div><div style='clear:both;'></div>");
+					    		}
+								
+							}
+							
+						}
+						myScroll.refresh();
+					}
+				}
+			});
+			myScroll.refresh(); //数据加载完成后，调用界面更新方法   Remember to refresh when contents are loaded (ie: on ajax completion)
+		}, 100); // <-- Simulate network congestion, remove setTimeout from production!
+	}
+
+	/**
+	 * 初始化iScroll控件
+	 */
+	function loaded() {
+		pullDownEl = document.getElementById('pullDown');
+		pullDownOffset = pullDownEl.offsetHeight;
+		
+		myScroll = new iScroll(
+				'chatBox',
+				{
+					scrollbarClass : 'myScrollbar', /* 重要样式 */
+					useTransition : false, /* 此属性不知用意，本人从true改为false */
+					topOffset : pullDownOffset,
+					onRefresh : function() {
+						if (pullDownEl.className.match('loading')) {
+							pullDownEl.className = '';
+							pullDownEl.querySelector('.pullDownLabel').innerHTML = '下拉刷新...';
+						}
+					},
+					onScrollMove : function() {
+						if (this.y > 5 && !pullDownEl.className.match('flip')) {
+							pullDownEl.className = 'flip';
+							pullDownEl.querySelector('.pullDownLabel').innerHTML = '松手开始更新...';
+							this.minScrollY = 0;
+						} else if (this.y < 5 && pullDownEl.className.match('flip')) {
+							pullDownEl.className = '';
+							pullDownEl.querySelector('.pullDownLabel').innerHTML = '下拉刷新...';
+							this.minScrollY = -pullDownOffset;
+						}
+					},
+					onScrollEnd : function() {
+						if (pullDownEl.className.match('flip')) {
+							pullDownEl.className = 'loading';
+							pullDownAction();
+							pullDownEl.querySelector('.pullDownLabel').innerHTML = '加载中...';
+						}
+					}
+				});
+
+		setTimeout(function() {
+			document.getElementById('chatBox').style.left = '0';
+		}, 800);
+	}
+
+	//初始化绑定iScroll控件 
+	document.addEventListener('touchmove', function(e) {
+		e.preventDefault();
+	}, false);
+	document.addEventListener('DOMContentLoaded', loaded, false);
+	
+	
+	function imageHide(ob){
+		$(ob).hide();
+		$(ob).empty();
+	}
+	
+</script>    
+<style type="text/css">
+.child_page_title1
+{
+	float: left;
+/*     width: 100px; */
+    height: 65%;
+    color: white;
+    font-size: 16px;
+    text-align: center;
+    line-height: 25px;
+    margin-top: 15px;
+  	margin-left:15%;
+}
+
+.child_page_title2
+{
+    color: white;
+    font-size: 16px;
+    text-align: center;
+}
+</style>     
+</head>
+<body>
+	<div class="div_body">
+<!-- 		<div id="toolbar" class="blue_top"> -->
+<!-- 			<div class="button_multi" > -->
+<!-- 				<img src="img/ztjy/02_06.png" class="img_back_or_xj" onclick="goback()"></img> -->
+<!-- 			</div> -->
+<!-- 			<div class="child_page_title1">	 -->
+<!-- 				<h1 id="toolbar_text" style="font-size:18px"></h1> -->
+<!-- 			</div> -->
+			
+<!-- 		</div>	 -->
+<div id="toolbar">
+		<span class="btn_bak" onclick="goback();"></span>
+		<span class="chat_name btn_toolbar_font " style="font-size: 18px;" ></span>
+		<h1 class="toolbar_title"></h1>
+		
+		</div>	
+		<!-- 图片放大弹出层 -->
+		<div class="box" onclick="imageHide(this)">
+			
+		</div>
+		<!-- 图片放大弹出层 -->
+		<!-- <div class="file" onclick="$(this).hide()">
+			
+		</div> -->
+		<!-- 聊天信息显示区域 -->
+		<div id="chatBox" onclick="hideShow()">
+			<div id="scroller">
+				<div id="pullDown">
+					<span class="pullDownIcon"></span><span class="pullDownLabel">下拉刷新...</span>
+				</div>
+				<div id="chatContent">
+					
+				</div>
+			</div>
+		</div>
+		<!-- 聊天信息输入功能区 -->
+		<div class="sendPortion" style="background-color: #eceaea;padding-top: 2px;" id="sendPortion">
+			<div style="display:-webkit-box;" id="inputPortion">
+				<div style="-webkit-box-flex:3;width:1px;padding:3px;width:75%">
+					<div contenteditable="true" style="line-height:35px;max-height: 130px;overflow: auto;" class="inputBox" id="inputBox" onclick="showKeyboard()" ontouchstart="inputpress()" ontouchend="copytouchend()"></div>
+				</div>
+				<div style="-webkit-box-flex:1;padding:3px;">
+					<!--<input type="button" class="sendButton" onclick="send()" value="发送"></input>-->
+                    <div class="sendButton" onclick="send()">发送</div>
+				</div>
+			</div>
+			<div style="width:100%;display: -webkit-box;height: 35px;line-height: 35px;">
+				<div class="img">
+					<img id="voice1" alt="" src="./image/voice1.png" onclick="showVoiceBtn()" style="width:26px;height:26px">
+				</div>
+				<div class="img">
+					<img alt="" src="./image/image1.png" onclick="uploadImg()" style="width:26px;height:26px">
+				</div>
+				<div class="img">
+					<img alt="" src="./image/camera1.png" onclick="photograph()" style="width:26px;height:26px">
+				</div>
+<!-- 				<div class="img"> -->
+<!-- 					<img id="phiz1" alt="" src="./image/phiz1.png" onclick="showPhiz('record')" onload="showPhiz()" style="width:26px;height:26px"> -->
+<!-- 				</div> -->
+				<div class="img">
+					<img alt="" src="./image/file1.png" style="width:26px;height:26px" onclick="my_chooseUploadFile('','')">
+				</div>
+				
+			</div>
+			<div id="gundong" class="gundong">
+				<div class="phiz" id="phiz">
+				
+				</div>
+			</div>
+			<div class="recording" id="recording">
+				<div id="onlyclick">
+					<div style="text-align: center;color:#5E5C5C ;padding-top: 6px;">
+						<div id="titleShow" style="margin-top:10px">点击说话</div>
+					</div>
+					<div style="padding-top: 10px;text-align: center;">
+						<div class="circle" >
+							<img id="recordstart" style="width:80px" src="./image/bigVoice1.png" onclick="clickstart()" >
+							<img id="recordstop" style="width:60px;display:none;" src="./image/bigVoice1.png" onclick="clickend()">
+						</div>
+					</div>
+				</div>
+				<div id="longpress" style="diplay:none">
+					<div style="text-align: center;color:#5E5C5C ;padding-top: 6px;">
+						<div id="titleShow1" style="margin-top:10px">按住说话</div>
+					</div>
+					<div style="margin-left: 39%;padding-top: 10px;">
+						<div class="circle">
+							<img id="recordingBtn" style="width:80px" src="./image/bigVoice1.png" ontouchstart="gtouchstart()" ontouchmove="gtouchmove()" ontouchend="gtouchend()">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="../../js/mui.min.js"></script>
+<script src="../../js/mui.zoom.js"></script>
+<script src="../../js/mui.previewimage.js"></script>
+<script type="text/javascript">
+	//拍照
+	function photograph(){
+        if(isIphone){
+            window.location.href='obj-c://takePictures?jstxpz';
+        }else{
+            window.webview.photograph();
+        }
+	}
+	
+	//长按-----
+	var timeOutEvent = 0;//定时器
+	var time = 0;//聊天时长
+	var timer;
+	function timedCount(){
+		var mm = 0;
+		var ss = 0;
+		var str = "";
+		timer = setInterval(function(){
+			time += 1;
+			str = "";
+			if(++ss == 60){
+				if(++mm == 60){
+					mm = 0;
+				}
+				ss = 0;
+			}
+			str += ss < 10 ? mm + ":0" + ss : mm + ":" + ss;
+			if(isIphone){
+				document.getElementById("titleShow").innerHTML = "点击结束 "+str;
+			}else{
+				document.getElementById("titleShow1").innerHTML = str;
+			}
+		},1000);
+	}
+	
+	//复制、转发 
+	function copytouchstart(guid,content,flag,type,filename){
+		
+		if(type=="pictrue" || type=="filetype"|| type=="recording"|| type=="link")
+		{
+			
+			event.stopPropagation();
+		}
+		
+		timeOutEvent = setTimeout("copyalert('"+guid+"','"+content+"','"+flag+"','"+type+"','"+filename+"')",500);
+		return false;
+	}
+	//输入框长按事件开始
+	function inputpress(){
+		event.stopPropagation();
+		timeOutEvent = setTimeout("presspaste()",500);
+		return false;
+	}
+	//添加选项div
+	function presspaste(){
+		var divs = document.getElementsByName("copydiv");
+
+		for(var i=0; i<divs.length; i++)
+		{
+			divs[i].style.display='none';
+		}
+		$("#inputBox").after("<div name='copydiv' class='copydivright' style='width:50px;margin-top: -74px;right: 301px;text-align: unset;'><label style='color:white;font-size:16px' onclick='inputpaste()'>&nbsp;&nbsp;粘贴</label></div>");
+		timeOutEvent = 0;
+	}
+	//粘贴
+	function inputpaste(){
+		var divs = document.getElementsByName("copydiv");
+
+		for(var i=0; i<divs.length; i++)
+		{
+			divs[i].style.display='none';
+		}
+
+		var inputbox = $("#inputBox").html();
+		var paste = $("<div id='pastebox' style='display:none;'>"+window.webview.paste()+"</div>").text();
+		$("#inputBox").html(inputbox + ClearBr(paste));
+	}
+	function ClearBr(key) { 
+		key = key.replace(/<\.+?>/g,""); 
+		key = key.replace(/[\r\n]/g, ""); 
+		return key; 
+	} 
+	
+	function copyalert(guid,content,flag,type,filename){
+	
+		if (myScroll.y > 15 && pullDownEl.className.match('flip')) {
+			myScroll.scrollTo(0,0,100);
+			return false;
+		} 
+	
+		var divs = document.getElementsByName("copydiv");
+
+		for(var i=0; i<divs.length; i++)
+		{
+			divs[i].style.display='none';
+		}
+		
+		if(flag=="rightflag")
+		{
+			if(type=="pictrue")
+			{
+				//转发
+				$("#"+guid+"").after("<div name='copydiv' class='copydivright' style='width:100px;'><label style='color:white;font-size:16px' onclick='zhuanfa(\""+content+"\",\"pictrue\")'>转发&nbsp;&nbsp;&nbsp;</label><div class='line'></div><label style='color:white;font-size:16px' onclick='chehui(\""+guid+"\")'>撤回</label></div>");
+			}else if(type=="recording"){
+				$("#"+guid+"").after("<div name='copydiv' class='copydivright' style='width:100px;'><label style='color:white;font-size:16px' onclick='chehui(\""+guid+"\")'>&nbsp;&nbsp;撤回</label></div>");
+			}else if(type=="filetype"){
+				
+				$("#"+guid+"").after("<div name='copydiv' class='copydivright' style='width:100px;'><label style='color:white;font-size:16px' onclick='zhuanfa(\""+content+"\",\"filetype\",\""+filename+"\")'>转发&nbsp;&nbsp;&nbsp;</label><div class='line'></div><label style='color:white;font-size:16px' onclick='chehui(\""+guid+"\")'>撤回</label></div>");
+			}else{
+				//复制和转发
+				$("#"+guid+"").after("<div name='copydiv' class='copydivright' style='width:150px;'><label style='color:white;font-size:16px' onclick='copy(\""+content+"\")'>复制</label><div class='line'></div><label style='color:white;font-size:16px' onclick='zhuanfa(\""+content+"\")'>&nbsp;&nbsp;&nbsp;&nbsp;转发&nbsp;&nbsp;&nbsp;&nbsp;</label><div class='line2'></div><label style='color:white;font-size:16px' onclick='chehui(\""+guid+"\")'>撤回</label></div>");
+				//复制
+				//$("#"+guid+"").after("<div name='copydiv' class='copydivright'><label style='margin-left:9px;color:white;font-size:16px' onclick='copy(\""+content+"\")'>复制&nbsp;&nbsp;&nbsp;</label></div>");
+			}
+			
+		}else if(flag=="leftflag"){
+			if(type=="pictrue")
+			{
+				//转发
+				$("#"+guid+"").after("<div name='copydiv' class='copydivleft' style='width:50px'><label style='color:white;font-size:16px' onclick='zhuanfa(\""+content+"\",\"pictrue\")'>转发</label></div>");
+			}else if(type=="filetype"){
+				$("#"+guid+"").after("<div name='copydiv' class='copydivleft' style='width:50px'><label style='color:white;font-size:16px' onclick='zhuanfa(\""+content+"\",\"filetype\",\""+filename+"\")'>转发</label></div>");
+			}else{
+				//复制和转发
+				$("#"+guid+"").after("<div name='copydiv' class='copydivleft' style='width:100px'><label style='color:white;font-size:16px' onclick='copy(\""+content+"\")'>复制&nbsp;&nbsp;</label><div class='line'></div><label style='color:white;font-size:16px' onclick='zhuanfa(\""+content+"\")'>&nbsp;&nbsp;转发</label></div>");
+				//复制
+				//$("#"+guid+"").after("<div name='copydiv' class='copydivleft'><label style='margin-left:9px;color:white;font-size:16px' onclick='copy(\""+content+"\")'>复制&nbsp;&nbsp;&nbsp;</label></div>");
+			}
+			
+		}else{
+			
+		}
+		
+		timeOutEvent = 0;
+	}
+	//长按事件结束
+	function copytouchend(guid,content,flag,type,filename){
+		if (pullDownEl.className.match('flip')) {
+				pullDownEl.className = 'loading';
+				pullDownAction();
+				pullDownEl.querySelector('.pullDownLabel').innerHTML = '加载中...';
+		}
+		event.stopPropagation();
+	    clearTimeout(timeOutEvent);//清除定时器 
+	    if(timeOutEvent != 0){
+	        
+	    }else{
+	    	if(guid==null){
+	    		presspaste();
+	    	}else{
+	    		copyalert(guid,content,flag,type,filename);
+	    	}
+	    	
+	    }
+	    return false;
+	};
+	
+	
+	//开始按 
+	function gtouchstart(){
+		$("#recordingBtn").css('width','70px');
+		timeOutEvent = setTimeout("longPress()",500);
+	    return false;
+	};
+	
+	//手释放，如果在500毫秒内就释放，则取消长按事件，此时可以执行onclick应该执行的事件 
+	function gtouchend(){
+		$("#recordingBtn").css('width','80px');
+	    clearTimeout(timeOutEvent);//清除定时器 
+	    if(timeOutEvent != 0){
+	        //这里写要执行的内容（尤如onclick事件） （系统自动执行单击行事件）
+	        alert("时间过短");
+	    }else{
+	    	clearInterval(timer);
+			$("#titleShow1").text("按住说话");
+	    	stopRecording();
+	    }
+	    return false;
+	};
+	
+	//如果手指有移动，则取消所有事件，此时说明用户只是要移动而不是长按 
+	function gtouchmove(){
+		$("#recordingBtn").css('width','80px');
+	    clearTimeout(timeOutEvent);//清除定时器 
+	    timeOutEvent = 0;
+	    clearInterval(timer);
+		$("#titleShow1").text("按住说话");
+		stopRecording();
+	};
+	
+	//真正长按后应该执行的内容 
+	function longPress(){
+		document.getElementById("titleShow1").innerHTML = "0:00";
+	    timeOutEvent = 0;
+	    timedCount();
+	    //执行长按要执行的内容，如弹出菜单 
+	    startRecording();
+	}
+	/*------苹果端点击录音start------*/
+	//开始
+	function clickstart(){
+		$("#recordstart").css('display','none');
+		$("#recordstop").css('display','');
+		timeOutEvent = setTimeout("timingrecord()",500);
+	};
+	function timingrecord(){
+		document.getElementById("titleShow").innerHTML = "点击结束 0:00";
+	    timeOutEvent = 0;
+	    strtimer=timedCount();
+	    startRecording();
+	}
+	function clickend(){
+		$("#recordstart").css('display','');
+		$("#recordstop").css('display','none');
+	    clearTimeout(timeOutEvent);//清除定时器 
+		clearInterval(timer);
+		$("#titleShow").text("点击说话 ");
+	    stopRecording();
+	};
+	/*------苹果端点击录音end------*/
+	
+	//展现录音按钮
+	function showVoiceBtn(){
+		if(isIphone){
+			$("#onlyclick").css('display','');
+			$("#longpress").css('display','none');
+		}else{
+			$("#onlyclick").css('display','none');
+			$("#longpress").css('display','');
+		}
+		$("#recordingBtn").css('width','80px');
+		//$("#voice1").attr('src','./image/voice2.png');
+		if($("#recording").css("display") == "none"){
+			if($("#gundong").css("display") != "none"){
+				$("#gundong").hide();
+			}
+			$("#recording").show();
+			$("#chatBox").height(recordHeight - 300);
+			$("#recording").animate({right: "0px"}, "slow");
+		}else{
+			$("#recording").hide();
+			$("#chatBox").height(recordHeight - 142);
+		}
+		myScroll.refresh();
+		if($("#chatContent").height() >= $("#chatBox").height()){
+			myScroll.scrollToElement("#chatContent > div:last-child", 500);
+		}
+		if(isAndriod){
+			window.webview.startRecording("apply");
+        }else if(isIphone){
+            window.location.href='obj-c://startRecording?apply';
+        }
+	}
+	
+	//开始录音
+	function startRecording(){
+        if(isIphone){
+            window.location.href='obj-c://startRecording?luyin';
+        }else{
+            window.webview.startRecording("no");
+        }
+	}
+	//结束录音
+	function stopRecording(){
+		
+		if(time==0)
+		{
+			if(isIphone){
+	            window.location.href='obj-c://stopRecording?luyinno';
+	        }else{
+	            window.webview.stopRecording("nocommit");
+	        }
+			alert("时间过短");
+		}else{
+			if(isIphone){
+	            window.location.href='obj-c://stopRecording?luyin';
+	        }else{
+	            window.webview.stopRecording("commit");
+	        }
+		}
+        
+	}
+
+	// function showRealImage(ob){
+ 	// 	location.href = ob.src.replace("breviary","");
+	// }
+	
+	function showRealPhoto(ob){
+		$(".box").append("<img src='"+ob.src+"?xxxx="+Math.random()+"' style='margin-top: 15%;width: 100%;'>");
+		$(".box").show();
+		
+	} 
+	
+	//选择图片
+	function uploadImg(){
+        if(isIphone){
+            window.location.href='obj-c://choosePictures?jstxxcxq';
+        }else{
+            window.webview.selectImg();
+        }
+	}
+	
+	//选择相册中图片后，调用壳中方法上传图片
+	function uploadStroePic(filePath){
+		var fileName = filePath.substring(filePath.lastIndexOf("/")+1);
+		window.webview.uploadAll(filePath,fileName,"img","showUploadImg");
+	}
+	
+	//在相册中选择上传图片后，显示上传图片
+	function showUploadImg(fileName,filePath){
+		common(fileName,filePath);
+	}
+	
+	//拍照后，显示上传图片
+	function showPhotograph(fileName,filePath){
+		common(fileName,filePath);
+        if(isAndriod){
+            window.webview.delTempFile(filePath);
+        }
+	}
+	
+	function common(fileName,filePath){
+		var guid = getGuid();
+		var breviaryImg = sys_ctx.replace("ltzfwpt","") + "/" + jstxPath + fileName.substring(0,10) + "/breviary" + fileName;
+		
+		var message = new Object();
+		message.senderId = senderId;
+		message.senderName = senderName;
+		message.receiverId = receiverId;
+		message.receiverName = receiverName;
+		message.guid = guid;
+		sys_ajaxPost("/jstx/default.do?method=getServerTime",function(json){
+			message.sendTime = json.time;
+			
+			message.sendContent = "<img src='"+breviaryImg+"' id='imgzoom' onclick='showRealImage(this)' data-preview-src='' data-preview-group='1'>";
+			var mySendMsg = rightTitle + "&nbsp;&nbsp;" + message.sendTime +"</div></div>";
+			if(message.senderId !=receiverId)
+			{
+			   if(message.guid!=null && message.guid!=undefined)
+			   {
+				   document.getElementById("chatContent").innerHTML += ( "<div style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' src='"+sys_ctxStr()+message.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" +  mySendMsg + rightContent+"<div id="+message.guid+" ontouchstart='copytouchstart(\""+message.guid+"\",\""+breviaryImg+"\",\"rightflag\",\"pictrue\")'  ontouchend='copytouchend(\""+message.guid+"\",\""+breviaryImg+"\",\"rightflag\",\"pictrue\")' style='float:right;background-color:none;border-radius:5px;padding:2px 2px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + message.sendContent + "</div></div></div><div style='clear:both;'></div>");    
+			   }else{
+				   document.getElementById("chatContent").innerHTML += ( "<div style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' src='"+sys_ctxStr()+message.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" +  mySendMsg + rightContent +"<div style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>"+ message.sendContent + "</div></div></div><div style='clear:both;'></div>");   
+			   }
+			}
+			websocket.send(JSON.stringify(message));
+			myScroll.refresh();
+			if($("#chatContent").height() >= $("#chatBox").height()){
+				myScroll.scrollToElement("#chatContent > div:last-child", 500);
+			}
+		});
+	}
+	
+	//语音时间秒、分转换
+	function turn(time){
+		var integer;
+		var remainder;
+		if(time > 60){
+			integer = parseInt(time / 60);
+			remainder = time % 60;
+			return integer + "'" + remainder + "''";
+		}else{
+			return time + "''";
+		}
+	}
+	
+	//显示语音聊天
+	function showRecording(fileName,filePath){
+		var chatTime = turn(time);
+		time = 0;	//语音计时清零
+		var recordingPath = sys_ctx.replace("ltzfwpt","") + "/" + jstxPath + fileName.substring(0,10) + "/" + fileName;
+		var message = new Object();
+		var guid = getGuid();
+		message.guid=guid;
+		message.senderId = senderId;
+		message.senderName = senderName;
+		message.receiverId = receiverId;
+		message.receiverName = receiverName;
+		sys_ajaxPost("/jstx/default.do?method=getServerTime",function(json){
+			message.sendTime = json.time;
+			
+			message.sendContent = "<div onclick='playRecording(\""+recordingPath+"\",this,\""+message.senderId+"\")' style='width:80px;height:30px;'><div style='float:left;margin-top:5px;'>"+chatTime+"</div><div style='float:left;margin-top:3px;'><img name='soundimgid' src='./image/sound.png'></div></div>";
+			var mySendMsg = rightTitle + "&nbsp;&nbsp;" + message.sendTime +"</div></div>";
+		    if(message.senderId!=message.receiverId)
+		    {
+		    	document.getElementById("chatContent").innerHTML += ( "<div id='chat_"+message.guid+"' style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' src='"+sys_ctxStr()+message.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" +  mySendMsg + rightContent +"<div id="+message.guid+" ontouchstart='copytouchstart(\""+message.guid+"\",\"\",\"rightflag\",\"recording\")'  ontouchend='copytouchend(\""+message.guid+"\",\"\",\"rightflag\",\"recording\")'  style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>"+ message.sendContent + "</div></div></div><div style='clear:both;'></div>");
+		    }
+			websocket.send(JSON.stringify(message));
+			myScroll.refresh();
+			if($("#chatContent").height() >= $("#chatBox").height()){
+				myScroll.scrollToElement("#chatContent > div:last-child", 500);
+			}
+            if(isAndriod){
+                window.webview.delTempFile(filePath);
+            }
+		});
+	}
+	var nowPlayingId = "";
+	//播放语音聊天
+	function playRecording(ob,obj,senderid){
+		var one = ob.lastIndexOf("/");
+		var ids = ob.substring(one+1,ob.length);
+		var id = ids.split('.')[0];
+		$("#"+id+"").hide();
+		
+		if(nowPlayingId == id){
+			$(obj).find('img').attr('src','./image/sound.png');
+			nowPlayingId = "";
+			window.webview.stopPlayRecording();
+			return ;
+		}else{
+			nowPlayingId = id;
+		}
+		
+		if(curid != senderid)
+		{
+			//标示该语音已读
+			sys_ajaxPost("/jstx/default.do?method=updateRecording&id="+ob,function(json){
+				
+			});
+		}
+		var time = $(obj).find('div').text();
+		var srcstr = $(obj).find('img').attr('src');
+		var allsrc = document.getElementsByName("soundimgid");
+		for(var i = 0;i<allsrc.length;i++)
+		{
+			var str = allsrc[i].src.split('/');
+			if(str[str.length-1]=='sound.gif')
+			{
+				document.getElementsByName("soundimgid")[i].src='./image/sound.png'
+			}else if(str[str.length-1]=='leftSound.gif')
+			{
+				document.getElementsByName("soundimgid")[i].src='./image/leftSound.png'
+			}
+		}
+		time = time.replace("\''","")+'000';
+		
+		if(srcstr=='./image/sound.png'||srcstr=='./image/sound.gif')
+		{
+			$(obj).find('img').attr('src','./image/sound.gif');
+			setTimeout(function(){
+					$(obj).find('img').attr('src','./image/sound.png');
+					time = 0;
+				}, time);
+		}else{
+			$(obj).find('img').attr('src','./image/leftSound.gif');
+			setTimeout(function(){
+				$(obj).find('img').attr('src','./image/leftSound.png');
+				time = 0;
+			}, time);
+		}
+		
+		if(isIphone){
+            window.location.href='obj-c://playRecording?'+ob;
+        }else{
+			window.webview.playRecording(ob);
+		}
+		
+		
+	}
+	
+	//聊天窗口div自适应滚动
+	function sc(){
+	    var div = document.getElementById("chatBox");
+	    div.scrollTop = div.scrollHeight;
+	};
+	
+	function copy(str){
+		document.getElementsByName("copydiv")[0].style.display="none";
+		
+		if(isIphone)
+		{
+			window.location.href='obj-c://copy?'+str;
+		}else{
+			window.webview.copy(str);
+		}
+		
+	}
+	
+	function chehui(selId){
+		sys_ajaxGet("/jstx/default.do?method=chehui&id="+selId,function(json){
+			if("success"==json.result){
+				$("#inputBox").html("chehui_"+selId);
+				send();
+			}else if("error"==json.result){
+				sys_alert("超过5分钟!");
+			}
+		});
+	}
+	
+	
+	function zhuanfa(content,type,filename)
+	{
+		if(type=="pictrue")
+		{
+			var sendcontent = "<img src='"+content+"'id='imgzoom' onclick='showRealImage(this)' data-preview-src='' data-preview-group='1'>";
+			sys_goURL("transmit.html?sendcontent="+sendcontent+"&receiverIdfrom="+receiverId+"&senderName="+senderName+"&py="+py+"&from="+from);
+		}else if(type=="filetype"){
+			sys_goURL("transmit.html?filename="+filename+"&url="+content+"&receiverIdfrom="+receiverId+"&senderName="+senderName+"&py="+py+"&from="+from);
+		}else{
+			sys_goURL("transmit.html?sendcontent="+content+"&receiverIdfrom="+receiverId+"&senderName="+senderName+"&py="+py+"&from="+from);
+		}
+		
+	}
+	
+	var leftContent = "<div style='width:100%;overflow-y:auto;overflow-x:hidden;margin-top:10px;'><div class='leftChatBox'></div>";
+	var leftTitle = "<div style='width:100%;height:16px;color:#b4b4b4;font-size:15px;'><div style='margin-left:8px;'>";
+	var rightContent = "<div style='width:100%;overflow-y:auto;overflow-x:hidden;margin-top:10px;'><div class='rightChatBox'></div> ";
+	var rightTitle = "<div style='width:100%;height:16px;color:#b4b4b4;font-size:15px;'><div style='float:right;margin-right:8px;'>";
+	
+	//websocket对象
+	var websocket = null;
+	//判断当前浏览器是否支持WebSocket
+	if("WebSocket" in window){
+// 	    websocket = new WebSocket(sys_ctx.replace("http","ws")+"/websocket/"+("personal"+senderId));
+	    websocket = new ReconnectingWebSocket(sys_ctx.replace("http","ws")+"/websocket/"+("personal"+senderId));
+	}else{
+	    sys_alert("Not support websocket");
+	}
+	
+	//连接发生错误的回调方法
+	websocket.onerror = function(){
+		sys_alert("连接服务器出错，请重试!");
+	};
+	 
+	//连接成功建立的回调方法
+	websocket.onopen = function(event){
+		
+	};
+	 
+	//接收到消息的回调方法
+	websocket.onmessage = function(event){
+		var json = JSON.parse(event.data);
+// 		if(json.send_content==$("#inputBox").html()){
+// 			$("#inputBox").empty();
+// 		}
+		setMessageInnerHTML(json);
+	};
+	 
+	//连接关闭的回调方法
+	websocket.onclose = function(){
+	    //setMessageInnerHTML("close");
+	};
+	 
+	//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+	window.onbeforeunload = function(){
+	    websocket.close();
+	    if(isAndriod){
+	    	window.webview.stopPlayRecording();
+	    }
+	    window.localStorage.setItem("chatContent", $("#inputBox").html());
+	};
+	
+	/* var mode = "";
+	
+	//确认聊天对象使用websocket还是轮询
+	sys_ajaxPost("/pollingMessage/default.do?method=verifyMode&receiverId="+receiverId,function(json){
+		if(json.result == "true"){
+			mode = "longPolling";
+			setInterval("longPolling()",3000);
+		}
+	}); */
+	//setInterval("longPolling()",3000);
+	
+	function longPolling(){
+		sys_ajaxPost("/pollingMessage/default.do?method=longPolling&senderId="+senderId+"&receiverId="+receiverId,function(json){
+			if(json.length > 0){
+				for (var i = 0; i < json.length; i++) {
+					var innerHTML = json[i].send_content;
+					if(innerHTML.indexOf("</div>") > 1 && innerHTML.indexOf("http") < 0){
+						var tempContent = innerHTML.replace("word-wrap:break-word","").replace("float:right","").replace("70%","100%");
+			       		innerHTML = tempContent.replace(tempContent.substring(tempContent.indexOf("font-size"),tempContent.indexOf("'>")),"");
+					}
+					var sendTime = json[i].send_time;
+					var senderName = json[i].sender_name;
+					if(senderId == json[i].sender_id){
+						var mySendMsg = rightTitle  + "&nbsp;&nbsp;" + sendTime + "</div></div>";
+						document.getElementById("chatContent").innerHTML += ( "<div style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' src='"+sys_ctxStr()+json[i].sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" +  mySendMsg + rightContent + innerHTML.replace("word-wrap:break-word","") + "</div></div></div><div style='clear:both;'></div>");
+
+					}else{
+						var mySendMsg = leftTitle  + "&nbsp;&nbsp;" + sendTime + "</div></div>";
+						document.getElementById("chatContent").innerHTML += ("<div style='width:100%;margin-top:10px;margin-left:10px'><div style='float:left;width:10%;'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json[i].sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + mySendMsg + leftContent + innerHTML.replace("sound.png","leftSound.png") + "</div></div></div><div style='clear:both;'></div>");
+					}
+					if($("#chatContent").height() >= $("#chatBox").height()){
+						myScroll.refresh();
+					}
+					if($("#chatContent").height() >= $("#chatBox").height()){
+						myScroll.scrollToElement("#chatContent > div:last-child", 500);
+					}
+				}
+			}
+		});
+	}
+	 
+	function sys_ctxStr() {
+// 		var count = 0;
+// 		var end = 0;
+// 		for (var i = 0; i < sys_ctx.length; i++) {
+// 			var c = sys_ctx.charAt(i);
+// 			if (c == '/') {
+// 				count++;
+// 				if (count == 3) {
+// 					end = i;
+// 				}
+// 			}
+// 		}
+		var hostUrl = sys_ctx.replace("ltzfwpt","");
+		return hostUrl;
+	}
+	
+	//获取项目名称
+	function sys_ctxProcName() {
+		var count = 0;
+		var end = 0;
+		for (var i = 0; i < sys_ctx.length; i++) {
+			var c = sys_ctx.charAt(i);
+			if (c == '/') {
+				count++;
+				if (count == 3) {
+					end = i;
+				}
+			}
+		}
+		var procName = sys_ctx.substring(end+1, sys_ctx.length);
+		return procName;
+	}
+	
+	//将消息显示在网页上
+	function setMessageInnerHTML(json){
+		var innerHTML = changeToHref(json.send_content);
+		if(innerHTML.indexOf("</div>") > 1 && innerHTML.indexOf("http") < 0){
+			var tempContent = innerHTML.replace("word-wrap:break-word","").replace("float:right","").replace("70%","100%");
+       		innerHTML = tempContent.replace(tempContent.substring(tempContent.indexOf("font-size"),tempContent.indexOf("'>")),"");
+		}
+		
+		var sendTime = json.send_time;
+		var senderName = json.sender_name;
+		
+		if(undefined != json.offLineCommon || undefined != json.onLineCommon){
+			if(senderId == json.sender_id){
+				var mySendMsg = rightTitle  + "&nbsp;&nbsp;" + sendTime + "</div></div>";
+		    	
+		    	if(json.guid!=null && json.guid!=undefined)
+		    	{
+		    		if(innerHTML.indexOf("img src=")>0 && innerHTML.indexOf("showRealImage")>0)
+		    		{
+		    			var sendcontent = innerHTML.split("'")[1];
+		    			
+		    			document.getElementById("chatContent").innerHTML += ( "<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:-10px'> <div style='float:right;width:10%'><img width='40px' height='40px' src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;' >" +  mySendMsg + rightContent+"<div id="+json.guid+" ontouchstart='copytouchstart(\""+json.guid+"\",\""+sendcontent+"\",\"rightflag\",\"pictrue\")'  ontouchend='copytouchend(\""+json.guid+"\",\""+sendcontent+"\",\"rightflag\",\"pictrue\")' style='float:right;background-color:none;border-radius:5px;padding:2px 2px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + innerHTML.replace("word-wrap:break-word","") + " </div></div></div><div style='clear:both;'></div>");
+		    		}else if(innerHTML.indexOf("downloadFile")>0 && innerHTML.indexOf("http")>0)
+		    		{
+		    			var url = innerHTML.split("\"")[1];
+		    			var filename = innerHTML.split("\"")[3];
+		    			document.getElementById("chatContent").innerHTML += ( "<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:-10px'> <div style='float:right;width:10%'><img width='40px' height='40px' src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\"  onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;' >" +  mySendMsg + rightContent+"<div onselectstart='return false' id="+json.guid+" ontouchstart='copytouchstart(\""+json.guid+"\",\""+url+"\",\"rightflag\",\"filetype\",\""+filename+"\")'  ontouchend='copytouchend(\""+json.guid+"\",\""+url+"\",\"rightflag\",\"filetype\",\""+filename+"\")' style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + innerHTML.replace("word-wrap:break-word","") + " </div></div></div><div style='clear:both;'></div>");
+		    		}else if(innerHTML.indexOf("img src=")>0 &&innerHTML.indexOf("image")>0&&innerHTML.indexOf("gif")>0)
+		    		{
+		    			var contentstr =  innerHTML.replace(/\<.*?\>/g,'');
+		    			
+		    			if(contentstr!=null && !""==contentstr)
+		    			{
+		    				document.getElementById("chatContent").innerHTML += ( "<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:-10px'> <div style='float:right;width:10%'><img width='40px' height='40px' src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;' >" +  mySendMsg + rightContent+"<div id="+json.guid+" ontouchstart='copytouchstart(\""+json.guid+"\",\""+contentstr+"\",\"rightflag\")'  ontouchend='copytouchend(\""+json.guid+"\",\""+contentstr+"\",\"rightflag\")' style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + innerHTML.replace("word-wrap:break-word","") + " </div></div></div><div style='clear:both;'></div>");
+		    			}else{
+		    				document.getElementById("chatContent").innerHTML += ( "<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:-10px'> <div style='float:right;width:10%'><img width='40px' height='40px' src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;' >" +  mySendMsg + rightContent+"<div id="+json.guid+" )' style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + innerHTML.replace("word-wrap:break-word","") + " </div></div></div><div style='clear:both;'></div>");
+		    			}
+		    		}else if(innerHTML.indexOf("onclick='playRecording(")>0 &&innerHTML.indexOf("sound.png")>0){
+						document.getElementById("chatContent").innerHTML += ( "<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px'  id=\""+json.sender_id+"\" src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" +  mySendMsg + rightContent+"<div  id="+json.guid+" ontouchstart='copytouchstart(\""+json.guid+"\",\"\",\"rightflag\",\"recording\")'  ontouchend='copytouchend(\""+json.guid+"\",\"\",\"rightflag\",\"recording\")'   style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:18px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + innerHTML.replace("word-wrap:break-word","") + "</div></div></div><div style='clear:both;'></div>");
+					}else if(innerHTML.indexOf("https:")>0 ||innerHTML.indexOf("www.")>0||innerHTML.indexOf("bbs.")>0){
+					   
+					    var copyinnerHTML = innerHTML.replace( /<a.*?>(.*?)<\/a>/ig, "$1");
+					
+						document.getElementById("chatContent").innerHTML += ( "<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px'  id=\""+json.sender_id+"\" src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" +  mySendMsg + rightContent+"<div id="+json.guid+" ontouchstart='copytouchstart(\""+json.guid+"\",\""+copyinnerHTML.replace("\"","'")+"\",\"rightflag\",\"link\")'  ontouchend='copytouchend(\""+json.guid+"\",\""+copyinnerHTML+"\",\"rightflag\",\"link\")' style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + innerHTML.replace("word-wrap:break-word","") + "</div></div></div><div style='clear:both;'></div>");
+					}else{
+		    			document.getElementById("chatContent").innerHTML += ( "<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:-10px'> <div style='float:right;width:10%'><img width='40px' height='40px' src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;' >" +  mySendMsg + rightContent+"<div id="+json.guid+" ontouchstart='copytouchstart(\""+json.guid+"\",\""+innerHTML+"\",\"rightflag\")'  ontouchend='copytouchend(\""+json.guid+"\",\""+innerHTML+"\",\"rightflag\")' style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + innerHTML.replace("word-wrap:break-word","") + " </div></div></div><div style='clear:both;'></div>");
+		    		}
+		    		
+		    	}else{
+		    		innerHTML=innerHTML.replace('./image/leftSound.png','./image/sound.png');
+		    		document.getElementById("chatContent").innerHTML += ( "<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:-10px'> <div style='float:right;width:10%'><img width='40px' height='40px' src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" +  mySendMsg + rightContent +"<div style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>"+ innerHTML.replace("word-wrap:break-word","") + " </div></div></div><div style='clear:both;'></div>");
+		    	}
+			    
+			}else{
+				
+				var mySendMsg = leftTitle  + "&nbsp;&nbsp;" + sendTime + "</div></div>";
+		    	
+		    	if(json.guid!=null && json.guid!=undefined)
+		    	{
+		    		if(innerHTML.indexOf("img src=")>0 && innerHTML.indexOf("showRealImage")>0)
+		    		{
+		    			var sendcontent = innerHTML.split("'")[1];
+		    			
+		    			document.getElementById("chatContent").innerHTML += ("<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:10px'> <div style='float:left;width:10%'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + mySendMsg + leftContent+ "<div id="+json.guid+" ontouchstart='copytouchstart(\""+json.guid+"\",\""+sendcontent+"\",\"leftflag\",\"pictrue\")'  ontouchend='copytouchend(\""+json.guid+"\",\""+sendcontent+"\",\"leftflag\",\"pictrue\")'  style='float:left;margin-right:-2px;background-color:none;border-radius:5px;padding:2px 2px;max-width:70%;word-wrap:break-word;font-size:19px;'>"+ innerHTML.replace("sound.png","leftSound.png") + "</div></div></div><div style='clear:both;'></div>");
+		    		}else if(innerHTML.indexOf("downloadFile")>0 && innerHTML.indexOf("http")>0){
+		    			var url = innerHTML.split("\"")[1];
+		    			var filename = innerHTML.split("\"")[3];
+		    			document.getElementById("chatContent").innerHTML += ("<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:10px'> <div style='float:left;width:10%'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + mySendMsg + leftContent+ "<div onselectstart='return false' id="+json.guid+" ontouchstart='copytouchstart(\""+json.guid+"\",\""+url+"\",\"leftflag\",\"filetype\",\""+filename+"\")'  ontouchend='copytouchend(\""+json.guid+"\",\""+url+"\",\"leftflag\",\"filetype\",\""+filename+"\")'  style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>"+ innerHTML.replace("sound.png","leftSound.png") + "</div></div></div><div style='clear:both;'></div>");
+		    		}else if(innerHTML.indexOf("img src=")>0 &&innerHTML.indexOf("image")>0&&innerHTML.indexOf("gif")>0)
+		    		{
+		    			var contentstr =  innerHTML.replace(/\<.*?\>/g,'');
+		    			if(contentstr!=null && !""==contentstr){
+		    				document.getElementById("chatContent").innerHTML += ("<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:10px'> <div style='float:left;width:10%'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + mySendMsg + leftContent+ "<div id="+json.guid+" ontouchstart='copytouchstart(\""+json.guid+"\",\""+contentstr+"\",\"leftflag\")'  ontouchend='copytouchend(\""+json.guid+"\",\""+contentstr+"\",\"leftflag\")'  style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>"+ innerHTML.replace("sound.png","leftSound.png") + "</div></div></div><div style='clear:both;'></div>");
+		    			}else{
+		    				document.getElementById("chatContent").innerHTML += ("<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:10px'> <div style='float:left;width:10%'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + mySendMsg + leftContent+ "<div id="+json.guid+"  style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>"+ innerHTML.replace("sound.png","leftSound.png") + "</div></div></div><div style='clear:both;'></div>");
+		    			}
+		    			
+		    		}else if(innerHTML.indexOf("playRecording")>0 ){
+		    			if(json.ext_two=='1')
+		    			{
+		    				document.getElementById("chatContent").innerHTML += ("<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:10px'> <div style='float:left;width:10%'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + mySendMsg + leftContent +"<div style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>" +innerHTML.replace("sound.png","leftSound.png") + "</div></div></div><div style='clear:both;'></div>");
+		    			}else{
+		    				var idstr = innerHTML.split(',')[0];
+			    			var one = idstr.lastIndexOf("/");
+			    			var ids = idstr.substring(one+1,idstr.length-1);
+			    			var id = ids.split('.')[0];
+		    				document.getElementById("chatContent").innerHTML += ("<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:10px'> <div style='float:left;width:10%'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + mySendMsg + leftContent +"<div style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>" +innerHTML.replace("sound.png","leftSound.png") + "</div><div id = '"+id+"' style='margin-left:125px;margin-top:8px'><img src='image/tips.png'/></div></div></div><div style='clear:both;'></div>");
+		    			}
+		    		}else if(innerHTML.indexOf("https:")>0 ||innerHTML.indexOf("www.")>0||innerHTML.indexOf("bbs.")>0){
+					
+						 var copyinnerHTML = innerHTML.replace( /<a.*?>(.*?)<\/a>/ig, "$1");
+					
+						document.getElementById("chatContent").innerHTML += ("<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:10px'><div style='float:left;width:10%;'><img style='float: right;width:40px;height:40px;'  id=\""+json.sender_id+"\"src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + mySendMsg + leftContent+"<div id="+json.guid+" ontouchstart='copytouchstart(\""+json.guid+"\",\""+copyinnerHTML+"\",\"leftflag\",\"link\")'  ontouchend='copytouchend(\""+json.guid+"\",\""+copyinnerHTML+"\",\"leftflag\",\"link\")'  style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>" + innerHTML.replace("sound.png","leftSound.png") + "</div></div></div><div style='clear:both;'></div>");	
+					}else{
+		    			document.getElementById("chatContent").innerHTML += ("<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:10px'> <div style='float:left;width:10%'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + mySendMsg + leftContent+ "<div id="+json.guid+" ontouchstart='copytouchstart(\""+json.guid+"\",\""+innerHTML+"\",\"leftflag\")'  ontouchend='copytouchend(\""+json.guid+"\",\""+innerHTML+"\",\"leftflag\")'  style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>"+ innerHTML.replace("sound.png","leftSound.png") + "</div></div></div><div style='clear:both;'></div>");
+		    		}
+		    	}else{
+		    		if(innerHTML.indexOf("playRecording")>0 )
+		    		{
+		    			if(json.ext_two=='1')
+		    			{
+		    				document.getElementById("chatContent").innerHTML += ("<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:10px'> <div style='float:left;width:10%'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + mySendMsg + leftContent +"<div style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>" +innerHTML.replace("sound.png","leftSound.png") + "</div></div></div><div style='clear:both;'></div>");
+		    			}else{
+		    				var idstr = innerHTML.split(',')[0];
+			    			var one = idstr.lastIndexOf("/");
+			    			var ids = idstr.substring(one+1,idstr.length-1);
+			    			var id = ids.split('.')[0];
+		    				document.getElementById("chatContent").innerHTML += ("<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:10px'> <div style='float:left;width:10%'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + mySendMsg + leftContent +"<div style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>" +innerHTML.replace("sound.png","leftSound.png") + "</div><div id = '"+id+"' style='margin-left:125px;margin-top:8px'><img src='image/tips.png'/></div></div></div><div style='clear:both;'></div>");
+		    			}
+		    			
+		    		}else{
+		    			document.getElementById("chatContent").innerHTML += ("<div id='chat_"+json.guid+"' style='width:100%;margin-top:10px;margin-left:10px'> <div style='float:left;width:10%'><img style='float: right;width:40px;height:40px;' src='"+sys_ctxStr()+json.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + mySendMsg + leftContent +"<div style='float:left;margin-right:-2px;background-color:#fff;border-radius:5px;padding:5px 12px;max-width:70%;word-wrap:break-word;font-size:19px;'>" +innerHTML.replace("sound.png","leftSound.png") + "</div></div></div><div style='clear:both;'></div>");
+		    		}
+		    		
+		    	}
+		    }
+		}
+		/* else if(undefined != json.onLineCommon){
+			if(senderId != json.sender_id){
+				var mySendMsg = leftTitle + senderName + "&nbsp;&nbsp;" + sendTime + "</div></div>";
+		    	document.getElementById("chatContent").innerHTML += mySendMsg;
+		    	document.getElementById("chatContent").innerHTML += (leftContent + innerHTML.replace("sound.png","leftSound.png") + "</div></div>");
+			}
+		} */
+		else if(undefined != json.inviteGroupId){
+			alert(json.inviterName+"邀请您加入"+json.inviteGroupName);
+		}
+		
+		 
+		 if(innerHTML.indexOf("chehui_") != -1){
+				if($("#chat_"+json.guid)){
+					$("#chat_"+json.guid).remove();
+				}
+				if($("#chat_"+innerHTML.replace("chehui_",""))){
+					$("#chat_"+innerHTML.replace("chehui_","")).remove();
+				}
+			}
+		 
+		
+		if($("#chatContent").height() >= $("#chatBox").height()){
+			myScroll.refresh();
+		}
+		if($("#chatContent").height() >= $("#chatBox").height()){
+			myScroll.scrollToElement("#chatContent > div:last-child", 500);
+		}
+	};
+	 
+	//关闭连接
+	function closeWebSocket(){
+		
+	};
+	
+	window.onload = function(){
+		setTimeout(init,300);
+	};
+	
+	
+	//初始化
+	function init(){
+		var message = new Object();
+		message.initSenderId = senderId;
+		message.initReceiverId = receiverId;
+		if("" == getQueryStringRegExp("showNum") || "undefined" == getQueryStringRegExp("showNum")){
+			message.showNum = 6;
+		}else{
+			message.showNum = getQueryStringRegExp("showNum");
+		}
+		websocket.send(JSON.stringify(message));
+	}
+	
+	//发送消息
+	function send(ob){
+		var guid = getGuid();  
+		if(!$("#inputBox").html() || "" == $("#inputBox").html().trim()){
+			alert("发送内容不能为空");
+			return false;
+		}else if(undefined != ob){
+			websocket.send(JSON.stringify(ob));
+		}else{
+			if(senderName==""){
+				  sys_ajaxPost("/jstx/default.do?method=getUsername&senderId="+senderId+
+						"&receiverId="+receiverId,function(json){
+					senderName = json.senderName;
+					receiverName = json.receiverName;
+					sender_photo = json.sender_photo;
+					$(".chat_name").html(receiverName);
+					sendInfo(guid);
+				  });		  
+			}else{
+			    sendInfo(guid);
+			}			
+		}
+	};
+	function sendInfo(guid){
+	        var message = new Object();
+			message.senderId = senderId;
+			message.senderName = senderName;
+			message.receiverId = receiverId;
+			message.receiverName = receiverName;
+			message.sender_photo = sender_photo;
+			message.guid=guid;
+		
+			sys_ajaxPost("/jstx/default.do?method=getServerTime",function(json){
+				message.sendTime = json.time;
+				message.sendContent = $("#inputBox").html();
+				var mySendMsg = rightTitle + "&nbsp;&nbsp;" + message.sendTime + "</div></div>";
+				if(message.senderId != message.receiverId)
+				{
+					if(message.guid!=null && message.guid!=undefined)
+					{
+						if((message.sendContent).indexOf("img src=")>0 &&(message.sendContent).indexOf("image")>0&&(message.sendContent).indexOf("gif")>0)
+						{
+							var contentstr =  (message.sendContent).replace(/\<.*?\>/g,''); 
+							if(contentstr!=null && !""==contentstr)
+							{
+								document.getElementById("chatContent").innerHTML += ( "<div id='chat_"+guid+"' style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' src='"+sys_ctxStr()+message.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\"></div><div style='float:left;width:90%;'>" +  mySendMsg + rightContent+"<div id="+message.guid+" ontouchstart='copytouchstart(\""+message.guid+"\",\""+contentstr+"\",\"rightflag\")'  ontouchend='copytouchend(\""+message.guid+"\",\""+contentstr+"\",\"rightflag\")' style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + message.sendContent + "</div></div></div><div style='clear:both;'></div>");
+							}else{
+								document.getElementById("chatContent").innerHTML += ( "<div id='chat_"+guid+"' style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' src='"+sys_ctxStr()+message.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\"></div><div style='float:left;width:90%;'>" +  mySendMsg + rightContent+"<div id="+message.guid+"  style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + message.sendContent + "</div></div></div><div style='clear:both;'></div>");
+							}
+							
+						}else{
+							document.getElementById("chatContent").innerHTML += ( "<div id='chat_"+guid+"' style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' src='"+sys_ctxStr()+message.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\"></div><div style='float:left;width:90%;'>" +  mySendMsg + rightContent+"<div id="+message.guid+" ontouchstart='copytouchstart(\""+message.guid+"\",\""+message.sendContent+"\",\"rightflag\")'  ontouchend='copytouchend(\""+message.guid+"\",\""+message.sendContent+"\",\"rightflag\")' style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + message.sendContent + "</div></div></div><div style='clear:both;'></div>");
+						}
+						
+						
+					}else{
+						document.getElementById("chatContent").innerHTML += ( "<div id='chat_"+guid+"' style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' src='"+sys_ctxStr()+message.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\"></div><div style='float:left;width:90%;'>" +  mySendMsg + rightContent +"<div style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>"+ message.sendContent + "</div></div></div><div style='clear:both;'></div>");
+					}
+		    		
+				}
+				var innerHTML = message.sendContent;
+				if(innerHTML.indexOf("chehui_") != -1){
+					if($("#chat_"+guid)){
+						$("#chat_"+guid).remove();
+					}
+					if($("#chat_"+innerHTML.replace("chehui_",""))){
+						$("#chat_"+innerHTML.replace("chehui_","")).remove();
+					}
+				}
+				if(message.sendContent && message.sendContent!=""){
+					if(isAndriod){
+			    		window.webview.copy(message.sendContent);//2018-720
+					}
+			    	websocket.send(JSON.stringify(message));
+		    		$("#inputBox").empty();
+		    	}
+				if($("#gundong").css("display") == "none"){
+// 					$("#inputBox").focus();
+				}
+				myScroll.refresh();
+				if($("#chatContent").height() >= $("#chatBox").height()){
+					myScroll.scrollToElement("#chatContent > div:last-child", 500);
+				}
+			});
+	  
+	}
+	
+	function changeToHref(sHtml){
+		//javascript 正则替换
+		//var sHtml ="http://www.huhangfei.com/";
+		//替换http://开头链接
+		if (sHtml.toLowerCase().indexOf("http://") >= 0&&sHtml.toLowerCase().indexOf("img src") < 0) {
+		      sHtml = sHtml.replace(/(^|[^<=""])(http:(\/\/|\\\\)(([\w\/\\\+\-~`@:%])+\.)+([\w\/\\\.\=\?\+\-~`@\':!%#]|(&amp;)|&)+)/g, "$1<a target=\"_blank\" href=\"$2?1=1&sysbrowser\">$2</a>");
+		}
+		if (sHtml.toLowerCase().indexOf("https://") >= 0&&sHtml.toLowerCase().indexOf("img src") < 0) {
+		      sHtml = sHtml.replace(/(^|[^<=""])(https:(\/\/|\\\\)(([\w\/\\\+\-~`@:%])+\.)+([\w\/\\\.\=\?\+\-~`@\':!%#]|(&amp;)|&)+)/g, "$1<a target=\"_blank\" href=\"$2?1=1&sysbrowser\">$2</a>");
+		}
+		//替换 www. bbs. 等开头网址
+		if ((sHtml.toLowerCase().indexOf("www.") >= 0 || sHtml.toLowerCase().indexOf("bbs.") >= 0)&&sHtml.toLowerCase().indexOf("img src") < 0) {
+		      sHtml = sHtml.replace(/(^|[^\/\\\w\=])((www|bbs)\.(\w)+\.([\w\/\\\.\=\?\+\-~`@\'!%#]|(&amp;))+)/g, "$1<a target=\"_blank\" href=http://$2?1=1&sysbrowser>$2</a>");
+		}
+		return sHtml;
+	}
+	
+	var my_curFolderPath;
+	function my_chooseUploadFile(folderpath,callback) {
+//         if(isIphone){
+//             alert("您好，iphone系统暂不支持上传文件！");
+//         }else{
+//             window.webview.getAllFiles(folderpath, "my_cardFileExplorer");
+//         }
+		sys_goURL("selectFile.html?from=chat.html&yhid="+senderId+"&guid="+receiverId);
+	}
+	
+	function my_chooseUploadFile_callback(){
+		var filepath = window.localStorage.getItem("filepath");
+		var filename = window.localStorage.getItem("filename");
+		if(filename&&filename!=""&&filepath&&filepath!=""){
+			window.webview.uploadAll(filepath,filename,"file","showUploadFile");
+			window.localStorage.setItem("filepath", "");
+			window.localStorage.setItem("filename", "");
+		}
+	}
+
+	function my_clickFile(filename) {
+		var filepath = my_curFolderPath + "/" + filename;
+		sys_confirm("确定要上传该文件吗？", function(btn) {
+			if (btn == true) {
+				window.webview.uploadAll(filepath,filename,"file","showUploadFile");
+			}
+		});
+	}
+	
+	//判断文件名称长度，超过25，中间显示省略号,中文翻倍，这里暂时只做纯英文或中文处理
+	function estimateFileLength(fileName){
+		var len = fileName.replace(/[^\x00-\xff]/g,"aa").length;
+		var len2 = fileName.length;
+		var font;
+		var tail;
+		if(len > 25 && (len == len2)){
+			font = fileName.substring(0,fileName.lastIndexOf(".") - 6);
+			tail = fileName.substring(fileName.lastIndexOf(".") - 3);
+			return font + "..." + tail;
+		}else if(len > 25 && (len > len2)){
+			font = fileName.substring(0,fileName.lastIndexOf(".") - 18);
+			tail = fileName.substring(fileName.lastIndexOf(".") - 3);
+			return font + "..." + tail;
+		}else{
+			return fileName;
+		}
+	}
+	
+	//判断上传文件类型，返回显示图片路径
+	function getShowFileTypePic(path){
+		//为了避免转义反斜杠出问题，这里将对其进行转换
+		var re = /(\\+)/g;
+		var filename = path.replace(re,"#");
+		//对路径字符串进行剪切截取
+		var one = filename.split("#");
+		//获取数组中最后一个，即文件名
+		var two = one[one.length-1];
+		//再对文件名进行截取，以取得后缀名
+		var three = two.split(".");
+		//获取截取的最后一个字符串，即为后缀名
+		var last = three[three.length-1];
+		if("jpg,jpeg,png,gif,bmp".indexOf(last) >= 0){
+			return "./fileType/img.png";
+		}else if("xls,xlsx".indexOf(last) >= 0){
+			return "./fileType/excel.png";
+		}else if("pdf".indexOf(last) >= 0){
+			return "./fileType/pdf.png";
+		}else if("txt".indexOf(last) >= 0){
+			return "./fileType/txt.png";
+		}else if("xml".indexOf(last) >= 0){
+			return "./fileType/xml.png";
+		}else if("doc,docx".indexOf(last) >= 0){
+			return "./fileType/word.png";
+		}else if("pptx,ppt".indexOf(last) >= 0){
+			return "./fileType/ppt.png";
+		}else{
+			return "./fileType/file.png";
+		}
+	}
+	
+	//显示上传的文件
+	function showFile(uploadFile){
+		//为了避免转义反斜杠出问题，这里将对其进行转换
+		var re = /(\\+)/g;
+		var filename = uploadFile.replace(re,"#");
+		//对路径字符串进行剪切截取
+		var one = filename.split("#");
+		//获取数组中最后一个，即文件名
+		var two = one[one.length-1];
+		//再对文件名进行截取，以取得后缀名
+		var three = two.split(".");
+		//获取截取的最后一个字符串，即为后缀名
+		var last = three[three.length-1];
+		if("jpg,jpeg,png,gif,bmp".indexOf(last) >= 0){
+			$(".box > img").attr("src",uploadFile);
+			$(".box").show();
+		}else{
+			$(".file").load(uploadFile);
+			$(".file").show();
+		}
+	}
+	
+	function downloadFile(url,filename){
+        if(isAndriod){
+            window.webview.downloadFile(url,filename);
+        }else{
+            window.location.href=url+filename;
+        }
+	}
+	
+	//显示上传文件
+	function showUploadFile(fileName){
+		var showFileName = fileName;
+		$("#div_sys_outerEXP").hide();
+		var url = sys_ctx.replace("ltzfwpt","") + "/" + jstxPath + fileName.substring(0,10) + "/";
+		var guid = getGuid();
+		var message = new Object();
+		message.senderId = senderId;
+		message.senderName = senderName;
+		message.receiverId = receiverId;
+		message.receiverName = receiverName;
+		message.guid = guid;
+		sys_ajaxPost("/jstx/default.do?method=getServerTime",function(json){
+			message.sendTime = json.time;
+			message.sendContent = "<div>" + 
+									showFileName.substring(23) + "&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='downloadFile(\""+url+"\",\""+showFileName+"\")'>查看</a>" + 
+								  "</div>";
+			var mySendMsg = rightTitle + "&nbsp;&nbsp;" + message.sendTime + "</div></div>";
+			
+			if(message.senderId !=message.receiverId)
+			{
+				if(message.guid!=null && message.guid!=undefined)
+				{
+					document.getElementById("chatContent").innerHTML += ( "<div id='chat_"+guid+"' style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' src='"+sys_ctxStr()+message.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\"></div><div style='float:left;width:90%;'>" +  mySendMsg + rightContent+"<div onselectstart='return false' id="+message.guid+" ontouchstart='copytouchstart(\""+message.guid+"\",\""+url+"\",\"rightflag\",\"filetype\",\""+showFileName+"\")'  ontouchend='copytouchend(\""+message.guid+"\",\""+url+"\",\"rightflag\",\"filetype\",\""+showFileName+"\")' style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + message.sendContent + "</div>></div></div><div style='clear:both;'></div>");
+				}else{
+					document.getElementById("chatContent").innerHTML += ( "<div id='chat_"+guid+"' style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' src='"+sys_ctxStr()+message.sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\"></div><div style='float:left;width:90%;'>" +  mySendMsg + rightContent +"<div style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>"+ message.sendContent + "</div></div></div><div style='clear:both;'></div>");
+				}
+				
+			}
+			
+			websocket.send(JSON.stringify(message));
+			myScroll.refresh();
+			if($("#chatContent").height() >= $("#chatBox").height()){
+				myScroll.scrollToElement("#chatContent > div:last-child", 500);
+			}
+		});
+	}
+	function my_goBackFile(obj) {
+		var folderpath = my_curFolderPath;
+		folderpath = folderpath.substring(0, folderpath.lastIndexOf("/"));
+		if (folderpath == "") {
+			folderpath = "/";
+		}
+		my_chooseUploadFile(folderpath);
+	}
+	function my_cardFileExplorer(json) {
+		my_curFolderPath = json[json.length - 1];
+		var div_sys_outerSEL = $("#div_sys_outerEXP");
+		if (div_sys_outerSEL.length == 0) {
+			var div_sys_outerSEL = '<div id="div_sys_outerEXP" style="display: none;">';
+			div_sys_outerSEL = div_sys_outerSEL
+					+ '<div id="selectFile_toolbar" ><span class="btn_bak" id="btn_selectFile_cancel"></span><span class="btn_toolbar_font" style="font-size:19px;font-weight:bold;">选择文件</span><h1 class="toolbar_title" ></h1></div><div style="height:47px;"></div><div id="sys_selectFileScoll"><div id="div_sys_selectFile"></div></div></div>';
+			$("body").append(div_sys_outerSEL);
+			// 选项少空白区域移动会显示后面内容
+			document.getElementById("div_sys_outerEXP").addEventListener(
+					"touchmove", function(e) {
+						e.preventDefault();
+					}, false);
+			$('#selectFile_toolbar').toolbar();
+			$('#btn_selectFile_cancel').on('click', function(e) {
+				$("#div_sys_outerEXP").hide();
+			});
+		}
+		var output = new Array();
+		var output1 = new Array();
+		var sys_selectFileinnerScoll = null;
+		if ($("#div_header_path").length > 0) {
+			$("#span_cur_path").text(my_curFolderPath);
+		} else {
+			output1.push("<div id='div_header_path' onclick=my_goBackFile(this)>");
+			output1.push("<img src='../img/uploadback.png' width='35' height='35' style='position: absolute;left: 10px;top:6px;'/>");
+			output1.push("<span id='span_cur_path' style='position: absolute;left: 70px;'>"
+							+ json[json.length - 1] + "</span>");
+			output1.push("</div>");
+			$("#selectFile_toolbar").append(output1.join(""));
+			$("#span_cur_path").width(window.innerWidth-70);
+		}
+		if (my_curFolderPath == "/") {
+			my_curFolderPath = "";
+		}
+		for ( var i = 0; i < json.length - 1; i++) {
+			output.push("<li>");
+			if (json[i].flag == "1") {
+				output.push("<div class='div_filelist_main' onclick=my_chooseUploadFile('"
+								+ my_curFolderPath + "/" + json[i].name + "')>");
+				output.push("<div class='div_filelist_icon'>");
+				output.push("<img src='../img/folderpic.png' width='45' height='45'/>");
+			} else {
+				output.push("<div class='div_filelist_main' onclick=my_clickFile('"
+								+ json[i].name + "')>");
+				output.push("<div class='div_filelist_icon'>");
+				output.push("<img src='../img/filepic.png' width='45' height='45'/>");
+			}
+			output.push("</div>");
+			output.push("<div class='div_filelist_content'>");
+			output.push("<div class='content_top'><span class='filetitle'>"
+					+ json[i].name + "</span></div>");
+			output.push("<div class='content_btn'><span class='filetitle'>");
+			if (json[i].flag == "0") {
+				output.push("[文件]" + json[i].size + "&nbsp;&nbsp;" + json[i].time);
+			} else {
+				output.push("[文件夹]");
+			}
+			output.push("</span></div>");
+			output.push("</div></div></li>");
+		}
+		$("#div_sys_selectFile").empty().html(output.join(""));
+		$("#div_sys_outerEXP").show();
+		// 设置内滚动
+		if (sys_selectFileinnerScoll) {
+			sys_selectFileinnerScoll.refresh();
+		} else {
+			$("#sys_selectFileScoll").height(window.innerHeight - 52 - 47);
+			sys_selectFileinnerScoll = new iScroll("sys_selectFileScoll", {
+				click : true
+			});
+		}
+	}
+	
+	
+	//点击键盘自带隐藏后的操作
+	var firstInnerHeight = null;
+	var secondInnerHeight = null;
+	window.onresize = renewChatBox;
+	function renewChatBox(){
+		if(null == firstInnerHeight){
+			firstInnerHeight = window.innerHeight;
+		}else if(null == secondInnerHeight){
+			secondInnerHeight = window.innerHeight;
+		}
+		if(secondInnerHeight > firstInnerHeight){
+			if(($("#recording").css("display") == "none") && ($("#gundong").css("display") == "none")){
+				hideShow();
+			}
+			firstInnerHeight = null;
+			secondInnerHeight = null;
+		}
+	}
+	
+	//获取guid
+	function getGuid()
+	{
+		var Num=""; 
+		 for(var i=0;i<5;i++) 
+		 { 
+		 Num+=Math.floor(Math.random()*10); 
+		 } 
+		var myDate = new Date();
+		var mouth=myDate.getMonth()+1;
+		if(mouth<10)
+		{
+			mouth="0"+mouth;
+		}
+		var guid = (myDate.getFullYear()+""+mouth+""+myDate.getDate()+""+myDate.getHours()+""+myDate.getMinutes()+""+myDate.getSeconds()+""+myDate.getMilliseconds()+""+Num);
+		return guid;
+	}
+</script>
+<script>
+    /*****************开启图片全屏预览begin***************************/
+    mui.previewImage();
+    mui('body').on('tap','a',function () {
+        if (this.href&&this.href!="#"){
+            document.location.href=this.href;
+            // mui.openWindow();
+        }
+    });
+    mui('body').on('click','a',function () {
+        if (this.href&&this.href!="#"){
+            document.location.href=this.href;
+            // mui.openWindow();
+        }
+    });
+    var obs = null;
+    function showRealImage(ob) {
+        addIndex();
+        obs=ob;
+        mui.previewImage().open(parseInt(ob.title),parseInt(ob.getAttribute('data-preview-group')));
+        is_mui_opened = true;
+    }
+    /*****************开启图片全屏预览end***************************/
+        //给聊天图片加下标
+    var imgs = document.getElementsByTagName('img');
+    function addIndex() {
+        var count=0;
+        for(var i=0;i<imgs.length;i++){
+            if (imgs[i].id=="imgzoom") {
+                count++;
+                //将索引当作img标签的属性进行存储
+                $(imgs[i]).attr('title',count-1);
+                $(imgs[i]).attr('data-preview-group',count);
+            }
+        }
+    }
+    function saveImage() {
+        location.href = obs.src.replace("breviary","")+"&saveToAlbum";
+    }
+</script>
+</html>

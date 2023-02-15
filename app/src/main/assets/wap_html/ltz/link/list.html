@@ -1,0 +1,357 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>在线学习</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript">
+	var innerscroll = null;
+	var nm = getQueryStringRegExp("nm");
+	$(function() {
+		//生成toolbar
+		$('#toolbar').toolbar();
+		if (nm == '') {
+			nm = 3;
+		}
+		$(".c_tabs_text").eq(3).addClass("c_tabs_active");
+		// loadLgbzj();//老干部之家
+		// sys_ajaxGet("/wxLink/default.do?method=getWxLink", function(json) {
+		// 	if (json.wxList) {
+		// 	var wxList=json.wxList;
+		// 	for(var i =0;i<json.wxList.length;i++){
+		// 	  var wxHthml="<div class='wx_item'><div class='wx_item_img wx_link_height' id='"+wxList[i].wxnum+"' style=\"background-image: url(img/"+wxList[i].wxnum+".png);\" "
+		// 				+"onclick=\"wx_goUrl('"+wxList[i].wxhref+"')\"></div> </div>"
+		//   	  $('#main_link').append(wxHthml);
+		// 	}
+		// 	 $('#main_link').height(Math.ceil((json.wxList.length+5)/2)*60+50);
+		// 	 _innerscoll();
+		//  }
+		// });
+		_innerscoll();
+			
+	});
+	function loadLgbzj(){
+	   var wxHthml="<div class='wx_item'><div class='wx_item_img wx_link_height' style=\"background-image: url(img/lgbzj.png);border:0px;\" "
+						+"onclick=\"goLgbzj()\"></div> </div>"
+		  	  $('#main_link').append(wxHthml);
+	}
+	function _innerscoll(){
+			if(innerscroll){
+			   innerscroll.refresh(); 
+			}else{
+				var _height = getListHeight();
+		    	$("#innerscroller").height(window.innerHeight-_height);
+		        innerscroll = new iScroll("innerscroller",{click:true});
+		    	//sys_autoTextarea(innerscroll); 		   
+			}		    
+		}    
+
+	function goUrl(url, param) {
+		if (isAndriod) {
+			if (param == '0') {
+				window.webview.loadurl_embed(url)
+			} else if (param == '1') {
+				window.webview.loadurl_new(url);
+			} else {
+				window.webview.loadurl_new(url);
+			}
+
+		} else if (isIphone) {
+			window.location.href = 'obj-c://outside//' + url;
+		} else {
+			var iTop = (window.screen.availHeight - 30 - 365) / 2;
+			var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+			window.open(url, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+		}
+		return;
+	}
+
+	// 点击tab页刷新画面显示相应tab页内容一览list
+	/* function getNm(dm) {
+		if (dm == "xxzl") { //学习专栏
+			sys_goURL(getBaseURL() + "ltz/elearning/list.html");
+		} else if (dm == "wdsj") { //我的书架
+			sys_goURL(getBaseURL() + "ltz/publication/list.html");
+		} else if (dm == "xxtj") { //我的书架
+			sys_goURL(getBaseURL() + "ltz/lgsy/list.html?lb_dm=71680");
+		} else if (dm == "yqlj") {
+			sys_goURL(getBaseURL() + "ltz/link/list.html");
+		}
+	} */
+	function getNm(dm){
+		if(dm=="yqlj"){
+			sys_goURL(getBaseURL() + "ltz/link/list.html");
+		}
+	}
+
+	function wx_goUrl(url) {
+		if (isAndriod) {
+			window.webview.loadurl_embed(url)
+		} else if (isIphone) {
+			window.location.href = 'obj-c://outside//' + url;
+		} else {
+			var iTop = (window.screen.availHeight - 30 - 365) / 2;
+			var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+			window.open(url, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+		}
+		return;
+
+	}
+	function goLgbzj() {
+	     var param="http://m.lgbzj.com/";
+		if (isAndriod) {
+			window.webview.loadurl_embed(param);
+		} else if (isIphone) {
+			window.location.href = 'obj-c://outside//' + param;
+		} else {
+			var iTop = (window.screen.availHeight - 30 - 365) / 2;
+			var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+			window.open(param, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+		}
+		return;
+	}
+</script>
+
+<style type="text/css">
+.ui-toolbar-wrap {
+	border: none !important;
+}
+
+.main {
+	padding: 5px;
+}
+
+.row {
+	width: 100%;
+	display: -webkit-box;
+	-webkit-box-orient: horizontal;
+	height: 60px;
+}
+
+.row .item {
+	width: 50%;
+	height: 100%;
+}
+
+.item_img {
+	margin: 5px 5px 5px 5px;
+	background-repeat: round;
+	background-size: 100% 100%;
+}
+
+.link_height {
+	height: 50px;
+}
+
+.wx_row {
+	width: 100%;
+	display: -webkit-box;
+	-webkit-box-orient: horizontal;
+	height: 60px;
+}
+
+.wx_row .wx_item {
+	width: 50%;
+	height: 100%;
+}
+
+.wx_item_img {
+	margin: 5px 5px 5px 5px;
+	background-repeat: round;
+	background-size: 100% 100%;
+	border-left: 1px solid #e7e4e4;
+	border-top: 1px solid #e7e4e4;
+	border-right: 1px solid #e7e4e4;
+	border-bottom: 1px solid #e7e4e4;
+}
+
+.wx_link_height {
+	height: 50px;
+	width: 46%;
+	float: left;
+}
+
+#link_rmw {
+	background-image: url("img/rmw.png");
+}
+
+#link_xhw {
+	background-image: url("img/xhw.png");
+}
+
+#link_gcdxww {
+	background-image: url("img/gcdxww.png");
+}
+
+#link_gcdyw {
+	background-image: url("img/gcdyw.png");
+}
+
+#link_djw {
+	background-image: url("img/djw.png");
+}
+
+#link_zgzzrs {
+	background-image: url("img/zgzzrs.png");
+}
+
+#link_xxjxs {
+	background-image: url("img/xxjxs.png");
+}
+
+#link_lgbzj {
+	background-image: url("img/lgbzj.png");
+}
+
+#link_zglgb {
+	background-image: url("img/zglgb.jpg");
+}
+
+#link_bjlgb {
+	background-image: url("img/bjlgb.jpg");
+}
+
+#link_zjlgb {
+	background-image: url("img/wx_zjlgb.png");
+}
+
+#link_hnlgb {
+	background-image: url("img/hnlgb.jpg");
+}
+
+#link_ahlgb {
+	background-image: url("img/ahlgb.jpg");
+}
+
+#link_gxlgb {
+	background-image: url("img/gxlgb.jpg");
+}
+
+#link_syxy {
+	background-image: url("img/syxy.jpg");
+}
+
+#link_khlgb {
+	background-image: url("img/khlgb.jpg");
+}
+
+#link_jyb {
+	background-image: url("img/jyblgbzj.jpg");
+}
+
+#link_bingqi {
+	background-image: url("img/bq.jpg");
+}
+
+#link_jllgb {
+	background-image: url("img/jllgb.jpg");
+}
+#link_djyj {
+	background-image: url("img/djyj.jpg");
+}
+.lgbzj {
+	background-color: #ece9e9;
+	height: 50px;
+	line-height: 50px;
+	position: fixed;
+	bottom: 50px;
+	left: 0px;
+	width: 100%;
+	text-align: center;
+	/* box-shadow:0px -5px 5px #c3c0c0; */
+}
+</style>
+
+</head>
+<body>
+	<div id="toolbar">
+		<span class="btn_bak" onclick="sys_goURL('../elearning/main.html');"></span>
+		<h1 class="toolbar_title">友情链接</h1>
+		<span class='c_tabs_text' onclick=getNm('yqlj')></span>
+	</div>
+	<!-- 学习专栏和我的书架 -->
+	<!-- <div class="c_tabs div_other_40" id="div_tabs">
+		<div id='div_list0'>
+			<div class='c_tabs_text' onclick="getNm('xxzl')">学习专栏</div>
+		</div>
+		<div id='div_list1'>
+			<div class='c_tabs_text' onclick="getNm('wdsj')">我的书架</div>
+		</div>
+		<div id='div_list2'>
+			<div class='c_tabs_text' onclick="getNm('xxtj')">信息推荐</div>
+		</div>
+		<div id='div_list3'>
+			<div class='c_tabs_text' onclick="getNm('yqlj')">友情链接</div>
+		</div>
+	</div> -->
+
+	<div id="innerscroller">
+		<div style="margin: 5px 5px 0px 5px;">
+			<div class="main" id="main_link">
+				<div class="row">
+					<div class="item">
+						<div class="item_img link_height" id="link_rmw"
+							 onclick="goUrl('http://m.people.cn/','0')"></div>
+					</div>
+					<div class="item">
+						<div class="item_img link_height" id="link_xhw"
+							 onclick="goUrl('http://m.xinhuanet.com','0')"></div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="item">
+						<div class="item_img link_height" id="link_gcdxww"
+							onclick="goUrl('http://cpc.people.com.cn','0')"></div>
+					</div>
+					<div class="item">
+						<div class="item_img link_height" id="link_gcdyw"
+							 onclick="goUrl('http://www.12371.cn/','0')"></div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="item">
+						<div class="item_img link_height" id="link_djw"
+							 onclick="goUrl('http://www.dangjian.cn/','1')"></div>
+					</div>
+					<div class="item">
+						<div class="item_img link_height" id="link_zgzzrs"
+							onclick="goUrl('http://www.zuzhirenshi.com/','1')"></div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="item">
+						<div class="item_img link_height" id="link_xxjxs"
+							onclick="goUrl('http://www.xinhuanet.com/politics/xxjxs/','1')"></div>
+					</div>
+					<div class="item">
+						<div class="item_img link_height" id="link_djyj"
+							onclick="goUrl('http://www.djyj.cn/','1')"></div>
+					</div>
+					
+				</div>
+				<div class="row">
+				<div class="item">
+						<div class="item_img link_height" id="link_lgbzj"
+							onclick="goUrl('http://m.lgbzj.com/','0')"></div>
+					</div>
+					
+				</div>
+			</div>
+			<!-- 微信公众号 -->
+			
+		</div>
+	</div>
+	<!-- 
+	<div class="div_other_50 lgbzj"
+		onclick="goLgbzj('http://m.lgbzj.com/')">
+		<img src="img/lgbzj.png" style="height:34px;margin-top:8px;">
+	</div>
+	 -->
+</body>
+</html>

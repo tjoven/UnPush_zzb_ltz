@@ -1,0 +1,831 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+<title>电话簿</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+	    <link rel="stylesheet" type="text/css" href="../../css/list.css" />
+
+<script type="text/javascript">
+	var sys_fsfw = getQueryStringRegExp("sys_fsfw");
+	var sys_fsfw_mc = getQueryStringRegExp("sys_fsfw_mc");
+	var sys_bm = getQueryStringRegExp("sys_bm");
+	//var sys_mkdm = getQueryStringRegExp("sys_mkdm");
+	var sys_mkdm = "address";
+	var sys_qxid = getQueryStringRegExp("sys_qxid");
+	var yhfw = getQueryStringRegExp("yhfw");
+    //var picPath = "";
+	var date = 0,
+		date_r = 0,
+		date_rs = 0,
+		date_g = 0,
+		date_gs = 0;
+	var divheight = $(window).height();
+	var flag = 0;
+	var bmid = "";
+	//var bmid=window.localStorage.getItem("bmid");
+	//var yhid=window.localStorage.getItem("yhid");
+	var innerscroll = null;
+	var innerscroll_search = null;
+	var yhid = "";
+	$(function() {
+		$('.button').button();
+// 		noBarsOnTouchScreen("main_left");
+// 		noBarsOnTouchScreen("search_rtn");
+		$('#toolbar').toolbar();
+		$("#search_rtn").hide();
+		//$("#quit_search").hide();
+		$("#user_search").width($(document).width()-20);
+		sys_ajaxGet("/ltz/address/default.do?method=getBmYhList&showyjdh=yes","hasbm=0&yhfw=" + yhfw + "&sys_bm=" + sys_bm + "&qxid=" + sys_qxid + "&mk_dm=" + sys_mkdm, function(json) {
+			if (json.list) {
+				setTreeList(json.list);
+				//picPath = json.txlj;
+				if (json.list.length > 0){
+					$("#initbmid").val(json.initbmid);
+				}
+			}
+		});
+		$("#btn_group").click(function() {
+			sys_goURL('groups.html');
+		});
+		var width = window.innerWidth;
+		$(".ui-btn-group").width(width - 100);
+		//$("#user_search").width(width - 70);
+		String.prototype.startWith = function(s) {
+			if (s == null || s == "" || this.length == 0 || s.length > this.length)
+				return false;
+			if (this.substr(0, s.length) == s)
+				return true;
+			else
+				return false;
+			return true;
+		}
+		
+		$(".live_call").live(function(){
+			$(this).find("a").click();
+		});
+		_innerscoll();
+		_innerscoll_search();
+	});
+
+	function setTreeList(list, bt) { //处理部门人员树区域
+		var output = new Array();
+		if (bt === undefined) {
+			bt = '';
+		}
+		output.push("<table class='c_wap_db_table' width='100%'>");
+		if (bt != '' && bt.length > 0) {
+			var i = 0;
+			var head = '<td align="center" width="5%"><img src="img/sj_b.png"/></td>';
+			output.push("<tr><td colspan='3'>");
+			output.push("&nbsp;<a href='javascript:void(0)' style='text-decoration:underline;' onclick=getBmyh('201','','','')><font color='gray'><b>单 位</b></font></a>");
+			output.push("<td></tr>");
+			output.push("<tr class='c_tr_spliter'><td class='c_td_bottom_line2' width='100%' colspan='3'></td></tr>");
+			for (i = 0; i < bt.length; i = i + 1) {
+				output.push("<tr>");
+				output.push(head + "<td colspan='2'><a href='javascript:void(0)' style='text-decoration:underline;' onclick=getBmyh('201','" + bt[i].bmid + "','" + bt[i].mc + "','')><font color='gray'><b>" + bt[i].mc + "</b></font></a>");
+				output.push("<td></tr>");
+				if (i != bt.length - 1) {
+					output.push("<tr class='c_tr_spliter'><td class='c_td_bottom_line2' width='100%' colspan='3'></td></tr>");
+				}
+			}
+			output.push("<tr class='c_tr_spliter'><td class='c_td_bottom_line' width='100%' colspan='3'></td></tr>");
+		}
+		if (list.length <= 0) {
+			output.push("<tr>");
+			output.push("<td align='left' colspan='2'><font color='gray'>&nbsp;&nbsp;无信息</font></td>");
+			output.push("</tr>");
+		} else {
+			var i = 0;
+			for (i = 0; i < list.length; i = i + 1) {
+				var chatlx = 1;
+				var mc = list[i].mc;
+				mc = mc.replace(/[ ]/g, ''); //替换所有空格
+				if (list[i].lx_dm == '201') {
+					output.push("<tr flagattr='"+list[i].lxid+"' class='c_tr_text' onclick=\"getBmyh('" + list[i].lx_dm + "','" + list[i].lxid + "','" + mc + "','',this)\">");
+				} else {
+					output.push("<tr class='c_tr_text' onclick=\"clickYh('" + list[i].sj + "','" + list[i].imail + "','" + mc + "','" + list[i].lxid + "','"+list[i].desj+"')\">");
+				}
+				output.push("<td></td><td align='center' width='8%'>");
+				if (list[i].lx_dm == '201') {
+					output.push("<img class='img' src='img/open.png' style='position: relative;top: 3px;left: 2px;'/>");
+					chatlx = 3;
+				}
+				output.push("</td><td align='left'>");
+				output.push(mc);
+				if (list[i].lx_dm == '201') {
+					var bmidArr = bmid.split(",");
+					for (var b = 0; b < bmidArr.length; b++) {
+						var bmidStr = "bm" + bmidArr[b];
+						if (bmidStr.startWith(list[i].lxid)) {
+							output.push("<span class='calling' onclick=\"clickYh('" + list[i].sj + "','" + list[i].imail + "','" + mc + "','" + list[i].lxid + "','"+list[i].desj+"')\"><img src='img/dialog.png' width='30px' height='30px'/></span>");
+							break;
+						}
+					}
+				} else {
+					output.push("<span class='calling' onclick=\"clickYh('" + list[i].sj + "','" + list[i].imail + "','" + mc + "','" + list[i].lxid + "','"+list[i].desj+"')\"><img src='img/dialog.png' width='30px' height='30px'/></span>");
+				}
+				output.push("</td></tr>");
+			}
+		}
+		output.push("<tr class='c_tr_text'><td></td></tr>");
+		output.push("</table>");
+		$("#main_left").html(output.join(""));
+		$("[flagattr='bmlxdh']").click();
+		$("[flagattr='bmyjdh']").click();
+		_innerscoll();
+	}
+	function getBmyh(lx_dm, id, mc, bmmc, obj) { //获取下级部门用户
+		if (date != 0) {
+			date_g = new Date();
+			date_gs = date_g.getTime() - date.getTime(); //时间差的毫秒数
+			if (date_gs <= 500) {
+				return;
+			}
+		}
+		if (lx_dm == '201') {
+			var t = $("#tab_" + id);
+			if (t.length > 0) {
+				if (t.css('visibility') != 'hidden' && t.css('display') != 'none') {
+					t.hide();
+					$(".img", obj).attr("src", "img/open.png");
+				} else {
+					t.show();
+					$(".img", obj).attr("src", "img/close.png");
+				}
+			} else {
+				sys_ajaxGet("/ltz/address/default.do?method=getBmYhList&showyjdh=yes", "org_bmid=" + id + "&sys_bm=" + sys_bm + "&qxid=" + sys_qxid + "&mk_dm=" + sys_mkdm + "&initbmid=" + $("#initbmid").val(), function(json) {
+					if (json.list) {
+						$(".img", obj).attr("src", "img/close.png");
+						var output = new Array();
+						output.push("<tr><td colspan=3><table id='tab_" + id + "' width='100%'>");
+						if (json.list.length > 0) {
+							var list = json.list;
+							//setTreeList(json.list,json.sjbmList);
+							var sl = (id.split('_')).length * 3;
+							var i = 0;
+							for (i = 0; i < list.length; i = i + 1) {
+								var chatlx = 1;
+								var mc = list[i].mc;
+								mc = mc.replace(/[ ]/g, ''); //替换所有空格
+								if (list[i].lx_dm == '201') {
+									output.push("<tr class='c_tr_text' onclick=\"getBmyh('" + list[i].lx_dm + "','" + list[i].lxid + "','" + mc + "','',this)\">");
+								} else {
+									if (list[i].lxid == "yh" + yhid) {
+										var phone = list[i].sj;
+										var imail = list[i].imail;
+										if (!phone)
+											phone = "";
+										if (!imail)
+											imail = "";
+										output.push("<tr class='c_tr_text' onclick=\"startCall('"+phone+ "','"+ imail+"','"+mc+"','"+list[i].lxid+"','"+list[i].desj+"')\">");
+									} else {
+										if(list[i].lxid=='fwdh' || list[i].lxid=='lxdh'){
+											 
+											output.push("<tr class='c_tr_text' onclick=\"dadianhua('"+list[i].sj+"')\">");
+											}else if(list[i].lxid=='yjdh'){
+											  output.push("<tr class='c_tr_text' onclick=\"call_aid()\">");
+											}else{
+										output.push("<tr class='c_tr_text' onclick=\"clickYh('"+list[i].sj+"','"+list[i].imail+"','"+mc+"','"+list[i].lxid+"','"+list[i].desj+"')\">");
+											}
+											}
+								}
+								output.push("<td width='" + sl + "%'></td><td align='center' width='8%'>");
+								if (list[i].lx_dm == '201') {
+									output.push("<img class='img' src='img/open.png' style='position: relative;top: 3px;left: 2px;'/>");
+									chatlx = 3;
+								}
+								output.push("</td><td align='left'>");
+								if (list[i].lx_dm == '204') {
+											if(list[i].lxid=='fwdh' || list[i].lxid=='lxdh'){
+												
+												    output.push("<div style='position: relative;width:50px;float:right;height:50px;'><img src='img/tel.jpg' style='margin-top:10px;border-radius:50px' width='30px' height='30px' onerror=\"javascript:this.src='img/tel.jpg';\" /></div>");
+												}else if (list[i].lxid=='yjdh'){
+												
+												   output.push("<div style='position: relative;width:50px;float:right;height:50px;'><img src='img/aid.png' style='margin-top:12px;' width='25px' height='25px' onerror=\"javascript:this.src='img/tel.jpg';\" /></div>");
+												}else if (list[i].dhlx=='gzrydh' || list[i].dhlx=='fwrydh'){
+													
+											         output.push("<div style='position: relative;width:50px;float:left;height:50px;'><img src='"+getPicPath(list[i].lxid,'a')+"' id='"+list[i].lxid+"a' style='margin-top:5px;border-radius:50px' width='40px' height='40px' onerror=\"javascript:this.src='img/person.png';\" /></div>");
+												}else{
+													output.push("<div onclick=\"dadianhua('"+list[i].sj+"')\" style='position: relative;width:50px;float:right;height:50px;'><img src='img/tel.jpg' style='margin-top:10px;border-radius:50px' width='30px' height='30px' onerror=\"javascript:this.src='img/tel.jpg';\" /></div>");
+													
+											         output.push("<div style='position: relative;width:50px;float:left;height:50px;'><img src='"+getPicPath(list[i].lxid,'a')+"' id='"+list[i].lxid+"a' style='margin-top:5px;border-radius:50px' width='40px' height='40px' onerror=\"javascript:this.src='img/person.png';\" /></div>");
+												}
+										}
+								output.push(mc);
+								if (list[i].lx_dm == '201') {
+									var bmidArr = bmid.split(",");
+									for (var b = 0; b < bmidArr.length; b++) {
+										var bmidStr = "bm" + bmidArr[b];
+										if (bmidStr.startWith(list[i].lxid)) {
+											output.push("<span class='calling' onclick=\"clickYh('" + list[i].sj + "','" + lsit[i].sj2 + "','" + list[i].zw + "','" + list[i].bgdh + "','" + list[i].imail + "','" + mc + "','" + list[i].lxid + "','"+list[i].desj+"')\"><img src='img/dialog.png' width='30px' height='30px'/></span>");
+											break;
+										}
+									}
+								} 
+								output.push("</td></tr>");
+							}
+						}
+						output.push("</table></td></tr>");
+						$(obj).after(output.join(""));
+						_innerscoll();
+					}
+				});
+			}
+		}
+		_innerscoll();
+	}
+	function clickYh(phone,imail,mc,yhid2,phone2) {
+		//window.event.stopPropagation();
+		//var url="chat.html?id="+id+"&mc="+escape(mc)+"&chatlx="+chatlx+"&retUrl=lxr.html";
+		//sys_goURL(url);
+		if (phone == 'undefined' || !phone)
+			phone = "";
+		if (imail == 'undefined' || !imail)
+			imail = "";
+		if (phone2 == 'undefined' || !phone2)
+			phone2 = "";
+		startCall(phone,imail, mc, yhid2,phone2);
+	}
+
+	function search_bmyh() { //搜索
+		$("#main_left").hide();
+		$("#search_rtn").show();
+		//$("#quit_search").show();
+		if(!($("#user_search").val()) || (""==$("#user_search").val())){
+			sys_goURL("lxr.html"); 	
+		}
+		sys_ajaxGet("/ltz/address/default.do?method=getBmYhCx&showyjdh=yes&sys_bm=" + sys_bm + "&qxid=" + sys_qxid + "&mk_dm=" + sys_mkdm + "&page_size=100&page_goto=1", {
+			cx_py : $("#user_search").val()
+		}, function(json) {
+			if (json.gridData.table_list.data) {
+				set_searchrtn(json.gridData.table_list.data);
+			} else {
+				$("#search_rtn").html("<font color='gray'>&nbsp;&nbsp;无信息</font>");
+			}
+		});
+	}
+	function set_searchrtn(list) { //设置搜索结果区域
+		if (list.length > 0) {
+			var output = new Array();
+			output.push("<table class='c_wap_db_table' width='100%'>");
+			for (var i = 0; i < list.length; i = i + 1) {
+				var chatlx = 1;
+				var mc = list[i].mc;
+				mc = mc.replace(/[ ]/g, ''); //替换所有空格
+				if (list[i].lx_dm == '201') {
+					output.push("<tr class='c_tr_text' onclick=\"getBmyh('" + list[i].lx_dm + "','" + list[i].id + "','" + mc + "','',this)\">");
+				} else {
+					if (list[i].id == "yh" + yhid) {
+						var phone = list[i].sj;
+						var imail = list[i].imail;
+						if (!phone)
+							phone = "";
+						if (!imail)
+							imail = "";
+						output.push("<tr class='c_tr_text' onclick=\"startCall('" +phone + "','" + imail + "','" + mc + "','" + list[i].id + "','"+list[i].desj+"')\">");
+					} else {
+						if(list[i].lxid=='fwdh' || list[i].lxid=='lxdh'){
+							 
+							output.push("<tr class='c_tr_text' onclick=\"dadianhua('"+list[i].sj+"')\">");
+							}else if(list[i].lxid=='yjdh'){
+								output.push("<tr class='c_tr_text' onclick=\"call_aid()\">");
+							}else{
+						output.push("<tr class='c_tr_text' onclick=\"clickYh('" + list[i].sj + "','" + list[i].imail + "','" + mc + "','" + list[i].id + "','"+list[i].desj+"')\">");
+							}
+							}
+				}
+				output.push("<td align='center' width='4%'>");
+				if (list[i].lx_dm == '201') {
+					output.push("<img class='img' src='img/open.png' style='position: relative;top: 3px;left: 2px;'/>");
+					chatlx = 3;
+				}
+				output.push("</td><td align='left'>");
+				if (list[i].lx_dm == '204') {
+                        if(list[i].lxid=='fwdh' || list[i].lxid=='lxdh'){
+						
+						   output.push("<div style='position: relative;width:50px;float:right;height:50px;'><img src='img/tel.jpg' style='margin-top:10px;border-radius:50px' width='30px' height='30px' onerror=\"javascript:this.src='img/tel.jpg';\" /></div>");
+						}else if (list[i].lxid=='yjdh'){												
+					          output.push("<div style='position: relative;width:50px;float:right;height:50px;'><img src='img/aid.png' style='margin-top:12px;' width='25px' height='25px' onerror=\"javascript:this.src='img/tel.jpg';\" /></div>");
+						}else{
+							output.push("<div onclick=\"dadianhua('"+list[i].sj+"')\" style='position: relative;width:50px;float:right;height:50px;'><img src='img/tel.jpg' style='margin-top:10px;border-radius:50px' width='30px' height='30px' onerror=\"javascript:this.src='img/tel.jpg';\" /></div>");
+							
+					output.push("<div style='position:relative;width:50px;float:left;height:50px;'><img src='" + getPicPath(list[i].lxid,'b') + "' id='"+list[i].lxid+"b' style='padding-top:5px;border-radius:50px' width='40px' height='40px' onerror=\"javascript:this.src='img/person.png';\" /></div>");
+						}
+						}
+				output.push(mc + list[i].bmmc);
+				output.push("</td></tr>");
+			}
+			output.push("</table>");
+			$("#search_rtn").html(output.join(""));
+			_innerscoll_search();
+		} else {
+			$("#search_rtn").html("<div style='text-align: center;height:60px'><font color='gray'>&nbsp;&nbsp;无信息</font></div>");
+		}
+	}
+
+	function quit_search1() { //退出搜索
+		$("#user_search").val('');
+		$("#quit_search").hide();
+		$("#search_rtn").hide();
+		$("#main_left").show();
+	}
+// 	function noBarsOnTouchScreen(arg) { //设置滚动
+// 		var elem,
+// 			tx,
+// 			ty;
+// 		if ('ontouchstart' in document.documentElement) {
+// 			if (elem = document.getElementById(arg)) {
+// 				elem.style.overflow = 'hidden';
+// 				elem.ontouchstart = ts;
+// 				elem.ontouchmove = tm;
+// 			}
+// 		}
+
+// 		function ts(e) {
+// 			var tch;
+// 			if (e.touches.length == 1) {
+// 				e.stopPropagation();
+// 				tch = e.touches[0];
+// 				tx = tch.pageX;
+// 				ty = tch.pageY;
+// 			}
+// 		}
+// 		function tm(e) {
+// 			var tch;
+// 			if (e.touches.length == 1) {
+// 				e.preventDefault();
+// 				e.stopPropagation();
+// 				tch = e.touches[0];
+// 				this.scrollTop += ty - tch.pageY;
+// 				ty = tch.pageY;
+// 			}
+// 		}
+// 	}
+	function startCall(phone,imail, mc, yhid2,phone2) {
+		window.event.stopPropagation();
+		var mask = $("#sys_mask_lxr");
+		if (mask.length == 0) {
+			var maskHTML = '<div id="sys_mask_lxr" onclick="closeDiv();"></div>';
+			$("body").append(maskHTML);
+		}
+		mask.css('display', '-webkit-box');
+		var div = $("#div_call");
+		//if($(div).css('visibility') == 'hidden' || $(div).css('display') == 'none'){
+		$(div).show();
+		//$(".c_wap_db_table").width()  background: url("+getPicPath(yhid)+") no-repeat 5px 2px;
+		var yhxx = new Array();
+		yhxx.push("<ul>");
+		yhxx.push("<li style='height: 54px;line-height:54px;'>");
+		yhxx.push("<img src='" + getPicPath(yhid2,'c')+"' id='"+yhid2+"c' style='position:absolute;left:5px;top:2px;border-radius:50px' width='50px' height='50px' onerror=\"javascript:this.src='img/person.png';\" />");
+		yhxx.push(mc);
+		yhxx.push("</li>");
+		yhxx.push("<li class='live_call'><img src='img/call1.png' width='30px' height='30px' style='position: absolute;left: 15px;padding-top: 8px;'/><a style='' href='tel:" + phone + "'>" + phone + "</a></li>");
+		yhxx.push("<li class='live_call'><img src='img/call1.png' width='30px' height='30px' style='position: absolute;left: 15px;padding-top: 8px;'/><a style='' href='tel:" + phone2 + "'>" + phone2 + "</a></li>");
+	     /*
+		if(!("lxdh"==yhid2)){
+		yhxx.push("<li><img src='img/mail.png' width='30px' height='30px' style='position: absolute;left: 15px;padding-top: 8px;'/>" + imail + "</li>");
+		} 
+		*/
+		yhxx.push("</ul>");
+		$(div).html(yhxx.join(''));
+		$("#div_call").width(window.innerWidth);
+		$(div).show();
+		$(div).css("z-index", 99);
+		$(div).css("bottom", '48px');
+	}
+	function closeDiv() {
+		var mask = $("#sys_mask_lxr");
+		mask.css('display', 'none');
+		var div = $("#div_call");
+		$(div).css("bottom", '-251px');
+		$(div).css("z-index", -99);
+		$(div).hide();
+	}
+	//得到头像的路径
+	function getPicPath(lxrid,s) {
+		if (lxrid) {
+			lxrid = lxrid.replace("yh", "");
+			lxrid = lxrid.replace("bm", "");
+		}
+		sys_ajaxGet("/ltz/address/default.do?method=getYhPicPath", {yh:lxrid}, function(json) {
+			if(json) {
+				$("#yh"+lxrid+s).attr('src',getUrl() +json.picPath+"?size=200*");
+				console.log("#yh"+lxrid+s);
+			}
+		});
+	}
+	
+	function getNm(){
+        sys_goURL("group.html");
+	}
+	
+	function go_back() {
+		var url =window.localStorage.getItem("goBack_txl");
+		if(url!=null){
+			sys_goURL(getBaseURL()+url);
+			return;
+		}
+	 	sys_goURL("../../main.html"); 	
+	}
+	
+	function sendMessage(ltzid){
+// 		alert(ltzid);
+	 	sys_goURL("../message/save.html?ltzid="+ltzid); 	
+	}
+ 
+	function dadianhua(sj){
+		if(!sj || sj=="undefined" || sj=="null"){
+			sj = "";
+		}
+		var v = "tel:"+sj;
+		window.location.href = v;
+		event.stopPropagation(); 
+	}
+	
+	function _innerscoll(){
+		if(innerscroll){
+		   innerscroll.refresh(); 
+		}else{
+			var _height = getListHeight();
+	    	$("#main_left").height(window.innerHeight-_height-50);
+	        innerscroll = new iScroll("main_left",{click:true});
+	    	sys_autoTextarea(innerscroll); 		   
+		}		    
+	}   
+	
+	function _innerscoll_search(){
+		if(innerscroll_search){
+			innerscroll_search.refresh(); 
+		}else{
+			var _height = getListHeight();
+	    	$("#search_rtn").height(window.innerHeight-_height-50);
+	    	innerscroll_search = new iScroll("search_rtn",{click:true});
+	    	sys_autoTextarea(innerscroll_search); 		   
+		}		    
+	} 
+	function call_aid(){
+        var v = "tel:010-56442500";
+        window.location.href = v;
+        event.stopPropagation();
+    }
+</script>
+
+<style type="text/css">
+html, body {
+	padding: 0;
+	margin: 0;
+	border: 0;
+	width: 100%;
+}
+
+body {
+	font-family: 16px Helvetica;
+	background-color: #FFFFFF;
+	overflow: hidden;
+}
+
+#header {
+	/* position: absolute; */
+	/* height: 50px;
+	line-height: 50px;
+	width: 100%; */
+	/* top: 53px; */
+	/* left: 0;
+	text-align: center;
+	vertical-align: middle;
+	background: #f9f9f9;
+	border-bottom: 1px solid #e7e7e7; */
+}
+
+#search_rtn {
+	/* position: absolute; */
+	width: 100%;
+/* 	top: 100px; */
+/* 	bottom: 49px; */
+/* 	left: 0; */
+/* 	overflow-y: auto; */
+	font-size: 16px;
+	font-family: "微软雅黑";
+}
+
+.m_div {
+	width: 100%;
+	overflow-y: hidden;
+	margin: 0px;
+}
+
+#main_left {
+/* 	position: absolute; */
+/* 	top: 90px; */
+/* 	bottom: 55px; */
+/* 	left: 0; */
+	font-size: 16px;
+	font-family: "微软雅黑";
+}
+
+.c_wap_db_table tr.c_tr_text {
+	height: 50px;
+	line-height: 50px;
+	padding: 0px;
+	border-bottom: #E0E0E0 solid 1px;
+}
+
+tr.c_tr_spliter {
+	height: 1px;
+}
+
+.c_wap_db_table td.c_td_bottom_line {
+	border-bottom: #DEDBD6 solid 0px;
+}
+
+.c_wap_db_table td.c_td_bottom_line2 {
+	border-bottom: #FFFFFF solid 0px;
+}
+
+.c_checkbox {
+	vertical-align: middle;
+}
+
+A:link {
+	COLOR: #000000;
+	TEXT-DECORATION: none
+}
+
+A:visited {
+	COLOR: #000000;
+	TEXT-DECORATION: none
+}
+
+A:active {
+	COLOR: #000000;
+	TEXT-DECORATION: none
+}
+
+A:hover {
+	COLOR: #000000;
+	TEXT-DECORATION: none
+}
+/*
+.search_btn {
+	width: 50px;
+	height: 30px;
+	background: #f94600;
+	border: 1px solid #f94600;
+	border-radius: 3px;
+	font: initial;
+	font-size: 14px;
+	font-family: "微软雅黑";
+	color: white;
+}
+
+#user_search {
+	height: 32px;
+	width: 200px;
+	border: 1px solid #ACA8A3;
+	border-radius: 3px;
+	font: initial;
+	font-size: 14px;
+}
+*/
+#div_call {
+	position: absolute;
+	width: 90%;
+	//height: 210px;
+	bottom: -251px;
+	background: #ffffff;
+	z-index: -99;
+	display: none;
+	opacity: 0.9;
+	/*color: #f94600;*/
+	font-size: 16px;
+	font-family: "微软雅黑";
+	border-radius: 4px;
+	-webkit-transition-property: bottom;
+	-webkit-transition-duration: 0.5s;
+}
+
+#div_call li {
+	border-top: 1px #EDEDED solid;
+	text-align: left;
+	padding-left: 70px;
+	height: 47px;
+	line-height: 48px;
+}
+
+.calling {
+	position: absolute;
+	width: 40px;
+	height: 40px;
+	right: 0px;
+	padding-top: 8px;
+}
+
+.yhxxxg {
+	position: absolute;
+	width: 40px;
+	height: 40px;
+	right: 0px;
+	padding-top: 10px;
+}
+
+.lxrxx {
+	position: absolute;
+	width: 40px;
+	height: 40px;
+	right: 0px;
+	padding-top: 10px;
+}
+
+#sys_mask_lxr {
+	position: fixed;
+	bottom: 49px;
+	top: 0px;
+	width: 100%;
+	z-index: 98;
+	background: #878787;
+	opacity: 0.5;
+	display: -webkit-box;
+	-webkit-box-pack: center;
+	-webkit-box-align: center;
+}
+
+.ui-btn-group {
+	font-family: "微软雅黑";
+	position: absolute;
+	top: 6px;
+	text-align: center;
+	left: 50px;
+}
+
+.ui-btn-group .ui-btn {
+	margin-top: 2px;
+	margin-left: -2px;
+	width: 60px;
+}
+
+.div_yhpic {
+	position: relative;
+	border: 1px solid red;
+	height: 50px;
+	width: 50px;
+	bottom: 200px;
+}
+
+.ui-toolbar-wrap { //
+	background-color: #D58900;
+	border: none !important;
+}
+.c_tabs{
+	height: 40px;
+	width: 100%;
+	background-color: white !important;
+	display:-webkit-box;
+	border-bottom: #dddddd solid 1px
+}
+.c_tabs>div{
+	-webkit-box-flex:1;
+	height:40px;
+	line-height:40px;
+	text-align: center;
+	font-size: 15px;
+	font-family: "微软雅黑";
+	display:none;
+	color: #4B5052;
+}
+.c_tabs_active{
+	/*height: 37px !important;
+	border-bottom: 3px solid #FD6C00;
+	color: #FD6C00;*/
+	color: #FF4854;
+	border-bottom: 2px solid #FF4854;
+	height: 38px !important;
+}
+.c_tabs_text{
+	display: inline-block;
+}
+
+.div_button {
+/* 	width: 150px; */
+	height: 30px;
+	padding-right:20px;
+	padding-left:20px;
+	line-height: 30px;
+ 
+/* 	background-color: #e0e0ee0; */
+/* 	background-color: #d40d02; */
+	font-family: 微软雅黑;
+/*     font-size: 19px; */
+/* 	color: #fff; */
+/* 	color: #fff; */
+/*     font-weight: bold; */
+    border-radius:25px;
+}
+
+    .div_btn{
+	   position:fixed;
+	   bottom:50px;
+	   width:100%;
+	   height: 40px;
+	   display:-webkit-box;
+	   -webkit-box-align: center;
+	   -webkit-box-pack: center;
+	    background-color: #edf0f5;
+	}
+	.div_btn>div{
+	    width:150px; 
+	   height:100%;
+       display:-webkit-box;
+	   -webkit-box-orient: horizontal; 	  
+	   -webkit-box-align: center;
+	   -webkit-box-pack: center;
+	}	
+	.div_aid_img{
+	  background-image: url("img/aid.png");
+	   background-repeat: no-repeat;
+	   background-size: 25px 25px;
+	   width:25px;
+	  height: 25px;	 
+	}	
+	.div_bottom_btn{
+	  width:120px;
+	  height: 30px;	 	  
+	  text-align: center;
+	  line-height: 30px;
+	  color: red;	
+	}
+</style>
+
+</head>
+<body>
+	<div id="toolbar">
+		<span class="btn_bak" onclick="go_back();"></span>
+		<h1 class="toolbar_title">电话簿</h1>
+	</div>
+	<div id="header">
+		<!-- <div style="width: 55px;float: right;" id="btn_search" onclick="search_bmyh();">
+			<img src="img/search.png" style="position: relative;top: 8px;" width="30px" height="30px" />
+		</div>
+	  <div style="float:right;position: absolute;right:50px;">
+			<input type="search" name="user_search" id="user_search" placeholder="请输入拼音或汉字" /> 
+			<img id="quit_search" onclick="quit_search1();" src="img/quxiao.png" style="position: absolute;right:5px;top:10px;" />
+		</div>
+		 -->
+		  <div id="div_search" class="list_div_search">			
+			<input type="text" name="user_search" id="user_search" class="list_search_input" style="line-height: normal;" placeholder="请输入名称查询" >		
+			<div class="list_search_img" id="btn_search" onclick="search_bmyh();"></div>			
+		  </div>	
+		  
+	</div>
+<!--     <div style="width: 100%;overflow-x:auto;"> -->
+<!-- 		<div class="c_tabs" id="div_tabs" style="" > -->
+<!-- 		   <div id='div_list_1' style='display: block;'> -->
+<!-- 		    <div class='c_tabs_text c_tabs_active'>组织机构</div> -->
+<!-- 		   </div> -->
+<!-- 		   <div id='div_list_2' style='display: block;'> -->
+<!-- 		    <div class='c_tabs_text' onclick="getNm()">用户组</div> -->
+<!-- 		   </div> -->
+<!-- 		</div> -->
+<!-- 	 </div> -->
+    <!-- 
+	<div id="header">
+		<div style="width: 55px;float: right;" id="btn_search"
+			onclick="search_bmyh();">
+			<img src="img/search.png" style="position: relative;top: 8px;" width="30px" height="30px" />
+		</div>
+		<div style="float:right;float: right; position: absolute; right: 50px;">
+			<input type="search" name="user_search" id="user_search" placeholder="请输入拼音或汉字" /> 
+			<img id="quit_search" onclick="quit_search1();" src="img/quxiao.png" style="position: absolute;right:5px;top:10px;" />
+		</div>
+	</div>
+ -->
+	<div id="main_left" class="m_div">&nbsp;</div>
+	<div class='div_call' id="div_call">&nbsp;</div>
+	<div id="search_rtn">&nbsp;</div>
+	<input type="hidden" name="choose" id="choose" />
+	<input type="hidden" name="choose_value" id="choose_value" />
+	<input type="hidden" name="initbmid" id="initbmid" />
+	
+<!-- 	<div style="position:absolute;bottom:60px;width:100%;" > -->
+<!-- 	<table style="width:100%;"> -->
+<!-- 		<tr> -->
+<!-- 		<td style="text-align:center;width:33%;"><input class="div_button" type="button" onclick="sys_goURL('../message/list.html');" value="查看消息" /></td> -->
+<!-- 		<td style="text-align:center;"><input class="div_button" type="button" onclick="sys_goURL('../../publish/common.html?lb_dm=71812&backUrl=ltz/address/lxr.html');" value="新退休人员" /></td> -->
+<!-- 		<td style="text-align:center;width:33%;"><input class="div_button" type="button" onclick="sys_goURL('../../publish/common.html?lb_dm=71820&backUrl=ltz/address/lxr.html');" value="去世信息" /></td> -->
+<!-- 		</tr> -->
+<!-- 	</table> -->
+		
+<!-- 	</div> -->
+<!--
+         <div class="div_btn div_other_40">
+	          <div onclick="sys_alert('正在建设中')"><div class="div_aid_img"></div><div id="xtxry" class="div_bottom_btn" onclick="">急救电话一键通</div></div>
+		</div>
+  -->
+</body>
+</html>

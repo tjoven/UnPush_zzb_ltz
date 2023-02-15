@@ -1,0 +1,51 @@
+@CHARSET "UTF-8";
+html,body{
+	width: 100%;
+	height: 100%;
+	background-color:#eeeee6;
+	font-family: "微软雅黑";
+}
+body,div{
+	margin: 0px;
+	padding: 0px;
+}
+
+/**标题栏**/
+.ui-toolbar-wrap{
+	background-color: rgba(255,255,255,0);
+	border: none !important;
+}
+.toolbar_btn_back{
+	border: none !important;
+	background-image:url("img/fanhui.png") !important;
+	background-size:cover;
+	width:25px !important;
+	height:25px;
+	margin-top:12px;
+	margin-left:5px;
+}
+.toolbar_title{
+	color: #FFFFFF;  
+}
+/*列表中的标题样式*/
+.list_font_title{
+	overflow: hidden;
+	text-overflow:ellipsis ;
+	white-space: nowrap;
+	font-size: 16px;
+	color:#333333;
+}
+/*列表中的日期样式*/
+.list_font_date{
+	font-size: 12px;
+	margin-top:5px;
+	color:#808080;
+}
+/*行后边的箭头图标*/
+.list_row_arrow{
+	width: 20px;
+	height: 20px;
+    background: url("img/jiantou_gray_20.png") no-repeat center center;
+    background-size: 11px 18px;
+    margin-right:5px;
+}

@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>我的事项</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+<script type="text/javascript"
+	src="../../bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+<link href="../../bootstrap-3.3.7-dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<script type="text/javascript">
+	sys_addMeun = true;
+	var list = {};
+	var nm = getQueryStringRegExp("nm");
+	$(function() {
+		//生成toolbar
+		$('#toolbar').toolbar();
+		 
+		sys_renderList('table_list',"/djypt/dcwj/default.do?method=list&page_size=20",{},list);
+   		 
+		// 刷新时选中刷新前选中的tab页
+		if (nm == '') {
+			nm = 2;
+		}
+		$(".c_tabs_text").eq(2).addClass("c_tabs_active");
+	});
+
+	function getNm(dm) {
+		if (dm == "shfw") {
+			sys_goURL("../mylive/myLive.html?nm=0");
+		} else if (dm == "wtjy") {
+			sys_goURL("../events/demandAndHandle/main.html?nm=1");
+		} else if (dm == "wjdc") {
+			sys_goURL("list_wstp.html?nm=2");
+		}else if (dm == "cgj") {
+			sys_goURL("../events/entryAndExit/entryAndExit.html");
+		}
+	}
+
+	function callback_trclick_table_list(param) {
+	 
+		var array = param.split(",");
+		var guid = array[0];
+		var lb_dm = array[1];
+	 
+		if("已答"==lb_dm){
+			sys_goURL("wstpy.html?guid=" + guid  );
+		}else if("未答"==lb_dm){
+			sys_goURL("wstp.html?guid=" + guid  );
+		}
+	}
+
+	function go_back() {
+		sys_goURL("../mylive/gzylj.html");
+	}
+</script>
+
+<style type="text/css">
+.ui-toolbar-wrap {
+	border: none !important;
+}
+
+li {
+	list-style-type: none;
+}
+</style>
+
+</head>
+<body>
+	<div id="toolbar">
+		<i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+		<h1 class="toolbar_title">问卷调查</h1>
+	</div>
+<!-- 	<div class="c_tabs div_other_40" id="div_tabs">
+		<div id='div_list0'>
+			<div class='c_tabs_text' onclick=getNm('shfw')>生活服务</div>
+		</div>
+		<div id='div_list1' style="display: none;">
+			<div class='c_tabs_text' onclick=getNm('wtjy')>问题建议</div>
+		</div>
+		<div id='div_list2'>
+			<div class='c_tabs_text' onclick=getNm('wjdc')>问卷调查</div>
+		</div>
+		<div id='div_list3'>
+			<div class='c_tabs_text' onclick=getNm('cgj')>出国（境）</div>
+		</div>
+	</div> -->
+	<div class="ui-refresh" id="div_table_list">
+		<ul class="data-list" id="table_list" style="list-style-type:none">
+			<li style="display: none;">
+				<div style="display: none;">{guid},{dtzt}</div> <!-- 点击行的参数 -->
+				<div class="list_row_con"
+					style="height:65px;background-color: #ffffff;">
+					<!-- <div class="list_row_slt" style="margin-top:7px;margin-left: 3px;">
+						<img src="{slt}" style="height: 75px;width:100px" />
+					</div> -->
+					<div class="list_row_col2" style="margin-top:10px;margin-left:8px;">
+						<div class="list_row_col2_1 overflow">{wjmc}</div>
+						<div class="list_row_col2_1 overflow">
+							{jssj}
+						</div>
+
+					</div>
+
+					<div class="list_row_col3" style="width:50px;background:none;">
+						<span style="font-size: 16px; ">{dtzt}</span>
+					</div>
+				</div>
+			</li>
+		</ul>
+		<div class="ui-refresh-down"></div>
+	</div>
+</body>
+</html>

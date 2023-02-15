@@ -1,0 +1,245 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>出勤情况</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+<link rel="stylesheet" type="text/css" href="zbkqList.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript">
+	sys_addMeun = true;
+	var innerscroll = null;
+	var nowYear;
+	var nowMonth;
+	var list = {};
+	$(function() {
+	 //initScroll();
+		//生成toolbar
+		var myDate = new Date();
+		nowYear = myDate.getFullYear();
+		nowMonth=myDate.getMonth()+1;
+		
+		
+		$('#toolbar2').toolbar();
+		sys_ajaxGet("/ltz/zbgl/default.do?method=getWapZbkqDic", function(json) {
+			bind(json);
+			//if ($("#divselect_year").text() == "请选择") {
+			//	$("#divselect_year").text(nowYear+"年度");
+			//}
+			//if ($("#divselect_month").text() == "请选择") {
+			//	$("#divselect_month").text(month+"月");
+			//}
+			$("#year").val(nowYear);
+			bindSelectText("year");
+			search();
+			
+		});
+		
+		/*
+		$("#table_list").bind('DOMNodeInserted', function(e) {
+		    innerscroll.refresh();
+		});
+		sys_renderList('table_list', '/ltz/zbgl/default.do?method=wapZbkqList&page_size=15&&page_goto=', {year:nowYear,month:monthEn}, list);
+		getZbkqTj(nowYear,monthEn);
+		*/
+		// 刷新时选中刷新前选中的tab页
+		$(".c_tabs_text").eq(2).addClass("c_tabs_active");
+	});
+	function search(){
+	    if($("#year").val()==""){
+	       return;
+	    }
+		 sys_ajaxGet("/ltz/zbgl/default.do?method=wapZbkqList",{year:$("#year").val()},function(json){
+		        $('#table_list').html("");
+	             bind_html(json.table_list);
+	            _innerscoll();
+		
+	        });
+	}
+			    //重置页面高度
+	function _innerscoll(){
+		if(innerscroll){
+		   innerscroll.refresh(); 
+		}else{
+			var _height = getListHeight();
+	    	$("#innerscroller").height(window.innerHeight-_height-35);
+	        innerscroll = new iScroll("innerscroller",{click:true});
+	    	sys_autoTextarea(innerscroll); 		   
+		}		    
+	}  
+	function replaceVal(val){
+	  return (typeof(val)== "undefined")?"":val;
+	}
+	function  bind_html(list){
+		  if (list.length > 0) {
+			var sspHtml = "";
+			var head_sspHtml="";
+		   if(list.length>0){
+	              head_sspHtml+=" <thead ><tr>";
+	              //sspHtml+="<td width='30px'></td>";
+	              head_sspHtml+="<td width='60px'>姓名</td>";
+	              head_sspHtml+="<td class='td_month month_up'>三月</td>";
+	              head_sspHtml+="<td class='td_month month_up'>四月</td>";
+	              head_sspHtml+="<td class='td_month month_up'>五月</td>";
+	              head_sspHtml+="<td class='td_month month_up'>六月</td>";
+	              head_sspHtml+="<td class='td_month month_down'>九月</td>";
+	              head_sspHtml+="<td class='td_month month_down'>十月</td>";
+	              head_sspHtml+="<td class='td_month month_down'>十一月</td>";
+	              head_sspHtml+="<td class='td_month month_down'>十二月</td>";
+	              //sspHtml+="<td width='120px'>备注</td>";
+	              head_sspHtml+="</tr></thead>"
+	              $('#table_list_thead').html("");
+			      $('#table_list_thead').html(head_sspHtml);
+	       } 
+			for (var i = 0; i < list.length; i++) {				
+		        if(i%2==0){
+		            sspHtml+="<tr class='c_trOdd'>";
+		        }else{
+		          sspHtml+="<tr class='c_trEven'>";
+		        }
+		       
+		        //sspHtml+="<td>"+(i+1)+"</td>";
+		        sspHtml+="<td width='60px'>"+list[i].xm+"</td>";
+		        sspHtml+="<td class='td_month month_up color_"+list[i].march+"'>"+replaceVal(list[i].kq_march)+"</td>";
+		        sspHtml+="<td  class='td_month month_up color_"+list[i].april+"'>"+replaceVal(list[i].kq_april)+"</td>";
+		        sspHtml+="<td  class='td_month month_up color_"+list[i].may+"'>"+replaceVal(list[i].kq_may)+"</td>";
+		        sspHtml+="<td class='td_month month_up color_"+list[i].june+"'>"+replaceVal(list[i].kq_june)+"</td>";
+		        sspHtml+="<td  class='td_month month_down color_"+list[i].september+"'>"+replaceVal(list[i].kq_september)+"</td>";
+		        sspHtml+="<td  class='td_month month_down color_"+list[i].october+"'>"+replaceVal(list[i].kq_october)+"</td>";
+		        sspHtml+="<td  class='td_month month_down color_"+list[i].november+"'>"+replaceVal(list[i].kq_november)+"</td>";
+		        sspHtml+="<td  class='td_month month_down color_"+list[i].december+"'>"+replaceVal(list[i].kq_december)+"</td>";
+		       // sspHtml+="<td  >"+replaceVal(list[i].remark)+"</td>";
+		        
+		        sspHtml+="</tr>";
+		        
+			}
+	
+			$('#table_list').html("");
+			$('#table_list').html(sspHtml);
+			 if(nowMonth<=6){
+				 switch_up_down('up');
+			  }else{
+				 switch_up_down('down');
+			 }
+			
+		}else{
+		  // $('#table_list').html("");
+		  // $('#table_list').html("没有数据！");
+		}
+	}
+   function switch_up_down(param){
+      $(".btn_year").removeClass("btn_year_yixuan");
+     // $(".btn_year").addClass("btn_year_weixuan");
+     if(param=='up'){
+        $(".month_up").show();
+        $(".month_down").hide();
+        
+        $("#btn_year_up").addClass("btn_year_yixuan");
+        //$("#btn_year_down").addClass("btn_year_weixuan");
+        
+     }else if(param=='down'){
+        $(".month_up").hide();
+        $(".month_down").show(); 
+    
+        $("#btn_year_down").addClass("btn_year_yixuan");
+       
+     }     
+   }
+	function getNm(num){
+		if(num==0){
+			sys_goURL("zbxx.html");
+		}else if (num == 1){
+			sys_goURL("zbhd.html");
+		} else if (num == 2) {
+			sys_goURL("zbkqList.html");
+		} else if (num == 3) {
+			sys_goURL("branchExchange/branchExchange.html");
+		}
+	}
+	function callback_trclick_table_list(param) {
+		//alert(param);
+
+	}
+	function go_back() {
+		sys_goURL("main.html");
+	}
+	function go_sphy() {
+		var url = "http://cloud.xylink.com/page/j/TUI0QPKH?from=singlemessage&isappinstalled=0&sysbrowser";
+		
+		 if(isAndriod){
+		 	window.webview.openXiaoyu(url);
+                	//window.webview.loadurl_new(url);
+                }else if(isIphone){
+                	window.location.href='obj-c://outside//'+url;                        	
+                }else{
+                   var iTop = (window.screen.availHeight - 30 - 365) / 2;
+		           var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+		           window.open(url, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+                }
+                return;	  
+	}
+
+</script>
+
+<style type="text/css">
+.ui-toolbar-wrap {
+	border: none !important;
+}
+
+
+</style>
+
+</head>
+<body>
+	<div id="toolbar2">
+		<i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+		<h1 class="toolbar_title">出勤情况</h1>
+	</div>
+	<!-- <div class="c_tabs div_other_40" id="div_tabs">
+		<div class="slideritem" id="div_list1">
+			<div class="c_tabs_text" onclick="getNm(0)">支部信息</div>
+		</div>
+		<div class="slideritem" id="div_list2">
+			<div class="c_tabs_text" onclick="getNm(1)">支部活动</div>
+		</div>
+		<div class="slideritem" id="div_list3">
+			<div class="c_tabs_text" onclick="getNm(2)">出勤情况</div>
+		</div>
+		<div class="slideritem" id="div_list3">
+			<div class="c_tabs_text" onclick="getNm(3)">交流互动</div>
+		</div>
+	</div> -->
+	
+			<div  class="div_other_40" id="div_head" >			 				
+				     <div id="div_cx_year">				    
+				       <div><select id="year" name="year" onchange="search()"></select></div>
+				       <div class="c_cx_div_jiantou"></div>			       
+				     </div>	
+								    
+				    <div id="div_cx_up_down" >
+				       <div id="btn_year_up" class="btn_year" onclick="switch_up_down('up')">上半年</div>
+				       <div id="btn_year_down" class="btn_year" onclick="switch_up_down('down')">下半年</div>
+				    </div>
+				    
+			</div>
+	 <table class="c_table_list" id="table_list_thead">
+		     	
+    </table>	
+	<div id="innerscroller"> 
+		 <div class="scroller_c">
+		   
+		   <table class="c_table_list" id="table_list">
+		     	
+		   </table>	
+		    <div style="height: 10px;"></div>   
+		 </div>
+      </div> 
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+    <title>课程详情</title>
+    <link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link type="text/css" rel="stylesheet" href="../../css/iconfont/iconfont.css" />
+    <script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+    <script type="text/javascript" src="../../js/ict.js"></script>
+    <script type="text/javascript" src="../../js/local.js"></script>
+    <script type="text/javascript">
+        var bmrid = getQueryStringRegExp("bmrid");//这个人的id
+        var guid = getQueryStringRegExp("guid");//课程的id
+        var clientWidth=window.innerWidth;
+        $(function(){
+            //生成toolbar
+            $('#toolbar').toolbar();
+
+            sys_ajaxGet("/ltz/lndx/default.do?method=wapBmxq",{kcid:guid,userid:bmrid,bz:'app'},function(json){
+                bind(json);
+                var _height = getListHeight();
+                $("#sys_innerscoll").height(window.innerHeight-_height);
+                var innerscroll = new iScroll("sys_innerscoll",{click:true});
+            });
+        });
+
+        function go_back(){
+            sys_goURL("kcxxShow.html?guid="+guid);
+        }
+    </script>
+
+    <style type="text/css">
+        .c_item_value{
+            padding-top: 15px;
+            font-size:.8em;
+        }
+        .c_item_container{
+            min-height: 46px;
+            border-bottom: 1px solid #DDD;
+
+        }
+
+        .ui-toolbar-wrap{
+        //background-color: #FFB73E;
+            border: none !important;
+        }
+        #div_lyfk{
+            position:absolute;
+            width:80% !important;
+            height:140px;
+            bottom:60px !important;
+            background: #ffffff;
+            z-index:99;
+            /*display: none;*/
+            opacity: 1;
+            /*color: #f94600;*/
+            font-size: 16px;
+            font-family: "微软雅黑";
+
+            -webkit-transition-property:bottom;
+            -webkit-transition-duration:0.5s;
+        }
+        .c_div_nr{
+            margin: 20px;
+        }
+        .form_cell_label{
+            color:#000000;
+            width: 30%;
+            padding-left: 50px;
+        }
+    </style>
+</head>
+<body>
+<div id="toolbar">
+    <span class="btn_bak"  onclick="go_back();"></span>
+    <h1 class="toolbar_title">报名情况</h1>
+</div>
+
+<div id="sys_innerscoll">
+    <form id="form_show">
+        <input type="hidden" name="guid" id="guid" />
+        <div class="c_form_show">
+            <div style="margin-top:10px;">
+                <div class="form_cell_label" ><span>姓名</span></div>
+                <div class="form_cell_item">
+                    <span name="xm" id="xm" style="width: 30%;color: #adadad;"></span>
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <div class="form_cell_label" ><span>性别</span></div>
+                <div class="form_cell_item">
+                    <span name="sex" id="sex" style="width: 30%;color: #adadad;"></span>
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <div class="form_cell_label" ><span>年龄</span></div>
+                <div class="form_cell_item">
+                    <span name="age" id="age" style="width: 30%;color: #adadad;"></span>
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <div class="form_cell_label" ><span style="width: 75px;display: inline-block;">原工作单位及职务</span></div>
+                <div class="form_cell_item">
+                    <span name="fomerwork" id="fomerwork" style="width: 30%;color: #adadad;"></span>
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <div class="form_cell_label" ><span>职级</span></div>
+                <div class="form_cell_item">
+                    <span name="post_mc" id="post_mc" style="width: 30%;color: #adadad;"></span>
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <div class="form_cell_label" ><span>退(离)休</span></div>
+                <div class="form_cell_item">
+                    <span name="retired_type" id="retired_type" style="width: 30%;color: #adadad;"></span>
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <div class="form_cell_label" ><span>联系电话</span></div>
+                <div class="form_cell_item">
+                    <span name="sj" id="sj" style="width: 30%;color: #adadad;"></span>
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <div class="form_cell_label" ><span>报名时间</span></div>
+                <div class="form_cell_item">
+                    <span name="cjsj1" id="cjsj1" style="width: 30%;color: #adadad;"></span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

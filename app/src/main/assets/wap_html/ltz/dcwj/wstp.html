@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+			content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+		<title>调查问卷</title>
+		<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+		<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+		<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+		<script type="text/javascript" src="../../js/ict.js"></script>
+		<script type="text/javascript" src="../../js/local.js"></script>
+		<script type="text/javascript">
+		var innerscroll = null;
+		var guid = getQueryStringRegExp("guid");
+		var src_notice= getQueryStringRegExp("src_notice");
+		var lb_dm="",tzlb="",id_notice="";
+		if(src_notice=='1'){
+		  guid=getQueryStringRegExp("id_questionnaire");
+		  lb_dm = getQueryStringRegExp("lb_dm");
+		  tzlb = getQueryStringRegExp("dm");
+		  id_notice= getQueryStringRegExp("id_notice");
+		}
+	$(function() {
+		$('#toolbar').toolbar();
+		_innerscoll();
+		
+		if (guid) {
+			sys_ajaxGet("/djypt/dcwj/default.do?method=show&guid=" + guid, function(json) {
+				if(json.tmlist){
+					var	html = "<table width='99%' border='0' cellspacing='0' cellpadding='0' class='c_form_table'>";
+					for(var v_i=0;v_i<json.tmlist.length;v_i++){
+						var tm = json.tmlist[v_i];
+						html += "<tr> <td style='width:70px;text-align:right;' > 第"+(v_i+1)+"题：</td>";
+						html += "<td colspan='2'>"+tm.tmmc+"&nbsp;&nbsp;("+tm.lxmc+") </td></tr> ";
+		                if(tm.xxlist){
+		                	for(var v_j=0;v_j<tm.xxlist.length;v_j++){
+		                		var xx = tm.xxlist[v_j];
+		                		html += "  <tr> <td style='width:70px;text-align:right;' >选项"+(v_j+1)+"：</td> <td>"+xx.xxmc+"</td>";
+		                		html += "<td style='width:50px;text-align:center;vertical-align:middle;'> <input style='width:20px;height:20px;' type='"+xx.lxinput+"' name='tpx_"+v_i+"' value='"+xx.guidinput+"' /></td> </tr>";
+		                	}
+		                }
+					}
+				$("#tmxx").html(html);
+				_innerscoll();
+				}
+				bind(json);
+				_innerscoll();
+			});
+		}
+      /*
+		$("#btn_bak").click(function() {
+			if(src_notice=='1'){
+			  sys_goURL("../notice/show.html?guid="+id_notice+"&lb_dm="+lb_dm+"&tzlb="+tzlb);
+			}else{
+			  sys_goURL("list_wstp.html?lb_dm=wd");
+			}
+		});
+		*/
+	});
+    function go_back(){
+        if(src_notice=='1'){
+			  sys_goURL("../notice/show.html?guid="+id_notice+"&lb_dm="+lb_dm+"&tzlb="+tzlb);
+			}else{
+			  sys_goURL("list_wstp.html?lb_dm=wd");
+		 }
+    }
+	function _innerscoll(){
+		if(innerscroll){
+		   innerscroll.refresh(); 
+		}else{
+			var _height = getListHeight();
+	    	$("#sys_innerscoll").height(window.innerHeight-_height);
+	        innerscroll = new iScroll("sys_innerscoll",{click:true});
+	    	sys_autoTextarea(innerscroll); 		   
+		}		    
+	}  
+
+	function tjtp(){
+	   var tpxguid = "";
+	   if($("input[name^=tpx]:checked")&&$("input[name^=tpx]:checked").size()>0){
+		   $("input[name^=tpx]:checked").each(function(){
+			   tpxguid += $(this).val()+",";
+		   });
+	   }else{
+		   sys_alert("未选择");
+		   return ;
+	   }
+	   var queryString="";
+	   sys_ajaxPost("/djypt/dcwj/default.do?method=saveDtmx&tpxguid="+tpxguid,queryString,function(data){
+		 if(data.result == true) {					  	
+			 sys_alert("保存成功");	
+			 //sys_goURL("list_wstp.html?lb_dm=wd");
+			 go_back();							 	
+		 }else{
+		     sys_alert(data.msg); 
+	     }
+       });
+	}
+
+</script>
+		<style type="text/css">
+.ui-toolbar-wrap { //
+	background-color: #FFB73E;
+	border: none !important;
+}
+
+.bx {
+	color: red;
+}
+td{
+	height:30px;
+	line-height:30px;
+}
+.c_form_text{
+	text-align:right;
+}
+</style>
+	</head>
+	<body>
+		<div id="toolbar">
+			<span id="btn_bak" class="btn_bak" onclick="go_back()"></span>
+			<h1 class="toolbar_title">
+				调查问卷
+			</h1>
+			 <span class="btn_toolbar_font" onclick="tjtp()"  style="color: #FFFFFF;" id="btn_save">提交</span>
+		</div>
+		<div id="sys_innerscoll">
+			<div>
+				<form id="frm1">
+					<input type="hidden" name="guid" id="guid" />
+ 						<div style="height:10px;"></div>
+					 <table width="95%" style="margin:0 auto;">
+					 	<tr> <td width="5%"></td>  <td  ><h4><span id="wjmc"></span></h4></td> </tr>
+					 	<tr> <td></td> <td> <span id="kssj"></span>至<span id="jssj"></span> </td> </tr>
+					 </table>
+				 
+			 <div id="tmxx"></div>
+			
+				</form>
+			</div>
+		</div>
+		 
+	</body>
+</html>

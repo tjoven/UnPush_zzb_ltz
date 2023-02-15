@@ -1,0 +1,117 @@
+<!doctype html>
+<html xmlns:https="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>家医平台</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+<link type="text/css" rel="stylesheet" href="../../css/iconfont/iconfont.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+<script type="text/javascript">
+
+	sys_addMeun = true;
+	var lb_dm=getQueryStringRegExp("lb_dm");
+	var _list = {};
+    var innerscroll = null;
+	$(function() {
+		$('#toolbar').toolbar();
+        var _height = getListHeight();
+        $("#sys_innerscoll").height(window.innerHeight-_height);
+        innerscroll = new iScroll("sys_innerscoll",{click:true});
+		$("#cx_zt").width($(document).width()-20);
+		$("#cx_zt").val("");
+		$(".c_tabs_text").eq(3).addClass("c_tabs_active");
+
+	});
+
+	function gourl(lb_dm) {
+		$("#div_"+lb_dm).addClass("table_tabs_active");
+		if("zxgh"==lb_dm){
+			sys_goURL("../events/demandAndHandle/main.html");
+		}else if("ylbx"==lb_dm || "sqyl"==lb_dm){
+			sys_goURL("ylbx.html?lx=" + lb_dm);
+		}else if("71320"==lb_dm){
+			sys_goURL("jypt.html?lb_dm=" + lb_dm);
+		}else if("71330"==lb_dm){
+			sys_goURL("ylbj.html?lb_dm=" + lb_dm);
+		}
+	}
+	
+	function gotoUrl(url){
+        if(isAndriod){
+            window.webview.loadurl_new(url);
+         }else if(isIphone){
+         	window.location.href='obj-c://outside//'+url;
+         }else{
+            var iTop = (window.screen.availHeight - 30 - 365) / 2;
+	        var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+	       	window.open(url, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+         }
+         return;
+	}
+
+	function go_back() {
+		sys_goURL("main.html");
+	}
+</script>
+
+<style type="text/css">
+   .ui-toolbar-wrap{
+	    		border: none !important;
+    		}
+
+	.content_text{
+		padding: 6%;
+		/* font-style: oblique; */
+		text-indent: 37px;
+		line-height: 31px;
+		font-size: 19px;
+	}
+
+	.content_a{
+		color: #d62724;
+		font-size: 20px;
+	}
+</style>
+
+</head>
+<body>
+	<div id="toolbar">
+		<span class="btn_bak"  onclick="go_back();"></span>
+		<h1 class="toolbar_title">家医平台</h1>
+	</div>
+	<div class="ui-refresh" id="div_table_list">
+		<div class="c_tabs div_other_40" id="div_tabs" style="display: none;">
+			<div id='div_list0'>
+				<div class='c_tabs_text' onclick=gourl('71330')>常用医院</div>
+			</div>
+			<div id='div_list1'>
+				<div class='c_tabs_text' onclick=gourl('zxgh')>挂号服务</div>
+			</div>
+			<div id='div_list2'>
+				<div class='c_tabs_text' onclick=gourl('sqyl')>社区医疗</div>
+			</div>
+			<div id='div_list3'>
+				<div class='c_tabs_text' onclick=gourl('71320')>家医平台</div>
+			</div>
+		</div>
+		<div id="sys_innerscoll">
+			<div class="content_text">
+				家庭医生签约服务主要依靠社区卫生服务团队来开展。
+				社区卫生服务团队由全科医师、社区护士、预防保健人员组成。
+				居民只需在居住地的社区卫生服务机构自由选择服务团队，无需缴纳任何费用，
+				简单签署一份《家庭医生签约服务协议书》，便可免费享受健康“点对点”服务。
+				家庭医生签约服务内容主要包括基本医疗服务、基本公共卫生服务、个性化健康管理服务。
+				如需进一步了解家庭医生签约服务详细内容。点击进入<a href="javascript:void(0);" class="content_a" onclick="gotoUrl('http://www.grdoc.org')">家医平台</a>。
+			</div>
+		</div>
+	</div>
+</body>
+</html>

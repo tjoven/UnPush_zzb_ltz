@@ -1,0 +1,545 @@
+<!doctype html>
+<html>
+<head>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=0.5, maximum-scale=2.0">
+<META HTTP-EQUIV="pragma" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate"> 
+<META HTTP-EQUIV="expires" CONTENT="0">
+	
+<title>搜索</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="css/oa.css" />
+    <script type="text/javascript" src="../../gmu/js/gmu.js"></script>   
+    <script type="text/javascript" src="js/touch.js"></script>   
+	<script type="text/javascript" src="../../js/ict.js"></script>
+    <script type="text/javascript" src="../../js/local.js"></script>
+    <script type="text/javascript" src="js/custom.js"></script>
+    <script type="text/javascript" src="js/datadumper.js"></script>
+
+<script type="text/javascript">
+		sys_expendRow['table_list']=false;
+		
+		
+		var sendcontent = getQueryStringRegExp("sendcontent");
+		var receiverIdfrom = getQueryStringRegExp("receiverIdfrom");
+		var receivernamefrom = getQueryStringRegExp("receivernamefrom");
+		var url = getQueryStringRegExp("url");
+		var filename = getQueryStringRegExp("filename");
+		var senderId = getQueryStringRegExp("senderId");
+		var senderName = getQueryStringRegExp("senderName");
+		
+    	var sjid = getQueryStringRegExp("sjid");
+    	var py = getQueryStringRegExp("py");
+    	var from = getQueryStringRegExp("from");
+    	var yhid=window.localStorage.getItem("yhid");
+    	var currId = window.localStorage.getItem("yhid");
+    	//alert("py is " + py);
+	   	var addr_list = {};
+	   	//sys_expendRow['table_list']=false;
+	    if(sys_pageData["table_list"]){
+	     	sys_pageData["table_list"] = null;
+	    }
+
+    	$(function(){
+    		//列表数据
+    		sys_renderList2('table_list','',{},addr_list);
+    		
+    		//生成toolbar
+		  	$('#toolbar').toolbar({
+	            fixed: true
+	        });	
+	        
+    		if(py == ""){
+				$("#search").focus();
+			}else{
+				$("#search").val(py);
+				$("#search").focus();
+                loadList(py);
+			}
+		  	//搜索事件
+			$("#search").bind("keyup",function(){
+				var py = $("#search").val();
+        		if(py != ""){
+                    if(isIphone){
+                        window.location.href='obj-c://getAccessByNameOrPy'+encodeURI(py);
+                    }else if(isAndriod){
+                    	loadList(py);
+                    }
+        		}else{
+        			clearList('table_list');
+        		}
+			});
+   		});
+    	
+    	function clearList(tableid){
+    		var _dataList = $("#"+tableid).children();
+    		_dataList.each(function(index){
+   	     		if(index!=0){
+   	     			$(this).remove();
+   	     		}
+    	    });
+    		$("#"+tableid).append('<li><div style="font-size: 16px;background: white;height: 80px;display: -webkit-box;-webkit-box-pack: center;-webkit-box-align: center">没有数据！</div></li>');
+    	}
+    	
+    	function query(){
+    		var py = $("#search").val();
+       		if(py != ""){
+                   if(isIphone){
+                       window.location.href='obj-c://getAccessByNameOrPy'+encodeURI(py);
+                   }else if(isAndriod){
+                   	loadList(py);
+                   }
+       		}
+    	}
+    	
+    	function search_(){
+    		var py = $("#search").val();
+    		loadList(py);
+    	}   
+    	
+    	function gochat(guid)
+    	{
+    		sys_goURL("chat.html?guid="+guid+"&yhid="+yhid+"&backTarget=searchgroup&py="+py+"&from=searchgroup");
+    	}
+    	
+    	function gogroupchat(guid,mc)
+    	{
+    		
+    		sys_goURL("groupChat.html?groupId="+guid+"&groupName="+mc+"&backTarget=searchgroup&py="+py+"&from="+from);
+    		
+    	}
+    	
+    	//弹出转发窗口
+    	function goTrans(sendid,sendname,receiveid,receivename){
+    	
+    		$("#sendcontent").empty();
+    		if((receiveid+"").length==11)
+    		{
+    			
+    			if(filename!=null && filename!=undefined && filename!="")
+    			{
+    				var sendcontentfile = "<div>" + filename.substring(23) + "&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='downloadFile(\""+url+"\",\""+filename+"\")'>查看</a>" +  "</div>";
+    				$("#sendcontent").append(sendcontentfile);
+    			}else{
+    			
+    				$("#sendcontent").append(sendcontent);
+    			}
+    			$("#sendname").text("发送给："+receivename);
+    			
+    			$("#sendid").val(sendid);
+    			$("#sendname").val(sendname);
+    			$("#receiveid").val(receiveid);
+    			$("#receivename").val(receivename);
+    		}else{
+    			if(filename!=null && filename!=undefined&& filename!="")
+    			{
+    				var sendcontentfile  = "<div>" + filename.substring(23) + "&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='downloadFile(\""+url+"\",\""+filename+"\")'>查看</a>" +  "</div>";
+    				$("#sendcontent").append(sendcontentfile);
+    			}else{
+    				
+    				$("#sendcontent").append(sendcontent);
+    			}
+    			$("#sendname").text("发送给："+receivename);
+    			
+    			$("#sendid").val(sendid);
+    			$("#sendname").val(sendname);
+    			$("#receiveid").val(receiveid);
+    			$("#receivename").val(receivename);
+    		}
+    		$("#xzsfbm").css("display", "block");
+    		$("#floatdiv").css("display", "block");		
+    	}
+    	
+    	
+    	 //转发
+    	 function transsend()
+    	 {
+    		 if(filename!=null && filename!=undefined && filename!="")
+    		 {
+    			sendcontent = "<div>" + filename.substring(23) + "&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='downloadFile(\""+url+"\",\""+filename+"\")'>查看</a>" +  "</div>";
+    		 }
+    		 var Num=""; 
+    		 for(var i=0;i<5;i++) 
+    		 { 
+    			 Num+=Math.floor(Math.random()*10); 
+    		 } 
+    		var myDate = new Date();
+    		var mouth=myDate.getMonth()+1;
+    		if(mouth<10)
+    		{
+    			mouth="0"+mouth;
+    		}
+    		var guid = (myDate.getFullYear()+""+mouth+""+myDate.getDate()+""+myDate.getHours()+""+myDate.getMinutes()+""+myDate.getSeconds()+""+myDate.getMilliseconds()+""+Num);
+    		var senderId = $("#sendid").val();
+    		var senderName = $("#sendname").val();
+    		var receiverId = $("#receiveid").val();
+    		var receiverName = $("#receivename").val();
+    		
+    		var message = new Object();
+    		message.senderId = senderId;
+    		message.senderName = senderName;
+    		message.receiverId = receiverId;
+    		message.receiverName = receiverName;
+    		message.guid=guid;
+    		
+    		sys_ajaxPost("/jstx/default.do?method=getServerTime",function(json){
+    			message.sendTime = json.time;
+    			message.sendContent = sendcontent;
+    		
+    	    	websocket.send(JSON.stringify(message));
+    	    	if((receiverIdfrom+"").length==11)
+    	    	{
+    	    		sys_goURL("groupChat.html?groupId="+receiverIdfrom+"&groupName="+receivernamefrom+"&backTarget=message");
+    	    	}else{
+    	    		sys_goURL("chat.html?yhid="+senderId+"&guid="+receiverIdfrom+"&backTarget=message");
+    	    	}
+    	    	
+    			
+    		});
+    			
+    	 }
+    	 
+    	 
+    		//websocket对象
+    			var websocket = null;
+    			//判断当前浏览器是否支持WebSocket
+    			if("WebSocket" in window){
+    			    websocket = new WebSocket(sys_ctx.replace("http","ws")+"/websocket/"+("mobile" + currId));
+    			}else{
+    			    alert("Not support websocket");
+    			}
+    			
+    			//连接发生错误的回调方法
+    			websocket.onerror = function(){
+    			    
+    			};
+    			 
+    			//连接成功建立的回调方法
+    			websocket.onopen = function(event){
+    				
+    			};
+    			 
+    			//接收到消息的回调方法
+    			websocket.onmessage = function(event){
+    				var json = JSON.parse(event.data);
+    				//如果被邀请人同意入群，并且当前邀请群在线，刷新群组成员信息
+    				if(undefined != json.mobileOnline){
+    					var str = json.refreshStatus == "agree" ? json.refreshBeInviterName + "同意了您的邀请!" : refreshBeInviterName + "拒绝了您的邀请!";
+    					$("#datahtml > div:first-child").before(
+    		   				"<div class='txl_ry' style='height:66px;'>" +
+    		 	   				"<div class='txl_ry_img' style='padding-top:6px;'>" +
+    		 	   					"<img height='40px' width='40px' style='margin:6px 16px;' src="+sys_ctxStr()+"/oainfo/ydyypt/yhface/pic onerror=\"javascript:this.src='../img/txl/03_09.png'\">" +
+    		 	   				"</div>" +
+    		 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+    		 	   					"<div style='height:32px;width:100%;font-size:16px;font-weight:500;font-family:microsoft yahei;line-height:33px;padding-left:30px;overflow:hidden;'>群通知</div>" +
+    		 	   					"<div style='height:32px;width:100%;color:gray;line-height:30px;padding-left:30px;overflow:hidden;' class='listSize'>" + 
+    		 	   						str + 
+    		 	   					"</div>" +
+    		 	   				"</div>" +
+    		 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+    		 	   					"<div style='height:32px;width:100%;'></div>" +
+    		 	   					"<div style='height:32px;width:100%;padding-bottom:6px;'>" +
+    		 	   						"<div style='float:left;height:100%;width:50px;border:1px solid gray;line-height:26px;text-align:center;font-size:15px;margin-left:60px;' onclick='delGroupRelated("+json[i].member_id+","+json[i].group_id+",\""+json[i].group_name+"\",\""+json[i].event+"\",this)'>确定</div>" +
+    		 	   					"</div>" +
+    		 	   				"</div>" +
+    			   			"</div>"
+    		           	);
+    					delGroupRelated(json.beInviterId,json.refreshGroupId,json.refreshGroupName,"invite");
+    				}else if(undefined != json.inviteGroupId){
+    					var str = json.inviterName + "邀请您加入" + json.inviteGroupName;
+    					show = "<div style='float:left;height:100%;width:50px;border:1px solid gray;line-height:26px;text-align:center;font-size:15px;' onclick='agreeJoin("+json.inviterId+","+json.beInviterId+","+json.inviteGroupId+",\""+json.inviteGroupName+"\",this)'>同意</div>" +
+    					   	   	"<div style='float:left;height:100%;width:50px;border:1px solid gray;line-height:26px;text-align:center;font-size:15px;margin-left:10px;' onclick='rejectJoin("+json.inviterId+","+json.beInviterId+","+json.inviteGroupId+",\""+json.inviteGroupName+"\",this)'>拒绝</div>";
+    					if($("#datahtml").children().length > 0){
+    						$("#datahtml > div:first-child").append(
+    			   				"<div class='txl_ry' style='height:66px;'>" +
+    			 	   				"<div class='txl_ry_img' style='padding-top:6px;'>" +
+    			 	   					"<img height='40px' width='40px' style='margin:6px 16px;' src="+sys_ctxStr()+"/oainfo/ydyypt/yhface/pic onerror=\"javascript:this.src='../img/txl/03_09.png'\">" +
+    			 	   				"</div>" +
+    			 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+    			 	   					"<div style='height:32px;width:100%;font-size:16px;font-weight:500;font-family:microsoft yahei;line-height:33px;padding-left:30px;overflow:hidden;'>群通知</div>" +
+    			 	   					"<div style='height:32px;width:100%;color:gray;line-height:30px;padding-left:30px;overflow:hidden;' class='listSize'>" + 
+    			 	   						str + 
+    			 	   					"</div>" +
+    			 	   				"</div>" +
+    			 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+    			 	   					"<div style='height:32px;width:100%;'></div>" +
+    			 	   					"<div style='height:32px;width:100%;padding-bottom:6px;'>" +
+    			 	   						show +
+    			 	   					"</div>" +
+    			 	   				"</div>" +
+    				   			"</div>"
+    			           	);
+    					}else{
+    						$("#datahtml").append(
+    		   					"<div class='txl_ry' style='height:66px;'>" +
+    			 	   				"<div class='txl_ry_img' style='padding-top:6px;'>" +
+    			 	   					"<img height='40px' width='40px' style='margin:6px 16px;' src="+sys_ctxStr()+"/oainfo/ydyypt/yhface/pic onerror=\"javascript:this.src='../img/txl/03_09.png'\">" +
+    			 	   				"</div>" +
+    			 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+    			 	   					"<div style='height:32px;width:100%;font-size:16px;font-weight:500;font-family:microsoft yahei;line-height:33px;padding-left:30px;overflow:hidden;'>群通知</div>" +
+    			 	   					"<div style='height:32px;width:100%;color:gray;line-height:30px;padding-left:30px;overflow:hidden;' class='listSize'>" + 
+    			 	   						str + 
+    			 	   					"</div>" +
+    			 	   				"</div>" +
+    			 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+    			 	   					"<div style='height:32px;width:100%;'></div>" +
+    			 	   					"<div style='height:32px;width:100%;padding-bottom:6px;'>" +
+    			 	   						show +
+    			 	   					"</div>" +
+    			 	   				"</div>" +
+    			   				"</div>"
+    		           		);
+    					}
+    					
+    				}
+    				//setMessageInnerHTML(json);
+    			};
+    			 
+    			//连接关闭的回调方法
+    			websocket.onclose = function(){
+    			    
+    			};
+    			 
+    			//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+    			window.onbeforeunload = function(){
+    			    websocket.close();
+    			};
+    			 
+    			//将消息显示在网页上
+    			function setMessageInnerHTML(json){
+    				
+    			};
+    			 
+    			//关闭连接
+    			function closeWebSocket(){
+    				
+    			};
+    	
+    	function loadList(py){
+    			//alert("loadList py is " + py);
+    			$("#table_list").empty();
+    			var json ;
+                var content;
+                sys_ajaxPost("/jstx/default.do?method=queryGrouppy&py="+py+"&type="+from+"&yhid="+yhid,function(json){
+                			if(json.length>0){
+                				for(var i = 0; i < json.length; i++)
+                				{
+                					if(json[i].guid.length==11)
+                					{
+                						if(from =="transmit" || from =="transmitgroup")
+                						{
+                							
+                							content = "<li onclick='goTrans("+yhid+",\""+senderName+"\","+json[i].guid+",\""+json[i].mc+"\")'> "+
+            				                "<div style='display: none;'>"+json[i].guid+"</div> "+
+            								"<div class='txl_ry'> "+
+            								"<div class='txl_ry_img' style='text-align:center;'> "+
+            									"<img id='tximg' src='image/group.png'  onerror='image/group.png' class='txl_img'></img> "+
+            								"</div> "+
+            					            "<div class='txl_ry_rm' style='width:100%'> "+
+            						        	""+json[i].mc+""+
+            					            "</div> "+
+            								"</div> "+		
+            			                   "</li>";
+                							
+                						}else{
+                							content = "<li onclick='gogroupchat("+json[i].guid+",\""+json[i].mc+"\")'> "+
+            				                "<div style='display: none;'>"+json[i].guid+"</div> "+
+            								"<div class='txl_ry'> "+
+            								"<div class='txl_ry_img' style='text-align:center;'> "+
+            									"<img id='tximg' src='image/group.png'  onerror='image/group.png' class='txl_img'></img> "+
+            								"</div> "+
+            					            "<div class='txl_ry_rm' style='width:100%'> "+
+            						        	""+json[i].mc+""+
+            					            "</div> "+
+            								"</div> "+		
+            			                   "</li>";
+                						}
+                						
+                					}else{
+                						if(from =="transmit" || from =="transmitlist")
+                						{
+                							content = "<li onclick='goTrans("+yhid+",\""+senderName+"\","+json[i].guid+",\""+json[i].mc+"\")'> "+
+            				                "<div style='display: none;'>"+json[i].guid+"</div> "+
+            								"<div class='txl_ry'> "+
+            								"<div class='txl_ry_img' style='text-align:center;'> "+
+            									"<img id='tximg' src='../img/txl/03_09.png'  onerror='../img/txl/03_09.png' class='txl_img'></img> "+
+            								"</div> "+
+            					            "<div class='txl_ry_rm' style='width:100%'> "+
+            						        	""+json[i].mc+""+
+            					            "</div> "+
+            								"</div> "+		
+            			                   "</li>";
+                						}else{
+                							content = "<li onclick='gochat("+json[i].guid+")'> "+
+            				                "<div style='display: none;'>"+json[i].guid+"</div> "+
+            								"<div class='txl_ry'> "+
+            								"<div class='txl_ry_img' style='text-align:center;'> "+
+            									"<img id='tximg' src='../img/txl/03_09.png'  onerror='../img/txl/03_09.png' class='txl_img'></img> "+
+            								"</div> "+
+            					            "<div class='txl_ry_rm' style='width:100%'> "+
+            						        	""+json[i].mc+""+
+            					            "</div> "+
+            								"</div> "+		
+            			                   "</li>";
+                						}
+                						
+                					}
+                                  	
+                    			    $("#table_list").append(content);	
+                    			    addr_list["table_list"].refresh();
+                				}
+                			}
+                });
+    		
+    	}	
+    	function loadSearchList(json){
+    		bind(json,'up');
+    	}
+	
+    	function callback_trclick_table_list(param){
+    		//var py = $("#search").val();
+    		//sys_goURL("show.html?guid="+param+"&from="+from+"&sjid="+sjid+"&py="+py);
+    		
+    		var url="/address/show.html?guid=" + param + "&sjid=" + sjid+"&from="+from;
+			if(isAndriod){//android端
+		        window.webview.openNewWin(url);   //调用外壳方法
+			}else if(isIphone){//iphone端
+		        execute("obj-c://openNewWin/"+url);
+			}else{//电脑端
+		        var iTop = (window.screen.availHeight-30-365)/2;        
+		   		var iLeft = (window.screen.availWidth-10-700)/2; 
+		   		window.open(sys_ctx+sys_gcml+url,'','height=365,innerHeight=365,width=700,innerWidth=700,top='+iTop+',left='+iLeft+',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+			}
+    	}
+    	
+    	function goback(){
+    		if(from == "search")
+    		{
+    			sys_goURL("list.html?sjid="+sjid);	
+    		}else if(from == "message")
+    		{
+    			sys_goURL("../jstx/message.html");	
+    		}else if(from=="group")
+    		{
+    			sys_goURL("../jstx/group.html");	
+    		}else if(from=="transmit" || from =="transmitlist" || from =="transmitgroup")
+    		{
+    			if((receiverIdfrom+"").length==11)
+        		{
+        			sys_goURL("transmit.html?receiverIdfrom="+receiverIdfrom+"&receivernamefrom="+receivernamefrom+"&sendcontent="+sendcontent);
+        		}else{
+        			sys_goURL("transmit.html?receiverIdfrom="+receiverIdfrom+"&sendcontent="+sendcontent);
+        		}
+    		}
+    		
+    	}
+    	
+    	function sys_renderList2(tableid,url,params,_refresh){
+    		var refreshDown = $("#div_"+tableid).find(".ui-refresh-down");
+    		if(refreshDown.length>0){
+    			refreshDown.hide();
+    		}
+    		if(!tableid){
+    			alert("请设置tableid");
+    			return false;
+    		}
+    		var refreshDIV = "div_"+tableid;
+    		var height = getListHeight();
+    		var removeStyle = (typeof(_refresh.removeStyle)!='undefined')?_refresh.removeStyle:true;
+    		//alert((window.innerHeight-parseInt(height))+"==="+height+"==="+window.innerHeight);
+    	    $('#'+refreshDIV).css('height',window.innerHeight-parseInt(height)-60).refresh({
+    			
+    	            load:function(dir,type){
+    	               	var me = this;
+    	               	var page_goto = sys_getPageNum(tableid,dir);
+    	               	if(!page_goto){
+    	               		me.afterDataLoading(dir);  
+    	               		me.disable('down',false);
+    	               		return ;
+    	               	}
+    	               $.get('search.html',function(response){//do_document.html
+    	               	  _refresh[tableid] = me._options.iScroll;
+    	               	  me.afterDataLoading(dir);  
+    	               });
+    	           	},
+    	           	
+    	           	ready:function(){
+    	           		this.trigger("load");
+    	           	},
+    	           	statechange:function(event,elem,state,dir){}
+    	      });
+    	      
+    	}
+   
+		
+    </script>
+</head>
+<body>
+<div class="div_body desk_table">	
+<!-- 	<div id="toolbar" class="blue_top"> -->
+<!-- 		<div class="button_multi" onclick="goback()"> -->
+<!-- 			<img src="img/ztjy/02_06.png" class="img_back_or_xj"></img> -->
+<!-- 		</div> -->
+<!-- 		<div id="toolbar_text" class="child_page_title"> -->
+<!-- 			搜索详情 -->
+<!-- 		</div> -->
+<!-- 		<div class="button_multi"> -->
+<!-- 		</div> -->
+<!-- 	</div> -->
+<div id="toolbar">
+		<span class="btn_bak" onclick="goback();"></span>
+		<h1 class="toolbar_title">搜索</h1>
+	</div>
+	<div id="search_div" class="search_div">
+		<div class="search_div_inner">
+			<div style="display:inline-block;">
+				<input type="text" id="search" class="cx_input" name="search" placeholder="请输入名称或拼音首字母"></input>
+			</div>
+			<div class="search_div_img" onclick="search_()">
+				<img src="img/ztjy/02_11.png" id="c_search_icon" class="cx_img" ></img>
+			</div>
+		</div>
+	</div>	
+	
+	
+	<!--  列表模板 -->
+	<div class="ui-refresh" id="div_table_list">
+		<ul class="data-list" id="table_list">
+			
+		</ul>
+		<div class="ui-refresh-down"></div>
+	</div>
+</div>	
+
+
+<div id="xzsfbm" class="xzqsyj" style="min-height:80px;">
+		<div  class="font-color-rm div-xz" style="margin-top:10px;border-bottom:0px">
+			<span id="sendname"></span>
+		</div>
+		<div class="font-color-rm div-xz" style="border-bottom:none;height:auto">
+			<span style="font-size:14px;color:gray"  id="sendcontent"></span>
+		</div>
+		<div class="an_jh" style="border-top:1px solid #e7e7e7">
+			
+			<div class="an_yj" onclick="$('#xzsfbm').css('display', 'none');$('#floatdiv').css('display', 'none');">
+				取消
+			</div>
+			<div class="an_yj" onclick="$('#xzsfbm').css('display', 'none');$('#floatdiv').css('display', 'none');transsend()" style="border-left:1px solid #e7e7e7;">
+				发送
+			</div>
+		</div>	
+		<input type="hidden" name="senderid" id="sendid"/>
+		<input type="hidden" name="sendername" id="sendname"/>
+		<input type="hidden" name="receiveid" id="receiveid"/>
+		<input type="hidden" name="receivename" id="receivename"/>
+			
+	</div>	
+	<div id="floatdiv" class="floatdiv"></div>
+</body>
+</html>

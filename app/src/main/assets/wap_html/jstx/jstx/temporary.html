@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+<title>临时会话</title>
+<link rel="stylesheet" type="text/css" href="../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../css/base.css" />
+<link rel="stylesheet" type="text/css" href="css/oa.css" />
+<link rel="stylesheet" type="text/css" href="./css/aui.2.0.css" />
+<script type="text/javascript" src="../gmu/js/gmu.js"></script>   
+<script type="text/javascript" src="js/touch.js"></script>   
+<script type="text/javascript" src="../js/ict.js"></script>
+<script type="text/javascript" src="../js/local.js"></script>
+<script type="text/javascript" src="js/custom.js"></script>
+<script type="text/javascript" src="js/datadumper.js"></script>
+<script type="text/javascript" src="./js/getPath.js"></script>
+<style type="text/css">
+   	
+</style>
+<script type="text/javascript">
+	sys_addMeun = false;
+	var currId = window.localStorage.getItem("yhid");
+	$(function(){
+		//生成toolbar
+	  	$('#toolbar').toolbar({
+            fixed: true
+        }); 
+	});
+	//返回上一步
+	function goback(){
+		var guid = getQueryStringRegExp("guid");
+		sys_goURL("../address/list.html?guid="+guid);
+	}
+	
+	function jumper(ob){
+		if(0 == ob){
+			sys_goURL("message.html");
+		}else if(1 == ob){
+			sys_goURL("group.html");
+		}else if(2 == ob){
+			sys_goURL("temporary.html");
+		}
+	}
+</script>    
+</head>
+<body>
+	<div class="div_body">
+		<div id="toolbar">
+			<span class="btn_bak" onclick="goback();"></span>
+		    <h1 class="toolbar_title">即时通信</h1>
+		</div>
+		<div id="tabs">
+			<div class="tab_none_active" onclick="jumper(0)" style="width: 33%;">消息</div>
+		    <div class="tab_none_active" onclick="jumper(1)" style="width: 33%;">群组</div>
+		    <div class="tab_active" onclick="jumper(2)" style="width: 33%;">临时会话</div>
+		</div>
+		<div class="div_blank"></div>
+		<div class="div_table_list">
+			<ul class="data-list" id="temporary_list">
+				
+			</ul>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	window.onload = init;
+	function init(){
+		sys_ajaxPost("/jstx/default.do?method=queryTemporary&yhid="+currId,function(json){
+			if(json.length > 0){
+				for(var i = 0; i < json.length; i++){
+					$("#temporary_list").append(
+						"<li onclick='goChat(this)' id='"+json[i].senderId+"'>" +
+							"<div class='is_persion_scan' style='display:-webkit-box;'>" +
+								"<div style='-webkit-box-flex:1;padding:5px 0px 0px 3px;'>" +
+									"<img src=" + sys_ctxStr() + headPortraitPath + json[i].senderId + ".jpg" +" onerror=\"javascript:this.src='../img/txl/03_09.png'\" style='width:30px;height:30px;'>" +
+								"</div>" +
+								"<div style='-webkit-box-flex:30;'>" +
+									json[i].senderName +
+								"</div>" +
+							"</div>" +
+						"</li>"		
+					);
+				}
+			}
+		});
+	}
+	
+	function goChat(ob){
+		sys_goURL("chat.html?guid="+ob.id);
+	}
+	
+	function sys_ctxStr() {
+		var count = 0;
+		var end = 0;
+		for (var i = 0; i < sys_ctx.length; i++) {
+			var c = sys_ctx.charAt(i);
+			if (c == '/') {
+				count++;
+				if (count == 3) {
+					end = i;
+				}
+			}
+		}
+		var hostUrl = sys_ctx.substring(0, end);
+		return hostUrl;
+	}
+</script>
+</html>

@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+<title></title>
+<link rel="stylesheet" type="text/css" href="css/oa.css" />
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" href="../../css/iconfont/iconfont.css">
+
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+
+<script type="text/javascript">
+		sys_addMeun = true;		
+        var yh_id = getQueryStringRegExp("yhid");
+        var groupId = getQueryStringRegExp("groupId");
+        var senderId = getQueryStringRegExp("senderId");
+        var curid = getQueryStringRegExp("curid");
+        var imgsrc = getQueryStringRegExp("imgsrc");
+        var groupName = getQueryStringRegExp("groupName");
+   		var iscr_show = null;
+		var phone = null;   
+		$(function(){
+		  	$('#toolbar_addrt').toolbar();
+		  	width=window.innerWidth;
+			var _height = getListHeight();					
+		    $("#iscr_show").height(window.innerHeight - _height);  	
+		    iscr_show = new iScroll("iscr_show",{click:true}); 
+		    
+		    sys_ajaxGet("/getwoinfo.do?method=mySettingWap&wo_yhid="+yh_id,function(json){
+		    	$("#wo_info").find("font").eq(0).html(json.dw_mc);
+		    	$("#sj_info").find("font").eq(0).html(json.sjhm);
+		    	phone = json.sjhm.replace(/手机号码：/,"");
+		    	//alert(phone);
+			});
+		    $("#yhpic").attr("src",imgsrc);
+			/* sys_ajaxGet("/org2/default.do?method=showTx",function(json){					
+				if(json.formData.imgurl){
+					$("#yhpic").attr("src",json.formData.imgurl+"?size=200*");
+				}else{
+					$("#yhpic").attr("src","./image/user.png");
+				}
+			}); */
+			
+		});		
+		function dadianhua(){
+			if(!phone || phone=="undefined" || phone=="null"){
+				phone = "";
+			}
+			var v = "tel:"+phone;
+			window.location.href = v;
+			event.stopPropagation(); 
+		}
+	
+		function goChat(id){
+			sys_goURL("chat.html?guid="+yh_id+"&yhid="+window.localStorage.getItem("yhid")+"&backTarget=linkman"+"&from=listtochat");
+		}
+
+		function go_back(){
+			sys_goURL("groupChat.html?yhid="+senderId+"&groupId="+groupId+"&groupName="+groupName);
+		}
+		
+
+    </script>
+    <style type="text/css">
+		.ui-toolbar-wrap{
+	    		border: none !important;
+    		}
+   
+		.grzx_border{
+			height: 10px;
+			//border-top:1px solid #c4c4c4;
+			//background-color: #f2f2f2;
+		}
+		.grzx_wo{
+			height: 180px;
+			width: 100%;
+			background-image:url("../image/wo_back.png"); 
+			background-repeat: no-repeat;
+			background-size:100% 100%; 
+			background-position: center center;
+			border: none !important;
+		}
+		.grxz_wo_div{
+			display: -webkit-box;
+			-webkit-box-pack: center;
+		    -webkit-box-align: center;
+		    font-size: 17px;
+			color: #555555;
+			font-family:微软雅黑;
+			    padding: 5px;
+		}
+		.grzx_wo_img{
+			height: 60px;
+			width: 60px;
+			margin-top: 0px;
+			border-radius: 50%;
+		}
+		#sys_mask_pic{
+			position: fixed;
+			bottom: 0px;
+			top: 0px;
+			width: 100%;
+			z-index: 98;
+			background: #878787;
+			opacity:0.5;
+			display: -webkit-box;
+			-webkit-box-pack: center;
+			-webkit-box-align: center;
+		}
+
+	#div_pic li{
+		border-top: 1px #EDEDED solid;
+		text-align: left;
+		padding-left: 70px;
+		height:47px;
+		line-height:48px;
+	}
+	.icon_font{
+	 font-size: 26px;
+	 color: #fea200
+	}
+	.gochat{
+		text-align: center;
+	    background-color: #ee3532;
+	    height: 36px;
+	    padding-top: 15px;
+	    margin: 0px 10px 0px 10px;
+	    color: #fff;
+	}
+    </style>
+</head>
+<body style="background-color: #ececec">
+	<div id="toolbar_addrt">
+	     <span class="btn_bak"  onclick="go_back();"></span>
+		<h1 class="toolbar_title">联系人详情</h1>
+	</div>
+	<div id="iscr_show"> 
+			<div class="grzx_wo">
+				<div class="grxz_wo_div">
+					<div style="width: 60px;height: 60px;margin-top: 30px;border-radius:50%">
+					<img src="./image/user.png" class="grzx_wo_img" id="yhpic" />
+					</div>
+				</div>
+				<div class="grxz_wo_div" id="wo_info"><font></font></div>
+				<div onclick="dadianhua()" class="grxz_wo_div" id="sj_info"><font></font></div>
+			</div>
+			<div class="gochat" onclick="goChat()">
+				<span >发送信息</span>
+			</div>
+	</div>
+</body>
+</html>

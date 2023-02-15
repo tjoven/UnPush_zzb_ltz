@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=1.0,maximum-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../pub.css" />
+    <link rel="stylesheet" type="text/css" href="../../main.css" />
+    
+    <script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+    <script type="text/javascript" src="../../js/ict.js"></script>
+    <script type="text/javascript" src="../../js/local.js"></script>
+
+    <script type="text/javascript">
+        var dm = getQueryStringRegExp("dm"); 
+        var nm = getQueryStringRegExp("nm");
+        var innerscroll = null;
+        var width = $(document).width();
+        var height = $(document).height() - 140 - 240 - 72;
+        var cx_bmid = window.localStorage.getItem("bmid");
+        $(function() {
+            initScroll();
+            $('#toolbar').toolbar();
+            if(nm == ''){
+                nm=0;
+            }
+            $(".c_tabs_text").eq(nm).addClass("c_tabs_active");
+        });
+
+        function initScroll(){
+            $("#div_main").height(window.innerHeight-106);
+            innerscroll = new iScroll("div_main", {
+                click : true
+            });
+        }
+
+        
+        function zbxuexi(param) {
+            if(isAndriod){
+                window.webview.loadurl_embed(param);
+            }else if(isIphone){
+                window.location.href='obj-c://outside//'+param;
+            }else{
+                var iTop = (window.screen.availHeight - 30 - 365) / 2;
+                var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+                window.open(param, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+            }
+            return;
+        }
+        function gourl(id) {
+            var url = null;
+            if(id=="llyj"){
+            	url = getBaseURL()+"publish/common.html?lb_dm=73640";
+            }
+            sys_goURL(url);
+        }
+
+        function back(){
+            sys_goURL("main.html");
+        }
+
+    </script>
+    <style type="text/css">
+        .ui-toolbar-button{
+            border: 1px solid #D2D2D2;
+        }
+
+        table{
+            
+            border-spacing:10px;
+            border-collapse:separate;
+        }
+
+        td {
+            height: 75px;
+            text-align: center;
+            font-size: 15px;
+            font-family: "微软雅黑";
+            color: #4B5052;
+        }
+
+        img{
+            
+            width: 100%;
+        }
+    </style>
+</head>
+<body style="background-color:#ffffff;">
+
+	<div id="toolbar" >
+	    <span id="btn_bak" class="btn_bak" onclick="back();" ></span>
+	    <h1 class="toolbar_title" >支部学习</h1>
+	</div>
+	
+	<div id="div_main" class="div_main" style="margin:0 auto;">
+	
+	    <table class="mainbox" >
+	        <tr class=" border_top_my">
+	            <td onclick="zbxuexi('https://mp.weixin.qq.com/s?__biz=MzIzNjM0ODI3Mg==&mid=2247612810&idx=1&sn=52ee108f8a30d311216c75487cff4d90&chksm=e8da4f95dfadc683e9d19f38d0aabcaa590d550769a333e2a4ac862db629d0c6fb89f1b0b1c6&mpshare=1&scene=1&srcid=1104aZyzlotYPmYIK34upgxd&sharer_sharetime=1668651861426&sharer_shareid=5f7d07fa1035ca870956451a105ba3b9&key=a55e707b20c85135464fb64b72fe57673c25843767d18c880e9bf622c3ebedfe3eddfe46b34459e1ded2c872681544471e12adbf257f6fa426e9c8f77f0cc670f03a6aa115191a9e9305f854c7f95913e45c0b7f74cd972f9d7883ccd9ed2019a1148486eba69eeb485668acd076851150d79228279132bad755aff3620ed675&ascene=1&uin=MjYyMDM5MjEwMg%3D%3D&devicetype=Windows+10+x64&version=6308001b&lang=zh_CN&exportkey=n_ChQIAhIQXYzj7vBf3qFX%2F1tE5KsifRLqAQIE97dBBAEAAAAAACGqF0spPbkAAAAOpnltbLcz9gKNyK89dVj0Nclb5UTi1JKWENq%2FH6QFb%2BoF0bzboIM9laehvqSpOGeWEyrCl4v2Bv4H%2F2rxOaO2%2By1jEA5dfqOaDUGZPxecGoBH9vC21hJTLeBr3bqDGJ%2FcvziNCJXSCJSjdadCcQpd8h65D%2B92du4wAZUKP5vuhmTBxspbparmZnwOufAmSHtWxM4i16zD7u0PRlLUfWPF3wZMWdrbnWFrUMC2bI7S1HBmi1pdUWqiI1ZUHhzj0as81gOAppNmCV%2FE3GnPTniwWYAF7g%3D%3D&acctmode=0&pass_ticket=AREzOdBa1tUiYiR6YSpIj5k%2F5IwmKNvFSRF33y6yx7Xk3Zwg%2Fw%2BcH3z%2BZbN%2FK1qi&wx_header=0&fontgear=2')">
+	             <!-- <td onclick="zbxuexi('http://ssj.xuexisd.com/mdm/front/index/in')"> -->
+	                <img src="img/esd.png">
+	            </td>
+	        </tr>
+	        <tr class=" border_top_my">
+	            <td onclick="zbxuexi('http://wws.ximalaya.com/wws-c/templ/videoFrame/index/1023?sourceId=1')">
+	                <img src="img/zbxuexi2.jpg">
+	            </td>
+	        </tr>
+	         <tr class=" border_top_my">
+	            <td onclick="gourl('llyj')">
+	                <img src="img/llzl.png">
+	            </td>
+	        </tr>
+	        </tr>
+	         <!-- <tr class=" border_top_my">
+	            <td onclick="zbxuexi('http://123.125.127.131:8081/wap_html_ltz/ltz/wdzb/zbxxByzl.html')">
+	                <img src="img/zbxx_byzl.png">
+	            </td>
+	        </tr> -->
+	    </table>
+	
+	</div>
+</body>
+
+</html>

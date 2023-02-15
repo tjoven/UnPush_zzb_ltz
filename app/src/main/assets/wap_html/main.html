@@ -1,0 +1,731 @@
+﻿<!doctype html>
+<html>
+<head>
+<title></title>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=1.0,maximum-scale=1.0">
+
+<link rel="stylesheet" type="text/css" href="gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="css/base.css" />
+<link rel="stylesheet" type="text/css" href="pub.css" />
+<link rel="stylesheet" type="text/css" href="main.css" />
+<script type="text/javascript" src="gmu/js/gmu.js"></script>
+<script type="text/javascript" src="js/ict.js"></script>
+<script type="text/javascript" src="js/local.js"></script>
+
+<script type="text/javascript" src="js/slider/slider.js"></script>
+<script type="text/javascript" src="js/slider/arrow.js"></script>
+<script type="text/javascript" src="js/slider/dots.js"></script>
+<script type="text/javascript" src="js/slider/$touch.js"></script>
+<script type="text/javascript" src="js/slider/$autoplay.js"></script>
+<script type="text/javascript" src="js/slider/$lazyloadimg.js"></script>
+<script type="text/javascript" src="js/slider/imgzoom.js"></script>
+<script type="text/javascript" src="js/touchslider.dev.js"></script>
+<script type="text/javascript">
+if(isAndriod){
+	var bmid = window.localStorage.getItem("bmid");
+	if(!bmid || ""==bmid){
+		window.localStorage.setItem("bmid", window.webview.getBmid());
+	}
+	var yhid = window.localStorage.getItem("yhid");
+	if(!yhid || ""==yhid){
+		window.localStorage.setItem("yhid", window.webview.getYhid());
+	}
+}
+var innerscroll = null;
+	var width = $(document).width();
+	//var height = $(document).height() - 52 - 240 - 72;
+	var height = $(document).height() - 140 - 240 - 72;
+	var cx_bmid = window.localStorage.getItem("bmid");
+	var slider;
+	// slider末位置				 
+	var lastLoacl;
+	// slider上次滑动位置（初始为0）
+	var slideIndex = getQueryStringRegExp("slideIndex");
+	if (slideIndex == null || slideIndex == '') {
+		slideIndex = "0"
+	}
+	var unReadNum=0;
+	$(function() {
+	    getWeatherInfo();
+		initScroll();
+		$("#div_list_gzdt div").text("动态·前沿·热点");
+		//$("#div_list_tzgg div").text("通知公告");
+		$("#div_list_tpxw div").text("图片新闻");
+   		//$("#div_table_list_tzgg").hide();
+   		$("#div_table_list_tpxw").hide();
+			
+		// 刷新时选中刷新前选中的tab页
+		$(".c_tabs_text").eq(0).addClass("c_tabs_active");
+		// 创建slider
+		/* slider = new TouchSlider('div_tabs', {
+			auto : false,
+			align : 'left',
+			mousewheel : false,
+			mouse : true,
+			fullsize : false,
+			after : doSlideAfter
+		}); */
+		// 设定slider展示宽度为页面宽度
+		var clientWidth = document.body.clientWidth;
+		//$(".swipe").css("width", clientWidth + "px");
+		//$(".slideritem").css("width", (clientWidth / 3) + "px");
+		// 取得slider末index
+		//lastLoacl = slider.length - 2;
+		// slider滑动到上次滑动位置
+		//slider.slide(parseInt(slideIndex), 0);
+		//生成toolbar
+		$('#toolbar').toolbar();
+		$('#div_tabs').style="position:static;"
+		
+		show_red_dot();
+		
+		//生成新闻信息
+		 //sys_ajaxGet("/publish/wap.do?method=desklist&lb_dm=71770&page_size=8",73060
+		 sys_ajaxGet("/publish/wap.do?method=desklist&lb_dm=73060&page_size=6",
+				function(data) {
+					//图片新闻输出****************************************
+					var tableList = $(data.gridData.table_list.data);
+					//alert(tableList.length);
+					var listCount=tableList.length;
+					//列表ul
+					var tableUl = $('#slider');
+					var template = $('#template').html();
+					
+					//循环输出数据
+					$.each(tableList, function(index, item) {
+						var tmp = template;
+						//标题信息
+						tmp = tmp.replace("{id}", item.guid);
+						tmp = tmp.replace(/\{title\}/ig, item.zt);
+						tmp = tmp.replace(/\{detail\}/ig, item.zy);
+						//图片地址生成
+						tmp = tmp.replace(/\{imgUrl\}/ig, item.slt_src);
+						tableUl.append(tmp);
+						//数据输出完成后，再初始化slider
+						if(index>=listCount-1 || index>7){
+							//创建slider组件；
+						    $("#slider").slider( { loop: false ,imgZoom:false, arrow:false});
+							return;
+						}
+					});
+					
+					//创建slider组件；
+				    $("#slider").slider( {loop: false ,imgZoom:false, arrow:false});
+				}); 
+		
+		getNm(0);
+	});
+		
+		function show_red_dot(){		  	
+		  sys_ajaxGet("/tzsf/wap.do?method=unReadNum",{queryType:'ltz'},
+			function(data) {
+			     unReadNum=data.unReadNum;
+				    if(unReadNum> 0) {
+				    	//$("#unReadNumDiv").show();
+				    	//$("#unReadNum").html(data.unReadNum);
+				    	$("#c_tabs_text_tzgg").addClass("span_noreadnum");
+				    	
+				    	//innerscroll.refresh();
+				    } else {
+				    	$("#c_tabs_text_tzgg").removeClass("span_noreadnum");
+				    }
+				}); 
+		}
+	
+	// tab左右滑动后记录滑动位置(末屏未填满时滚动填满)
+	function doSlideAfter(newIndex, newSlide) {
+		slideIndex = newIndex;
+		if (lastLoacl <= 0) {
+			slider.slide(0);
+			slideIndex = 0;
+		} else if (newIndex > lastLoacl && lastLoacl > 0) {
+			slider.slide(lastLoacl);
+			slideIndex = lastLoacl;
+		}
+	}
+	function getNm(num) {
+		if (num == 0) {
+			$(".c_tabs_text").eq(0).addClass("c_tabs_active");
+			$(".c_tabs_text").eq(1).removeClass("c_tabs_active");
+			$(".c_tabs_text").eq(2).removeClass("c_tabs_active");
+			$("#div_table_list_gzdt").hide();
+			$("#div_table_list_xwbb").hide();
+			//$("#div_table_list_tzgg").hide();
+			$("#div_table_list_tpxw").show();
+		    getTPXW();;
+		} else if (num == 1) {
+				
+			$(".c_tabs_text").eq(0).removeClass("c_tabs_active");
+			$(".c_tabs_text").eq(2).removeClass("c_tabs_active");
+			$(".c_tabs_text").eq(1).addClass("c_tabs_active");
+			$("#div_table_list_tpxw").hide();
+			$("#div_table_list_xwbb").hide();
+			//$("#div_table_list_tzgg").hide();
+			$("#div_table_list_gzdt").show();
+			getGZDZ();
+			
+		} else if (num == 2) {
+		    $(".c_tabs_text").eq(0).removeClass("c_tabs_active");
+			$(".c_tabs_text").eq(1).removeClass("c_tabs_active");
+			$(".c_tabs_text").eq(2).addClass("c_tabs_active");
+			$("#div_table_list_gzdt").hide();
+			$("#div_table_list_tpxw").hide();
+			$("#div_table_list_xwbb").show();
+			//$("#div_table_list_tzgg").show()
+			// getXXZX();
+			getXWBB();
+
+		}
+	}
+	function getWeatherInfo(){
+	   var weatherinfo=window.localStorage.getItem("weather_interval_30min");
+	  if(weatherinfo!=null&&weatherinfo!="null"&&weatherinfo!=""){
+	     var weatherinfo_json=JSON.parse(weatherinfo);//alert(weatherinfo);
+	     var update_time=weatherinfo_json.update_time;//alert(update_time);alert(getIntervalMinutes(new Date(update_time),new Date()));
+	     if(getIntervalMinutes(new Date(update_time),new Date())>=30){	//alert(">30分钟更新天气");
+	        sys_getPosition();        
+	        //showWeather('CN101010100');
+	     }else{//alert("<30分钟调用缓存天气");
+	      document.getElementById('main_weather_text').innerHTML =  weatherinfo_json.city + "&nbsp;" + weatherinfo_json.weather+"&nbsp;"+ weatherinfo_json.temperature + "°"+"&nbsp;" ;	
+		  document.getElementById('main_weather_img').style.backgroundImage = "url(img/weather/"+weatherinfo_json.weather_picture +".png)";
+	     }
+	  }else{//alert("没缓存天气");
+	         sys_getPosition();
+		   //showWeather('CN101010100');
+	  }
+	}
+	function loadlocation(wd, jd, sj, dz) {
+	/* alert("进入回调函数");
+	alert("经度 ： " + jd); */
+		if (wd !== null || wd !== undefined || wd !== '') {
+			showWeather(jd+","+wd);
+		} else {
+			showWeather('CN101010100');
+		}
+		
+	}
+	
+	function showWeather (location) {
+		sys_ajaxGet("/ltz/weather/default.do?method=weather&location="+location,
+				function(data) {
+					if(data.HeWeather6[0].status == "ok")	{
+						var now = data.HeWeather6[0].now;
+						var basic = data.HeWeather6[0].basic;
+						//document.getElementById('main_weather').innerHTML =  now.tmp + "° <br>" + basic.parent_city + " " + now.cond_txt;	
+						document.getElementById('main_weather_text').innerHTML =  basic.parent_city + "&nbsp;" + now.cond_txt+"&nbsp;"+ now.tmp + "°"+"&nbsp;" ;	
+						document.getElementById('main_weather_img').style.backgroundImage = "url(img/weather/"+now.cond_code +".png)";
+						
+						var weather_jsonString = '{"update_time":"'+new Date()+'","city":"'+basic.parent_city+'","weather":"'+now.cond_txt+'","temperature":"'+now.tmp+'","weather_picture":"'+now.cond_code+'"}';
+						window.localStorage.setItem("weather_interval_30min",weather_jsonString);//{"update_time":"","city":"","weather","","temperature":"","weather_picture":""}
+						
+					}		    
+				});
+	}
+	 function getIntervalMinutes(startDate, endDate) {
+            var ms = endDate.getTime() - startDate.getTime();
+            if (ms < 0) return 0;
+            return Math.floor(ms/1000/60);
+     }
+	
+	function noBarsOnTouchScreen(arg) { //设置滚动
+		var elem,
+			tx,
+			ty;
+		if ('ontouchstart' in document.documentElement) {
+			if (elem = document.getElementById(arg)) {
+				elem.style.overflow = 'hidden';
+				elem.ontouchstart = ts;
+				elem.ontouchmove = tm;
+			}
+		}
+
+		function ts(e) {
+			var tch;
+			if (e.touches.length == 1) {
+				e.stopPropagation();
+				tch = e.touches[0];
+				tx = tch.pageX;
+				ty = tch.pageY;
+			}
+		}
+
+		function tm(e) {
+			var tch;
+			if (e.touches.length == 1) {
+				e.preventDefault();
+				e.stopPropagation();
+				tch = e.touches[0];
+				this.scrollTop += ty - tch.pageY;
+				ty = tch.pageY;
+			}
+		}
+	}
+	
+	
+	//获取通知公告信息
+	function getXXZX() {
+		sys_ajaxGet("/tzsf/wap.do?method=tzSignList&p_flag=1t&lb_dm=8103&page_size=3", function(json) {
+			if (json.gridData.table_list) {
+				var html = '';
+				var dataArr = json.gridData.table_list.data;
+				$.each(dataArr, function(i, v) {
+					if(v.slt ==''){
+						v.slt = "publish/img/default.jpg";
+					}
+					/* html+='<li onclick=showDetail(3,"'+v.guid+'"); >' +
+							'<div style="display: none;">'+v.guid+'</div>'+
+							'<div class="list_row_con" style="height:65px;background-color: #ffffff;" >'+
+							'<div class="red_dot" >'+
+							'<div class="span_noreadnum" style="display:'+v.display_val+';"></div>'+
+							'</div>'+
+							'<div class="list_row_col2" style="margin-top:13px;margin-left: 2px;">'+
+							'<div class="list_row_col2_1 overflow">'+v.zt+'</div>'+
+							'<div class="list_row_col2_2" style="top:0px;clear:none;width: 100%;float: left;">'+
+							'<span style="display:inline;float: right;margin-right: 5px;">'+v.fbrq+'</span>	'+
+							'</div></div></div></li>'; */
+					
+				
+			
+					
+					html+="<li onclick=showDetail(3,'"+v.guid+"');>"+
+					"<div style='display: none;'>"+v.guid+"</div>"+
+					"<div class='list_row_con' style='height:45px;min-height:50px;'>"+
+					" <div class='red_dot' ><div class='list_span_noreadnum' id='red_dot_"+v.guid+"' style='display:"+v.display_val+";'></div></div>"+
+					"<div class='list_row_col2' style='margin-left:5px;line-height:50px;color:#383737;margin-right:40;'>"+
+					"<span class='overflow' style='display:inline-block;width:90%;'>"+v.zt+
+					"</span><span style='line-height:50px;position:absolute;top:0px;right:15px;background:url(img/main/right.png) no-repeat center;"+
+					"background-size:22px 22px;'>&nbsp;&nbsp;</span>"+
+					"</div></div></li>"; 
+				});
+				$('#table_list2').html(html);
+				
+				 innerscroll.refresh();
+				 sys_autoTextarea(innerscroll); 
+			}
+			 
+		}); 
+	}
+	// 获取工作动态
+	function getGZDZ() {
+		sys_ajaxGet("/publish/wap.do?method=waplist&lb_dm=70860&page_size=3", function(json) {
+			if (json.gridData.table_list) {
+				var html = '';
+				var dataArr = json.gridData.table_list.data;
+				$.each(dataArr, function(i, v) {
+					if(v.slt ==''){
+						v.slt = "publish/img/default.jpg";
+					}
+					html+="<li onclick=showDetail(2,'"+v.guid+"')>"+
+					"<div style='display: none;'>"+v.guid+"</div>"+
+					"<div class='list_row_con' style='height:99px;'>"+
+					"<div class='list_row_slt' style='background-image:url("+v.slt+")'></div>"+
+					"<div class='list_row_col2' style='margin-top:10px;margin-left:8px;'>"+
+					"<div class='list_row_col2_1' style='text-overflow: -o-ellipsis-lastline;overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;font-size:16px;margin-top:5px;'>"+v.zt+"</div>"+
+					"<div class='list_row_col2_2' style='top:0px;clear:none;width: 100%;font-size:12px;'>"+
+					"<span style=''>"+"</span>"+""+
+					""+
+					"<span style='float:right; margin-right:5px;'>"+v.cjsj+"</span>"+"</div>"+
+					"</div></div></li>";
+				});
+				$('#table_list3').html(html);
+				
+				 innerscroll.refresh();
+				 sys_autoTextarea(innerscroll); 
+			}
+			 
+		});
+	}
+	// 获取图片新闻
+	function getTPXW() {
+		sys_ajaxGet("/publish/wap.do?method=waplist&lb_dm=73060&page_size=3", function(json) {
+			if (json.gridData.table_list) {
+				var html = '';
+				var dataArr = json.gridData.table_list.data;
+				$.each(dataArr, function(i, v) {
+					if (v.slt == '') {
+						v.slt = "publish/img/default.jpg";
+					}
+					html += "<li onclick=showDetail(4,'" + v.guid + "')>" +
+						"<div style='display: none;'>" + v.guid + "</div>" +
+						"<div class='list_row_con' style='height:89px;'>" +
+						"<div class='list_row_slt' style='height:70px;background-image:url(" + v.slt + ")'></div>" +
+						"<div class='list_row_col2' style='margin-top:10px;margin-left:8px;'>" +
+						"<div class='list_row_col2_1' style='text-overflow: -o-ellipsis-lastline;overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;font-size:16px;margin-top:5px;'>" + v.zt + "</div>" +
+						"<div class='list_row_col2_2' style='top:0px;clear:none;width: 100%;font-size:12px;'>" +
+						"<span style=''>" + "</span>" + "" +
+						"" +
+						"<span style='float:right; margin-right:5px;'>" + v.cjsj + "</span>" + "</div>" +
+						"</div></div></li>";
+				});
+				$('#table_list4').html(html);
+
+				innerscroll.refresh();
+				sys_autoTextarea(innerscroll);
+			}
+
+		});
+	}
+	// 获取新闻播报
+	function getXWBB() {
+		sys_ajaxGet("/publish/wap.do?method=waplist&lb_dm=73470&page_size=3", function(json) {
+			if (json.gridData.table_list) {
+				var html = '';
+				var dataArr = json.gridData.table_list.data;
+				$.each(dataArr, function(i, v) {
+					if (v.slt == '') {
+						v.slt = "publish/img/default.jpg";
+					}
+					html += "<li onclick=showDetail(5,'" + v.guid + "')>" +
+						"<div style='display: none;'>" + v.guid + "</div>" +
+						"<div class='list_row_con' style='height:89px;'>" +
+						"<div class='list_row_col2' style='margin-top:10px;margin-left:8px;'>" +
+						"<div class='list_row_col2_1' style='text-overflow: -o-ellipsis-lastline;overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;font-size:16px;margin-top:5px;'>" + v.zt + "</div>" +
+						"<div class='list_row_col2_2' style='top:0px;clear:none;width: 100%;font-size:12px;'>" +
+						"<span style=''>" + "</span>" + "" +
+						"<span style='float:right; margin-right:5px;'>" + v.cjsj + "</span>" + "</div>" +
+						"</div></div></li>";
+				});
+				$('#table_list5').html(html);
+
+				innerscroll.refresh();
+				sys_autoTextarea(innerscroll);
+			}
+
+		});
+	}
+	//设定界面可拖动
+	function initScroll(){
+		 $("#div_main").height(window.innerHeight-96);
+		 innerscroll = new iScroll("div_main", {
+			click : true
+		}); 
+	}
+	//显示明细
+	function showDetail(type,guid) {
+		if (type == "1") {
+			var url= "/publish/show.html?guid="+guid+"&ismain=1";
+			sys_showDetail(url);
+			}
+		if (type == "2") {
+		// 工作动态
+			url= "/publish/show.html?guid="+guid+"&ismain=1";
+			sys_showDetail(url);
+		} else if (type == "3") {
+		     // 通知公告
+		    if($("#red_dot_"+guid).css("display")!='none'){
+		            unReadNum=unReadNum-1;
+		            if(unReadNum> 0) {
+				    	$("#c_tabs_text_tzgg").addClass("span_noreadnum");
+				    } else {
+				    	$("#c_tabs_text_tzgg").removeClass("span_noreadnum");
+				    }
+		    }
+		     $("#red_dot_"+guid).hide();	//unReadNum	
+			 url = "/ltz/notice/show.html?guid="+guid;
+			//window.location.href=url;
+			sys_showDetail(url);
+		} else if (type == "4") {
+		// 图片新闻
+			url= "/publish/show.html?guid="+guid+"&ismain=1&mkmc=" + escape("图片新闻");
+			sys_showDetail(url);
+		} else if (type == "5") {
+		// 新闻播报
+			url= "/publish/show.html?guid="+guid+"&ismain=1&mkmc=" + escape("新闻播报");
+			sys_showDetail(url);
+		}
+		
+	}
+	
+	//调到各个功能模块
+	function gourl(id){
+				var url;
+				if(id=="wdzb"){//我的支部					
+					url = "ltz/wdzb/main.html";	
+				}else if(id=="wdznl"){//我的正能量
+					url = "ltz/znl/znlList.html?lb_dm=71540";		
+				}else if(id=="ylbj"){//医疗保健
+					url = "ltz/ylbj/main.html?lb_dm=71330";
+				}else if(id=="event"){
+					//我的事项
+					url = "ltz/events/demandAndHandle/main.html";
+					//window.localStorage.setItem("rwlx","我的事项");
+				}else if(id=="wdsj"){//我的书架
+					url = "ltz/publication/list.html";	
+				}else if(id=="zxxx"){//在线学习
+					url = "ltz/elearning/main.html";	
+				}else if(id=="shyl"){//社会养老
+					url = "publish/common.html?lb_dm=70870";
+				}else if(id=="gzjz"){//我的大学
+                    url = "ltz/lndx/kcxx.html";
+                }else if(id=="wddhb"){//我的大学
+                    url = "ltz/address/lxr.html";
+                } else if (id=="lgsy") {
+                	url = "ltz/lgsy/list.html?lb_dm=71680&dm=" // 老干视野
+                } else if (id=="wdsh") {// 我的生活
+                	//url = "ltz/mylive/myLive.html" ;
+					url = "ltz/mylive/main.html" ;
+                }else if (id=="jlpt") {// 我的生活
+                	url = "jstx/jstx/message.html" ;
+                }else if(id=="bjfw"){//便捷服务
+					//url = "ltz/bjfw/ylj.html";
+					url = "ltz/bjfw/food.html";	
+				}
+				sys_goURL(url);
+
+	}
+	
+	function openTzgg() {
+		sys_goURL("ltz/notice/list.html?lb_dm=8103");
+	}
+	
+	function showTongZhiDetail(id) {
+		var url = "tongzhi/show.html?guid=" + id;
+		sys_goURL(url);
+	}
+	function openWeather() {
+		var url = "http://m.weather.com.cn/";
+		if (isAndriod) {
+			window.webview.loadurl_embed(url);
+		} else if (isIphone) {
+			window.location.href = 'obj-c://outside//' + url;
+		} else {
+			var iTop = (window.screen.availHeight - 30 - 365) / 2;
+			var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+			window.open(url, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+		}
+	}
+</script>
+<style type="text/css">
+.ui-toolbar-button{
+	border: 1px solid #D2D2D2;
+}
+.red_dot{
+		  display: -webkit-box;
+	      -webkit-box-align: center;
+	      -webkit-box-pack: center;
+		  width: 12px;
+		  height: 65px;
+		  line-height: 65px;
+		}
+		.span_noreadnum{
+		 height: 65px;
+		background: url("img/noread.png") no-repeat;
+		background-size: 7px 7px;	
+		background-position:0px 18px;
+		padding-left:10px;
+	}
+::-webkit-input-placeholder { /* WebKit browsers */  
+    color:    #A9A9A9;  
+    font-size:12px;
+} 
+.list_row_slt {
+	width: 110px;
+	height: 80px;
+	margin-left: 10px;
+	display: -webkit-box;
+	-webkit-box-pack: center;
+	-webkit-box-align: center;
+	background-repeat: round;
+	background-size: cover;
+	margin-top: 10px;
+}
+
+.grzx_wo_img{
+			height: 40px;
+			width: 40px;
+			margin-top: 15px;
+			border-radius: 50%;
+			margin-left:15px;
+		}
+    .red_dot{
+		  display: -webkit-box;
+	      -webkit-box-align: center;
+	      -webkit-box-pack: center;
+		  width: 12px;
+		  height: 65px;
+		  line-height: 65px;
+		}
+	.list_span_noreadnum{
+	     width: 15px;
+		 height: 50px;
+		background: url("img/noread.png") no-repeat;
+		background-size: 7px 7px;	
+		background-position:6px 12px;
+		display: none;
+	}
+</style>
+<title>首页</title>
+</head>
+<body>
+<div class="div_main_top"  id="toolbar" style="height:44px!important;">
+		<!-- 个人头像 -->
+		<!-- <img src="../image/wo_user.png" class="grzx_wo_img" id="yhpic" onclick="sys_goURL('ltz/personInfo/personInfo.html');" /> -->
+	<span class="toolbar_icon" style="width:30px !important;"></span>
+	<h1 class="toolbar_title" style="margin-left: 45px;text-align:left;font-size: 16px;">不忘初心</h1>
+	<div class="main_weather" id="main_weather"  onclick="openWeather();">
+	   <div id="main_weather_text"></div><div id="main_weather_img"></div>
+	</div>
+	<!-- <img id="weather_img" src="img/weather/100.png;" style="width:35px;float:none!important;border-width:0px!important;"> -->
+	<!-- <img id="weather_img" src="" style="width:35px;float:none!important;border-width:0px!important;"> -->
+</div>
+	
+	<div id="div_main" class="div_main">
+		<div>
+			<div id="slider" class="mainboxtop">
+			</div>
+			<!-- slider使用的模板 -->
+			<div id="template" style="display:none;">
+			
+				<div class="div_img" onclick="showDetail('4','{id}')"  style="background-image: url({imgUrl});background-repeat:no-repeat;background-position-y:bottom;background-position-y:bottom;overflow:hidden;background-size:cover;" >
+			      <!--   <a href="#"><img class="slider_img" lazyload="{imgUrl}"></a> -->
+			        <p>{title}</p>
+			    </div>
+			</div>
+			<!-- slider使用的模板            end-->
+			
+			<div>
+			<!-- 未读数 -->
+			<!-- 
+			<div style="display:none;background: #fff;height:40px;line-height:40px;color:#d40d02;text-indent:1em;" id="unReadNumDiv" onclick="openTzgg();">
+				<span style="padding-left:25px;background:url(img/tongzhi.png) no-repeat left center; background-size:20px 20px;">您有（<span id="unReadNum"></span>）条提醒！</span>
+			</div>
+			 -->
+			<div style="background:#edf0f5;height:5px;"></div>
+			<div >
+				<!-- 小图标 start-->
+				<div class="mainbox">
+					<div class="main_item border_top">
+						<div class="" onclick="gourl('wdzb')">
+							<div class="item_smallButton" id="2017041815364813256661">
+								<!-- <div class="item_djdt item_smallButton_img"></div>--> 
+								<div class="item_wdzb item_smallButton_img"></div>
+								<div class="item_smallButton_text">我的支部</div>
+							</div>
+						</div>
+							<div onclick="gourl('gzjz')">
+							<div class="item_smallButton">
+								<div class="item_wddx item_smallButton_img"></div>
+								<div class="item_smallButton_text">我的大学</div>
+							</div>
+						</div>
+						<div onclick="gourl('wdznl')">
+							<div class="item_smallButton">
+								<!-- <div class="item_tzgg item_smallButton_img" onclick="gourl('tzgg')"></div> -->
+								<div class="item_wdznl item_smallButton_img"></div>
+								<div class="item_smallButton_text">正能量</div>
+							</div>
+						</div>
+						<div class="" onclick="gourl('zxxx')">
+							<div class="item_smallButton" >
+								<div class="item_zxxx item_smallButton_img"></div>
+								<div class="item_smallButton_text">在线学习</div>
+							</div>
+						</div>
+						
+					</div>
+					<div class="main_item border_top" style="border-bottom: 0px solid #e6e6e6;height:90px;">
+						<div class="" onclick="gourl('ylbj')">
+							<div class="item_smallButton">
+								<div class="item_ylbj item_smallButton_img"></div>
+								<div class="item_smallButton_text">医疗保健</div>
+							</div>
+						</div>
+						
+						<div class="" onclick="gourl('wdsh')">
+							<div class="item_smallButton">
+								<div class="item_wdsh item_smallButton_img"></div>
+								<div class="item_smallButton_text">我的生活</div>
+							</div>
+						</div>
+						
+						<div class="" onclick="gourl('jlpt')">
+							<div class="item_smallButton">
+								<div class="item_jlpt item_smallButton_img"></div>
+								<div class="item_smallButton_text">我爱我群</div>
+							</div>
+						</div>
+						
+						<div class="" onclick="gourl('bjfw')">
+							<div class="item_smallButton" id="2017041815364813256661">
+								<!-- <div class="item_djdt item_smallButton_img"></div>--> 
+								<div class="item_bjfw item_smallButton_img"></div>
+								<div class="item_smallButton_text">便捷服务</div>
+							</div>
+						</div>
+					</div>
+				</div>				
+			</div>
+			<div style="background:#edf0f5;height:5px;"></div>
+			<div class='swipe' style="width:100%;">
+			<div class="c_tabs" id="div_tabs">
+			    <div class="slideritem" id="div_list_tpxw">
+					<div class="c_tabs_text" onclick="getNm(0)">图片新闻</div>
+				</div>
+				<div class="slideritem" id="div_list_gzdt" >
+					<div class="c_tabs_text" onclick="getNm(1)">工作动态</div>
+				</div>
+			    <div class="slideritem" id="div_list_xwbb">
+					<div class="c_tabs_text" onclick="getNm(2)">新闻播报</div>
+				</div>
+			
+				<!--  
+				<div class="slideritem" id="div_list_tzgg">
+					<div class="c_tabs_text " onclick="getNm(2)" id="c_tabs_text_tzgg">通知公告</div>
+				</div>
+				-->
+			</div>
+		</div>
+						<!-- 工作动态 -->
+					<div>
+						<!-- 列表数据 -->
+						<div class="ui-refresh" id="div_table_list_gzdt">
+							<ul class="data-list" id="table_list3">
+							</ul>
+							<div style="text-align:center;color:#999;height:50px;line-height:50px;" 
+							onclick="sys_goURL('publish/common.html?lb_dm=70860')" id="gzdtMoreDiv">查看更多>></div>
+						</div>
+
+					</div>
+				   <!-- 通知公告
+					<div>
+					
+						<div class="ui-refresh" id="div_table_list_tzgg">
+							<ul class="data-list" id="table_list2">
+							</ul>
+							<div style="text-align:center;color:#999;height:50px;line-height:50px;" 
+							onclick="openTzgg();" id="tzggMoreDiv">查看更多>></div>
+						</div>
+
+					</div>
+					 -->
+					<!-- 图片新闻 -->
+					<div>
+						<!-- 列表数据 -->
+						<div class="ui-refresh" id="div_table_list_tpxw">
+							<ul class="data-list" id="table_list4">
+							</ul>
+							<div style="text-align:center;color:#999;height:50px;line-height:50px;" 
+							onclick="sys_goURL('publish/common.html?lb_dm=73060&mkmc=图片新闻')" id="tpxwMoreDiv">查看更多>></div>
+						</div>
+
+					</div>
+					<!-- 新闻播报 -->
+					<div>
+						<!-- 列表数据 -->
+						<div class="ui-refresh" id="div_table_list_xwbb">
+							<ul class="data-list" id="table_list5">
+							</ul>
+							<div style="text-align:center;color:#999;height:50px;line-height:50px;"
+							onclick="sys_goURL('publish/common.html?lb_dm=73470&mkmc=新闻播报')" id="xwbbMoreDiv">查看更多>></div>
+						</div>
+
+					</div>
+				</div>
+			
+		</div>
+	</div>
+	<div id="div_codeShow" class="div_codeShow"></div>
+</body>
+</html>

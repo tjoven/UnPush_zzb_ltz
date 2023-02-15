@@ -1,0 +1,207 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>常用医院</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+<link type="text/css" rel="stylesheet" href="../../css/iconfont/iconfont.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+<script type="text/javascript">
+
+	sys_addMeun = true;
+	var lb_dm=getQueryStringRegExp("lb_dm");
+	var _list = {};
+	
+	$(function() {
+		$('#toolbar').toolbar();
+		$("#mc").width($(document).width()-20);
+		$("#mc").val("");
+		$(".c_tabs_text").eq(0).addClass("c_tabs_active");
+		var _height = getListHeight();
+        $("#sys_innerscoll").height(window.innerHeight-_height);
+        var innerscroll = new iScroll("sys_innerscoll",{click:true});
+		// sys_renderList('table_list', '/publish/wap.do?method=waplist&page_size=10&&page_goto=', {lb_dm:lb_dm}, _list);
+        sys_ajaxGet("/ltz/yyjsAndsqyl/default.do?method=waplist&page_size=10&page_goto=", {type : "0"}, function(json) {
+            var html = "";
+            var jsonT = json.list;
+            if (jsonT.length === 0) {
+                html += "<li><div class='list_row_con' style='height:70px;min-height:70px;background-color: #ffffff;'>";
+                html += "<div class='list_row_col2' style='padding-top:12px;margin-left:18px;'>";
+                html += "<div class='list_row_col2_1 overflow' style='text-align: center;'>没有数据！</div></div></div></li>";
+                $("#table_list").html(html);
+            } else if (jsonT.length === 1) {
+                html += "<li><div class='list_row_con' style='height:50px;min-height:50px;background-color: #ffffff;'>";
+                html += "<div class='list_row_col2' style='padding-top:12px;margin-left:18px;'>";
+                html += "<div class='list_row_col2_1 overflow' onclick=goUrl('" + jsonT[0].link_url + "','" + jsonT[0].embed + "')>" + jsonT[0].mc + "</div>";
+                html += "</div><div class='list_row_col3' style='margin-right: 15px;'></div></li>";
+                $("#table_list").html(html);
+            } else {
+                for(var i=0;i<jsonT.length;i++){
+                    html += "<li style='width: 50%;display: inline-block;'><div class='list_title' onclick=gotoPage('" + jsonT[i].link_url + "','" + jsonT[i].embed + "') style='height:40px;min-height:40px;background-color: #ffffff;padding-top: 12px;text-align: center;'>"+ jsonT[i].mc + "</div>";
+                }
+                $("#table_list").html(html);
+            }
+            // _list["table_list"].refresh();
+            // _list['table_list'].scrollTo(0, 0, 500, false);
+            var _height = getListHeight();
+            $("#sys_innerscoll").height(window.innerHeight-_height);
+            var innerscroll = new iScroll("sys_innerscoll",{click:true});
+        });
+	});
+
+  
+	function search() {
+		var mc = $("#mc").val();
+		sys_ajaxGet("/ltz/yyjsAndsqyl/default.do?method=waplist&type=0&page_size=10&page_goto=", {mc : mc}, function(json) {
+            var html = "";
+            var jsonT = json.list;
+            if (jsonT.length === 0) {
+                html += "<li><div class='list_row_con' style='height:70px;min-height:70px;background-color: #ffffff;'>";
+                html += "<div class='list_row_col2' style='padding-top:12px;margin-left:18px;'>";
+                html += "<div class='list_row_col2_1 overflow' style='text-align: center;'>没有数据！</div></div></div></li>";
+                $("#table_list").html(html);
+            } else if (jsonT.length === 1) {
+                html += "<li><div class='list_row_con' style='height:50px;min-height:50px;background-color: #ffffff;'>";
+                html += "<div class='list_row_col2' style='padding-top:12px;margin-left:18px;'>";
+                html += "<div class='list_row_col2_1 overflow' onclick=goUrl('" + jsonT[0].link_url + "','" + jsonT[0].embed + "')>" + jsonT[0].mc + "</div>";
+                html += "</div><div class='list_row_col3' style='margin-right: 15px;'></div></li>";
+                $("#table_list").html(html);
+            } else {
+                for(var i=0;i<jsonT.length;i++){
+                    html += "<li style='width: 50%;display: inline-block;'><div class='list_title' onclick=gotoPage('" + jsonT[i].link_url + "','" + jsonT[i].embed + "') style='height:40px;min-height:40px;background-color: #ffffff;padding-top: 12px;text-align: center;'>"+ jsonT[i].mc + "</div>";
+                }
+                $("#table_list").html(html);
+            }
+			// _list["table_list"].refresh();
+			// _list['table_list'].scrollTo(0, 0, 500, false);
+            var _height = getListHeight();
+            $("#sys_innerscoll").height(window.innerHeight-_height);
+            var innerscroll = new iScroll("sys_innerscoll",{click:true});
+		});
+	}
+
+    function gotoPage(url,param){
+        if(isAndriod){
+            if(param=='0'){
+                window.webview.loadurl_embed(url)
+            }else if(param=='1'){
+                window.webview.loadurl_new(url);
+            }else{
+                window.webview.loadurl_new(url);
+            }
+
+        }else if(isIphone){
+            window.location.href='obj-c://outside//'+url;
+        }else{
+            var iTop = (window.screen.availHeight - 30 - 365) / 2;
+            var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+            window.open(url, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+        }
+        return;
+    }
+	function gourl(lb_dm) {
+		// if("zxgh"!=lb_dm){
+			$("#div_"+lb_dm).addClass("table_tabs_active");
+		// }
+		if("zxgh"==lb_dm){
+			sys_goURL("../events/demandAndHandle/main.html");
+		}else if("ylbx"==lb_dm || "sqyl"==lb_dm){
+			sys_goURL("ylbx.html?lx=" + lb_dm);
+		}else if("71320"==lb_dm){
+			sys_goURL("jypt.html?lb_dm=" + lb_dm);
+		}else if("71330"==lb_dm){
+			sys_goURL("ylbj.html?lb_dm=" + lb_dm);
+		}
+	}
+
+	function go_back() {
+		sys_goURL("main.html");
+	}
+</script>
+
+<style type="text/css">
+	.ui-toolbar-wrap {
+		border: none !important;
+	}
+</style>
+
+</head>
+<body>
+	<div id="toolbar">
+		  <span class="btn_bak"  onclick="go_back();"></span>
+		<h1 class="toolbar_title">常用医院</h1>
+	
+	</div>
+	<div class="ui-refresh" id="div_table_list">
+	
+	<div class="c_tabs div_other_40" id="div_tabs" style="display: none;">
+		<div id='div_list0'>
+			<div class='c_tabs_text' onclick=gourl('71330')>常用医院</div>
+		</div>
+		<div id='div_list1'>
+			<div class='c_tabs_text' onclick=gourl('zxgh')>挂号服务</div>
+		</div>
+		<div id='div_list2'>
+			<div class='c_tabs_text' onclick=gourl('sqyl')>社区医疗</div>
+		</div>
+		<div id='div_list3'>
+			<div class='c_tabs_text' onclick=gourl('71320')>家医平台</div>
+		</div>
+	</div>
+
+		 <!--  <table class="table_tabs">
+			<tr><td style="width:20%;"> <div class="table_tabs_text" id="div_71330" onclick="gourl('71330')">医院介绍</div> </td>
+				<td style="width:20%;"> <div class="table_tabs_text" id="div_zxgh" onclick="gourl('zxgh')">挂号服务</div> </td>
+				<td style="width:20%;"> <div class="table_tabs_text" id="div_ylbx" onclick="gourl('ylbx')">医疗报销</div> </td> 
+				<td style="width:20%;"> <div class="table_tabs_text" id="div_sqyl" onclick="gourl('sqyl')">社区医疗</div> </td>
+				<td style="width:20%;"> <div class="table_tabs_text" id="div_71320" onclick="gourl('71320')">家医平台</div> </td>
+			</tr></table>-->
+
+		<!-- <div id="div_search" class="list_div_search div_other_50">
+			<input type="text" id="mc" class="list_search_input" placeholder="请输入名称" >
+			<div class="list_search_img" id="btn_search" onclick="search()"></div>
+		</div> -->
+		<div id="sys_innerscoll">
+		<!--<div class="ui-refresh-up" id="ui-refresh-up"></div>-->
+		<ul class="data-list" id="table_list" style="list-style-type:none">
+			<!--<li style="display: none;" >
+				<div style="display: none;">{guid}</div>
+				&lt;!&ndash; 点击行的参数 &ndash;&gt;
+				<div class="list_row_con" style="height:70px;min-height:70px;background-color: #ffffff;" >
+					<div class="list_row_col2" style="margin-top:8px;margin-left:18px;">
+						<div class="list_row_col2_1 overflow">{zt}</div>
+						<div class="list_row_col2_2"
+							style="top:4px;clear:none;width: 100%;float: left;">
+							<span style="right: 5px;float: left;">{yhxm}</span> <span
+								style="float: right;">{cjsj}</span>
+						</div>
+					</div>
+					<div class="list_row_col3"></div>
+				</div>
+			</li>-->
+		</ul>
+		<!--<div class="ui-refresh-down"></div>-->
+		<!--</div>-->
+	</div>
+	<!-- <div id="dialog_search">
+        <p>名称：<input type="text" id="input_cxmc" value="" placeholder="名称"/></p>
+    </div> -->
+	</div>
+</body>
+<!--<div style="background-color:#e5e5e5;height:50px;position:fixed;bottom:52px;left:0px;width:100%;text-align: center" class="div_other_50">
+	<img onclick="dadianhua('010-51669752')" alt="" src="../../img/zjfwrx.png" style="margin-top:8px;height: 33px;width: 30%;">
+</div>-->
+
+<!--<div style="background-color:#e5e5e5;height:50px;position:fixed;bottom:50px;left:0px;width:100%;text-align: center" class="div_other_50">
+	<img onclick="gotoPage('http://yyghiptv.bjguahao.gov.cn/index.htm','0')" alt="" src="../../img/114gh.png" style="margin-top:5px;height: 33px;width: 30%;">
+	<img onclick="gotoPage('')" alt="" src="../../img/jytgh.png" style="margin-top:5px;height: 33px;width: 30%;">
+</div>-->
+</html>

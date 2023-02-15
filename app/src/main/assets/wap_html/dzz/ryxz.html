@@ -1,0 +1,669 @@
+<!doctype html>
+<html>
+  <head>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+    <title>组织党员一览</title>
+    <link rel="stylesheet" type="text/css" href="../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../css/base.css" />
+    <script type="text/javascript" src="../gmu/js/gmu.js"></script> 
+	<script type="text/javascript" src="../js/ict.js"></script>
+    <script type="text/javascript" src="../js/local.js"></script>
+
+
+    <script type="text/javascript" src="../js/iscroll-probe.js"></script>
+    <script type="text/javascript">
+	var sys_fsfw = getQueryStringRegExp("sys_fsfw");
+	var sys_fsfw_mc = getQueryStringRegExp("sys_fsfw_mc");
+	var sys_bm = getQueryStringRegExp("sys_bm");
+	//var sys_mkdm = getQueryStringRegExp("sys_mkdm");
+	var sys_mkdm="address";
+	var sys_qxid = getQueryStringRegExp("sys_qxid");
+	var yhfw = getQueryStringRegExp("yhfw");
+	
+	var date = 0,date_r=0,date_rs=0,date_g=0,date_gs=0;
+	var divheight = $(window).height();
+	var flag = 0;
+	var bmid="";
+	//var bmid=window.localStorage.getItem("bmid");
+	//var yhid=window.localStorage.getItem("yhid");
+	var yhid="";
+    $(function(){
+     	$('.button').button();
+		noBarsOnTouchScreen("main_left");
+		noBarsOnTouchScreen("search_rtn");
+		$('#toolbar').toolbar();
+    	$("#search_rtn").hide();
+    	$("#quit_search").hide();
+		sys_ajaxGet("/wap/org/default.do?method=getBmYhList","hasbm=0&yhfw="+yhfw+"&sys_bm="+sys_bm+"&qxid="+sys_qxid+"&mk_dm="+sys_mkdm,function(json){
+			if(json.list){
+				setTreeList(json.list);
+				if(json.list.length>0){
+					$("#initbmid").val(json.initbmid);
+				}
+			}
+		});	
+		$("#btn_group").click(function(){
+			 sys_goURL('groups.html');
+		});
+		var width=window.innerWidth;
+		$(".ui-btn-group").width(width-100);
+		$("#user_search").width(width-70);
+		 String.prototype.startWith=function(s){
+			  if(s==null||s==""||this.length==0||s.length>this.length)
+			   return false;
+			  if(this.substr(0,s.length)==s)
+			     return true;
+			  else
+			     return false;
+			  return true;
+			 }
+ 	});
+ 	
+ 	function setTreeList(list,bt){//处理部门人员树区域
+		var output = new Array();
+		if(bt===undefined){
+			bt = '';
+		}
+		output.push("<table class='c_wap_db_table' width='100%'>");
+		if(bt !='' && bt.length>0){
+			var i=0;
+			var head = '<td align="center" width="5%"><img src="img/sj_b.png"/></td>';
+			output.push("<tr><td colspan='3'>"); 
+			output.push("&nbsp;<a href='javascript:void(0)' style='text-decoration:underline;' onclick=getBmyh('201','','','')><font color='gray'><b>单 位</b></font></a>");
+			output.push("<td></tr>"); 
+			output.push("<tr class='c_tr_spliter'><td class='c_td_bottom_line2' width='100%' colspan='3'></td></tr>");
+			for (i=0;i<bt.length;i=i+1)
+			{
+				output.push("<tr>"); 
+		  		output.push(head+"<td colspan='2'><a href='javascript:void(0)' style='text-decoration:underline;' onclick=getBmyh('201','"+bt[i].bmid+"','"+bt[i].mc+"','')><font color='gray'><b>"+bt[i].mc+"</b></font></a>"); 
+		  		output.push("<td></tr>"); 
+		  		if(i != bt.length-1){
+					output.push("<tr class='c_tr_spliter'><td class='c_td_bottom_line2' width='100%' colspan='3'></td></tr>");
+				}
+			}
+		  	output.push("<tr class='c_tr_spliter'><td class='c_td_bottom_line' width='100%' colspan='3'></td></tr>");
+		}
+		if(list.length<=0){
+			output.push("<tr>"); 
+		  	output.push("<td align='left' colspan='2'><font color='gray'>&nbsp;&nbsp;无信息</font></td>"); 
+		  	output.push("</tr>"); 
+		}else{
+			var i=0;	
+			for (i=0;i<list.length;i=i+1)
+			{
+				var chatlx=1;
+				var mc = list[i].mc;
+				mc = mc.replace(/[ ]/g,''); //替换所有空格
+				if(list[i].lx_dm=='201'){
+					output.push("<tr class='c_tr_text' onclick=\"getBmyh('"+list[i].lx_dm+"','"+list[i].lxid+"','"+mc+"','',this)\">"); 
+				}else{
+					output.push("<tr class='c_tr_text' onclick=\"clickYh('"+list[i].sj+"','"+list[i].bgdh+"','"+list[i].imail+"','"+mc+"','"+list[i].lxid+"')\">"); 
+				}
+				output.push("<td></td><td align='center' width='8%'>");
+				if(list[i].lx_dm=='201'){
+					output.push("<img class='img' src='img/open.png' style='position: relative;top: 3px;left: 2px;'/>");
+					chatlx=3;
+				} 
+				output.push("</td><td align='left'>");
+				output.push(mc);
+				if(list[i].lx_dm=='201'){
+					var bmidArr=bmid.split(",");
+					for(var b=0;b<bmidArr.length;b++){
+						var bmidStr="bm"+bmidArr[b];
+						if(bmidStr.startWith(list[i].lxid)){
+							//console.log(bmidStr+"++++++++++++"+list[i].lxid);
+							output.push("<span class='calling' onclick=\"clickYh('"+list[i].sj+"','"+list[i].bgdh+"','"+list[i].imail+"','"+mc+"','"+list[i].lxid+"')\"><img src='img/dialog.png' width='30px' height='30px'/></span>");
+							break;
+						}
+					}
+				}else{
+				    /*
+					var phone=list[i].sj;
+					var num=list[i].bgdh;
+					var imail=list[i].imail;
+					if(phone||num||imail){
+						if(!phone)phone="";
+						if(!num)num="";
+						if(!imail)imail="";
+						output.push("<span class='lxrxx' onclick=\"startCall('"+phone+"','"+num+"','"+imail+"','"+mc+"','"+list[i].lxid+"')\"><img src='img/lxrxx.png' width='30px' height='30px'/></span>");
+					}
+					*/
+				output.push("<span class='calling' onclick=\"clickYh('"+list[i].sj+"','"+list[i].bgdh+"','"+list[i].imail+"','"+mc+"','"+list[i].lxid+"')\"><img src='img/dialog.png' width='30px' height='30px'/></span>");
+				}
+				output.push("</td></tr>");
+			}
+		}
+		output.push("</table>"); 
+	  	$("#main_left").html(output.join(""));
+		
+	}
+	function getBmyh(lx_dm,id,mc,bmmc,obj){//获取下级部门用户
+		if(date != 0){
+			date_g = new Date();
+			date_gs = date_g.getTime()-date.getTime(); //时间差的毫秒数
+			if(date_gs<=500){
+				return;
+			}
+		}
+		if(lx_dm =='201'){
+			var t=$("#tab_"+id);
+			if(t.length>0){
+				if(t.css('visibility') != 'hidden' && t.css('display') != 'none'){
+					t.hide();
+					$(".img",obj).attr("src","img/open.png");
+				}else{
+					t.show();
+					$(".img",obj).attr("src","img/close.png");
+				}
+			}else{
+				sys_ajaxGet("/wap/org/default.do?method=getBmYhList","org_bmid="+id+"&sys_bm="+sys_bm+"&qxid="+sys_qxid+"&mk_dm="+sys_mkdm+"&initbmid="+$("#initbmid").val(),function(json){
+					if(json.list){
+						$(".img",obj).attr("src","img/close.png");
+						var output = new Array();
+						output.push("<tr><td colspan=3><table id='tab_"+id+"' width='100%'>");
+						if(json.list.length>0){
+							var list=json.list;
+							//setTreeList(json.list,json.sjbmList);
+							var sl=(id.split('_')).length*3;
+							var i=0;	
+							for (i=0;i<list.length;i=i+1)
+							{
+								var chatlx=1;
+								var mc = list[i].mc;
+								mc = mc.replace(/[ ]/g,''); //替换所有空格
+								if(list[i].lx_dm=='201'){
+									output.push("<tr class='c_tr_text' onclick=\"getBmyh('"+list[i].lx_dm+"','"+list[i].lxid+"','"+mc+"','',this)\">"); 
+								}else{
+									if(list[i].lxid=="yh"+yhid){
+										var phone=list[i].sj;
+										var num=list[i].bgdh;
+										var imail=list[i].imail;
+										if(!phone)phone="";
+										if(!num)num="";
+										if(!imail)imail="";
+										output.push("<tr class='c_tr_text' onclick=\"startCall('"+phone+"','"+num+"','"+imail+"','"+mc+"','"+list[i].lxid+"')\">"); 
+									}else{
+										output.push("<tr class='c_tr_text' onclick=\"clickYh('"+list[i].sj+"','"+list[i].rdrq+"','"+list[i].imail+"','"+mc+"','"+list[i].lxid+"','"+id+"','"+list[i].bmmc+"')\">"); 
+									}
+								}
+								output.push("<td width='"+sl+"%'></td><td align='center' width='8%'>");
+								if(list[i].lx_dm=='201'){
+									output.push("<img class='img' src='img/open.png' style='position: relative;top: 3px;left: 2px;'/>");
+									chatlx=3;
+								} 
+								output.push("</td><td align='left'>");
+								if(list[i].lx_dm=='204'){
+								output.push("<div style='position: relative;width:50px;float:left;height: 50px;'><img src='"+getPicPath(list[i].lxid)+"' style='padding-top:5px;' width='40px' height='40px' onerror=\"javascript:this.src='img/panel.png';\" /></div>");
+								}
+								output.push(mc);
+								if(list[i].lx_dm=='201'){
+									var bmidArr=bmid.split(",");
+									for(var b=0;b<bmidArr.length;b++){
+										//alert(bmidArr[b]);
+										var bmidStr="bm"+bmidArr[b];
+										if(bmidStr.startWith(list[i].lxid)){
+										//console.log(bmidStr+"===="+list[i].lxid);
+											output.push("<span class='calling' onclick=\"clickYh('"+list[i].sj+"','"+list[i].bgdh+"','"+list[i].imail+"','"+mc+"','"+list[i].lxid+"')\"><img src='img/dialog.png' width='30px' height='30px'/></span>");
+											break;
+										}
+									}
+								}else{
+								   /*20140710
+									var phone=list[i].sj;
+									var num=list[i].bgdh;
+									var imail=list[i].imail;
+									if(phone||num||imail){
+										if(!phone)phone="";
+										if(!num)num="";
+										if(!imail)imail="";
+										if(list[i].lxid!="yh"+yhid){
+											output.push("<span class='lxrxx' onclick=\"startCall('"+phone+"','"+num+"','"+imail+"','"+mc+"','"+list[i].lxid+"')\"><img src='img/lxrxx.png' width='30px' height='30px'/></span>");
+										}
+									}
+									if(list[i].lxid=="yh"+yhid){
+										output.push("<span class='yhxxxg'><img src='img/yhxxxg.png' width='30px' height='30px'/></span>");
+									}
+									*/
+									//else{
+									//	output.push("<span class='calling' onclick=\"clickYh('"+list[i].lxid+"','"+mc+"','',"+chatlx+")\"></span>");
+									//}
+								}
+								output.push("</td></tr>");
+							}
+						}
+						output.push("</table></td></tr>"); 
+						$(obj).after(output.join(""));
+					}
+				});
+			}
+		}
+	}
+	function clickYh(phone,num,imail,mc,yhid2,id,bmmc){
+
+ 		//window.event.stopPropagation();
+		//var url="chat.html?id="+id+"&mc="+escape(mc)+"&chatlx="+chatlx+"&retUrl=lxr.html";
+		//sys_goURL(url);
+		if(phone=='undefined' || !phone)phone="";
+		if(num=='undefined' || !num)num="";//alert(imail);
+		if(imail=='undefined' || !imail)imail="";
+		startCall(phone,num,imail,mc,yhid2,id,bmmc);
+	}
+	
+	function search_bmyh(){//搜索
+        $("#main_left").hide();
+        $("#search_rtn").show();
+        $("#quit_search").show();
+        sys_ajaxGet("/wap/org/default.do?method=getBmYhCx&sys_bm="+sys_bm+"&qxid="+sys_qxid+"&mk_dm="+sys_mkdm+"&page_size=100&page_goto=1",{cx_py:$("#user_search").val()},function(json){
+        	if(json.gridData.table_list.data){
+        		set_searchrtn(json.gridData.table_list.data);
+        	}else{
+        		$("#search_rtn").html("<font color='gray'>&nbsp;&nbsp;无信息</font>");
+        	}
+	    });
+		
+	} 
+	
+	function set_searchrtn(list){//设置搜索结果区域
+		if(list.length>0){
+			var output = new Array();
+			output.push("<table class='c_wap_db_table' width='100%'>");
+			for (var i=0;i<list.length;i=i+1)
+			{
+				var chatlx=1;
+				var mc = list[i].mc;
+				mc = mc.replace(/[ ]/g,''); //替换所有空格
+				if(list[i].lx_dm=='201'){
+					output.push("<tr class='c_tr_text' onclick=\"getBmyh('"+list[i].lx_dm+"','"+list[i].id+"','"+mc+"','',this)\">"); 
+				}else{
+					if(list[i].id=="yh"+yhid){
+						var phone=list[i].sj;
+						var num=list[i].bgdh;
+						var imail=list[i].imail;
+						if(!phone)phone="";
+						if(!num)num="";
+						if(!imail)imail="";
+						output.push("<tr class='c_tr_text' onclick=\"startCall('"+phone+"','"+num+"','"+imail+"','"+mc+"','"+list[i].id+"')\">"); 
+					}else{
+						output.push("<tr class='c_tr_text' onclick=\"clickYh('"+list[i].sj+"','"+list[i].bgdh+"','"+list[i].imail+"','"+mc+"','"+list[i].id+"')\">"); 
+					}
+				}
+				output.push("<td align='center' width='4%'>");
+				if(list[i].lx_dm=='201'){
+					output.push("<img class='img' src='img/open.png' style='position: relative;top: 3px;left: 2px;'/>");
+					chatlx=3;
+				} 
+				output.push("</td><td align='left'>");
+				if(list[i].lx_dm=='204'){
+					output.push("<div style='position: relative;width:50px;float:left;height: 50px;'><img src='"+getPicPath(list[i].id)+"' style='padding-top:5px;' width='40px' height='40px' onerror=\"javascript:this.src='img/panel.png';\" /></div>");
+				}
+				output.push(mc+list[i].bmmc);
+				
+				/*20140710
+				var phone=list[i].sj;
+				var imail=list[i].imail;
+				//phone="18615525056";
+				var num=list[i].bgdh;
+				if(phone||num||imail){
+					if(!phone)phone="";
+					if(!num)num="";
+					if(!imail)imail="";
+					if(list[i].id!="yh"+yhid){
+						output.push("<span class='lxrxx' onclick=\"startCall('"+phone+"','"+num+"','"+imail+"','"+mc+"','"+list[i].id+"')\"><img src='img/lxrxx.png' width='30px' height='30px'/></span>");
+					}
+				}
+				if(list[i].id=="yh"+yhid){
+					output.push("<span class='yhxxxg'><img src='img/yhxxxg.png' width='30px' height='30px'/></span>");
+				}
+				*/
+				output.push("</td></tr>");
+			}
+			output.push("</table>"); 
+			$("#search_rtn").html(output.join(""));
+		}else{
+			$("#search_rtn").html("<div style='text-align: center;height:60px'><font color='gray'>&nbsp;&nbsp;无信息</font></div>");
+		}
+	}
+	
+	function quit_search1(){ //退出搜索
+		$("#user_search").val('');
+		$("#quit_search").hide();
+		$("#search_rtn").hide();
+		$("#main_left").show();
+	}
+	function noBarsOnTouchScreen(arg){ //设置滚动
+	  var elem, tx, ty;
+	  if('ontouchstart' in document.documentElement ) {
+	          if (elem = document.getElementById(arg)) {
+	              elem.style.overflow = 'hidden';
+	              elem.ontouchstart = ts;
+	              elem.ontouchmove = tm;
+	          }
+	  }
+	
+	  function ts( e )
+	  {
+	    var tch;
+	    if(  e.touches.length == 1 )
+	    {
+	      e.stopPropagation();
+	      tch = e.touches[ 0 ];
+	      tx = tch.pageX;
+	      ty = tch.pageY;
+	    }
+	  }
+	
+	  function tm( e )
+	  {
+	    var tch;
+	    if(  e.touches.length == 1 )
+	    {
+	      e.preventDefault();
+	      e.stopPropagation();
+	      tch = e.touches[ 0 ];
+	      this.scrollTop +=  ty - tch.pageY;
+	      ty = tch.pageY;
+	    }
+	  }
+	}
+	function startCall(phone,num,imail,mc,yhid2,id,bmmc){
+		window.event.stopPropagation();
+		var mask = $("#sys_mask_lxr");
+		if(mask.length==0){
+			var maskHTML = '<div id="sys_mask_lxr" onclick="closeDiv();"></div>';
+			$("body").append(maskHTML);
+		}
+		mask.css('display','-webkit-box');
+		var div=$("#div_call");
+		//if($(div).css('visibility') == 'hidden' || $(div).css('display') == 'none'){
+			$(div).show();
+			//$(".c_wap_db_table").width()  background: url("+getPicPath(yhid)+") no-repeat 5px 2px;
+			var yhxx=new Array();
+			yhxx.push("<ul>");
+			yhxx.push("<li style='height: 54px;line-height:54px;' onclick=\"yhjbxx('"+yhid2+"');\">");
+			yhxx.push("<img src='"+getPicPath(yhid2)+"' style='position: absolute;left: 5px;top: 2px;' width='50px' height='50px' onerror=\"javascript:this.src='img/panel.png';\" />");
+			yhxx.push(mc);
+			yhxx.push("<div style='text-align: right; padding-bottom: -39px;margin-top: -45px;'><img src='../oa/image/jt.png' /></div>");
+			if(yhid2=="yh"+yhid){
+				yhxx.push("<div style='position: absolute;width: 60px;right: 0px;top: 0px;font-size: 20px;color: #f94600;' onclick=\"Yhxxxg('"+phone+"','"+num+"','"+imail+"','"+mc+"','"+yhid+"');\">修改</div>");
+			}
+			yhxx.push("</li>");
+			yhxx.push("<li><font style='position: absolute;left: 3px;color:red'>手机号码</font><a style=''>"+phone+"</a></li>");
+			yhxx.push("<li><font style='position: absolute;left: 3px;color:red'>入党时间</font><a style='' >"+num+"</a></li>");
+			yhxx.push("<li><font style='position: absolute;left: 3px;color:red'>邮&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;箱</font>"+imail+"</li>");
+			yhxx.push("<li style='background: #ffffff;' onclick=\"zzxx('"+id+"');\"><font style='position: absolute;left: 3px;color:red'>部门名称</font><a style='' >"+bmmc+"</a>");
+			yhxx.push("<div style='text-align: right; padding-bottom: -39px;margin-top: -45px;'><img src='../oa/image/jt.png' /></div>");
+			yhxx.push("</li>");
+			yhxx.push("</ul>");
+			$(div).html(yhxx.join(''));
+			$("#div_call").width(window.innerWidth);
+			$(div).css("bottom",'102px');
+			//$(div).animate({ bottom: '48px' }, 500,'', function() {
+			//	$(div).css("bottom",'48px');
+	        //});
+	    //}
+	}
+	function yhjbxx(yh){
+		var yhid = yh.substring(2);
+		window.localStorage.setItem("returnentryval","dzz/ryxz");
+		sys_goURL("../dyyl/list.html?yhid="+yhid);
+		//sys_goURL("../dzz/show.html?yhid="+yhid);
+	}
+	function zzxx(zzid){
+		var yhid = zzid.substring(2);
+		sys_goURL("../dzz/show1.html?lxid="+yhid);
+	}
+	function Yhxxxg(phone,num,imail,mc,yhid){
+		var url="yhxxxg.html?yhid="+yhid+"&retURL=lxr.html";
+		sys_goURL(url);
+		//alert(yhid);
+	}
+	function closeDiv(){
+		var mask = $("#sys_mask_lxr"); 
+		mask.css('display','none');	
+		var div=$("#div_call");
+		$(div).css("bottom",'-151px');
+		//$(div).hide();
+		//if($(div).css('visibility') != 'hidden' && $(div).css('display') != 'none'){
+		//	$(div).animate({ bottom: '-101px' }, 500,'', function() {
+	     //   });
+		//}
+	}
+		  //得到头像的路径
+	function getPicPath(yhid){
+		if(yhid){
+			yhid=yhid.replace("yh","");
+			yhid=yhid.replace("bm","");
+		}
+		var src=getUrl()+"oainfo_dxyx"+"/im/pic/"+yhid+".jpg?size=50*&t="+Math.random(); 
+		return src;
+	}
+    </script>
+    <script type="text/javascript" src="../js/pad.js"></script>
+    <style type="text/css">
+    html,body{
+		padding:0;
+		margin:0;
+		border:0;
+		width: 100%;
+	}
+    body {
+		font-family: 16px Helvetica;
+		background-color:#FFFFFF;
+		overflow: hidden;
+	}
+	#header {
+		position: absolute;
+		height: 45px;
+		line-height:45px;
+		width: 100%;
+		top: 53px; left:0;
+		text-align:center;
+		vertical-align:middle;
+		background: #f9f9f9;
+		border-bottom:1px solid #e7e7e7;
+	}
+	#search_rtn {
+		position: absolute; 
+		width: 100%;
+		top: 150px; bottom: 49px; left:0; 
+		overflow-y:auto;
+		font-size:16px;
+ 		font-family:"微软雅黑";
+	}
+	.m_div{
+		width: 100%;
+		overflow-y:auto;
+		margin:0px;
+	}
+	#main_left{
+		position: absolute; 
+		top: 100px; 
+		bottom: 49px; 
+		left:0; 
+		font-size:16px;
+ 		font-family:"微软雅黑";
+    }
+    .c_wap_db_table tr.c_tr_text {
+		height:50px;
+		line-height:50px;
+		padding:0px;
+		border-bottom: #E0E0E0 solid 1px;
+    }
+    tr.c_tr_spliter {
+		height:1px;
+    }
+    .c_wap_db_table td.c_td_bottom_line {
+		border-bottom: #DEDBD6 solid 1px;
+    }
+    .c_wap_db_table td.c_td_bottom_line2 {
+		border-bottom: #FFFFFF solid 1px;
+    }
+    .c_checkbox{
+		vertical-align:middle; 
+    }
+	A:link {
+		COLOR: #000000;TEXT-DECORATION: none
+	}
+	A:visited {
+		COLOR: #000000; TEXT-DECORATION: none
+	}
+	A:active {
+		COLOR: #000000; TEXT-DECORATION: none
+	}
+	A:hover {
+		COLOR: #000000; TEXT-DECORATION: none
+	}
+	.search_btn{
+		width:50px;
+       	height:30px;
+       	background: #f94600;
+       	border: 1px solid #f94600;
+       	border-radius: 3px;
+       	font: initial;
+       	font-size:14px;
+		font-family:"微软雅黑";
+		color:white;
+	}
+	#user_search{
+		height:32px;
+		width:200px;
+		border:1px solid #ACA8A3;
+		border-radius: 3px;
+		font: initial;
+		font-size:14px;
+	}
+	.div_call2{
+		position: fixed;
+		bottom: 0px;
+		top: 0px;
+		width: 100%;
+		z-index: 100;
+		background: #efefef;
+		opacity:0.5;
+		display: none;
+		-webkit-box-pack: center;
+	    -webkit-box-align: center;
+	}
+	.div_call1{
+		height:100px;
+		width: 200px;
+		z-index: 1000;
+		background: #E0E0E0;
+		/*opacity:0.5;*/
+		display: none;
+	    border:1px solid #E0E0E0;
+	    border-radius: 3px;
+		-webkit-box-pack: center;
+	    /*-webkit-box-align: center;*/
+	}
+	#div_call{
+		position:absolute;
+		width:90%;
+		height:200px;
+		bottom:-151px;
+		background:#ffffff;
+		z-index:99;
+		/*display: none;*/
+		opacity: 0.9;
+		/*color: #f94600;*/
+		font-size: 16px;
+		font-family: "微软雅黑";
+		border-radius: 4px;
+		-webkit-transition-property:bottom;
+		-webkit-transition-duration:0.5s;
+	} 
+	#div_call li{
+		border-top: 1px #EDEDED solid;
+		text-align: left;
+		padding-left: 70px;
+		height:47px;
+		line-height:48px;
+	}
+	.calling{
+		position: absolute;
+		width: 40px;
+		height: 40px;
+		right: 0px;
+		padding-top:8px;
+	}
+	.yhxxxg{
+		position: absolute;
+		width: 40px;
+		height: 40px;
+		right: 0px;
+		padding-top:10px;
+	}
+	.lxrxx{
+		position: absolute;
+		width: 40px;
+		height: 40px;
+		right: 0px;
+		padding-top:10px;
+	}
+	#sys_mask_lxr{
+		position: fixed;
+		bottom: 49px;
+		top: 0px;
+		width: 100%;
+		z-index: 98;
+		background: #878787;
+		opacity:0.5;
+		display: -webkit-box;
+		-webkit-box-pack: center;
+	    -webkit-box-align: center;
+	}
+	.ui-btn-group {
+		font-family:"微软雅黑";
+			position: absolute;
+			top: 6px;
+			text-align: center;
+			left:50px;
+		}
+		.ui-btn-group .ui-btn {
+			margin-top: 2px;
+			margin-left: -2px;
+			width: 60px;
+		}
+		.div_yhpic{
+			position: relative;
+			border: 1px solid red;
+			height: 50px;
+			width: 50px;
+			bottom: 200px;
+		}
+		.ui-toolbar-wrap{
+    		//background-color: #D58900;
+    		border: none !important;
+    	}
+    </style>
+     
+  </head>
+  <body>
+  <div id="toolbar">
+	<span class="btn_bak" onclick="sys_goURL('../main.html');"></span> 
+    <h1 class="toolbar_title">组织党员一览</h1>
+	<span class="btn_toolbar_font" ></span>
+</div>
+
+ 
+	<div id="header">
+		<div style="width: 55px;float: right;" id="btn_search" onclick="search_bmyh();">
+			<img src="img/search.png" style="position: relative;top: 8px;" width="30px" height="30px"/>
+		</div>
+		<div style="float:right">
+			<input type="search" name="user_search" id="user_search" placeholder="请输入拼音或汉字"/>
+			<img id="quit_search" onclick="quit_search1();" src="img/quxiao.png" style="position: absolute;right: 60px;top: 10px;"/>
+		</div>
+	</div>
+
+  	<div id="main_left" class="m_div">&nbsp;</div>
+  	<div class='div_call' id="div_call">
+  	&nbsp;
+  	</div>
+  	<div id="search_rtn">&nbsp;</div>
+	<input type="hidden" name="choose" id="choose"/> 
+  	<input type="hidden" name="choose_value" id="choose_value"/>
+  	<input type="hidden" name="initbmid" id="initbmid"/>
+  </body>
+</html>

@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>任务计划</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+
+<script type="text/javascript" src="../../js/slider/slider.js"></script>
+<script type="text/javascript" src="../../js/slider/arrow.js"></script>
+<script type="text/javascript" src="../../js/slider/dots.js"></script>
+<script type="text/javascript" src="../../js/slider/$touch.js"></script>
+<script type="text/javascript" src="../../js/slider/$autoplay.js"></script>
+<script type="text/javascript" src="../../js/slider/$lazyloadimg.js"></script>
+<script type="text/javascript" src="../../js/slider/imgzoom.js"></script>
+<script type="text/javascript">
+	sys_addMeun = true;
+	var list = {};
+	var lb_dm =  getQueryStringRegExp("lb_dm");
+	var backUrl =  getQueryStringRegExp("backUrl");
+	var sfltz =  getQueryStringRegExp("sfltz");
+	$(function() {
+		//生成toolbar
+		$('#toolbar').toolbar();
+		$("#toolbar h1").text("主题列表");
+		if (sfltz=="0") {
+			$("#add").hide();
+		} else {
+			$("#add").show();
+		}
+		
+		sys_renderList('table_list', '/ltz/znl/default.do?method=list&page_size=15', {sfltz:sfltz,lb_dm:lb_dm}, list);
+		
+	});
+
+	function callback_trclick_table_list(param) {
+		url= "/ltz/znl/showZnl.html?guid="+param+"&backUrl=znlList";
+		sys_showDetail(url);
+	}
+	//显示明细
+	function showDetail(type,id) {
+		var url= "/ltz/znl/show.html?guid="+id+"&backUrl=znlList";
+		if (type == "2") {
+			url= "/ltz/znl/showZnl.html?guid="+id+"&backUrl=znlList";
+		}
+		sys_showDetail(url);
+	}
+	function go_back() {
+		if (backUrl.length>0) {
+			sys_goURL(backUrl + ".html");
+		} else {
+			if (lb_dm=="71540") {
+				sys_goURL("znlList.html");
+			} else {
+				sys_goURL("ggkfList.html");
+			}
+		}
+		
+		
+	}
+	function add() {
+		sys_goURL("add.html?lb_dm="+lb_dm + "&backUrl=ztList&sfltz="+sfltz);
+		
+	}
+</script>
+
+<style type="text/css">
+.ui-toolbar-wrap {
+	border: none !important;
+}
+
+li {
+	list-style-type: none;
+}
+
+.c_tabs {
+	height: 40px;
+	width: 100%;
+	background-color: white !important;
+	display: block;
+	border-bottom: #dddddd solid 1px
+}
+
+.c_tabs>div {
+	-webkit-box-flex: 1;
+	height: 40px;
+	line-height: 40px;
+	text-align: center;
+	font-size: 15px;
+	font-family: "微软雅黑";
+	/* display:none; */
+	color: #4B5052;
+}
+
+.c_tabs_active {
+	/*height: 37px !important;
+			border-bottom: 3px solid #FD6C00;
+			color: #FD6C00;*/
+	color: #FF4854;
+	border-bottom: 2px solid #FF4854;
+	height: 39px !important;
+}
+.list_row_col2_22 {
+    font-size: 14px;
+    color: #808080;
+    width: 53%;
+    position: absolute;
+    bottom: 8px;
+    font-family: Microsoft YaHei;
+}
+.c_tabs_text {
+	display: inline-block;
+}
+
+.swipe {
+	/* margin-bottom:20px; */
+	overflow: hidden;
+	position: relative;
+	width: 100%;
+	width: 337px;
+}
+
+.swipe div {
+	overflow: hidden;
+}
+.add{
+	width:50px;
+	height: 50px;
+	background:url("../../img/jiahao.png") no-repeat;
+	background-position: center center;
+	background-size: 28px 28px;
+	border: 0px !important;
+}
+</style>
+
+</head>
+<body>
+	<div id="toolbar">
+		<i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+		<h1 class="toolbar_title">主题列表</h1>
+		<span id="add" class="add" onclick="add();" style="display:none;"></span>
+	</div>
+	<div class="ui-refresh" id="div_table_list">
+		<div>
+		</div>
+		<div style="background:#edf0f5;height:10px;"></div>
+		<ul class="data-list" id="table_list" style="list-style-type:none">
+			<li onclick="showDetail(2,'{guid}')" style="display:none;">
+					<div style='display: none;'>{guid}</div>
+					<div class='list_row_con' style='height:85px;'>
+					<div class='list_row_col2' style='margin-top:10px;margin-left:8px;'>
+					<div class='list_row_col2_1' style='text-overflow: -o-ellipsis-lastline;overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;font-size:16px;margin-top:5px;'>{zt}</div>
+					<div class='list_row_col2_22' style='clear:none;width: 100%;font-size:12px;'>
+					<span style=''>{fbr}</span>
+					
+					<span style='float:right; margin-right:15px;'>{cjsj}</span></div>
+					</div></div></li>
+		</ul>
+		<div class="ui-refresh-down"></div>
+	</div>
+	</div>
+	
+</body>
+</html>

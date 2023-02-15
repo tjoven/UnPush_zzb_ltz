@@ -1,0 +1,597 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>登录</title>
+<link rel="stylesheet" type="text/css" href="gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="css/base.css" />
+<script type="text/javascript" src="gmu/js/gmu.js"></script>
+<script type="text/javascript" src="js/local.js"></script>
+<script type="text/javascript" src="js/ict.js"></script>
+<script type="text/javascript" src="js/sm4.js"></script>
+<script type="text/javascript">
+	sys_addMeun = false;
+	var codeGuid = "";
+	window.localStorage.setItem("sys_ztid", "");
+	window.localStorage.setItem("sys_lbid", "");
+	window.localStorage.setItem("sys_jdzt", "");
+	window.localStorage.setItem("sys_guid", "");
+	window.localStorage.setItem("sys_rytype", ""); //人员类型 1：来宾 2：接待负责人
+
+	$(function() {
+		var _height = $(".div_main").height() + $(".div_bottom").height();
+		if (window.innerHeight > _height) {
+			$(".div_bottom").css("margin-top", window.innerHeight - $(".div_main").height() - $(".div_bottom").height());
+		}
+
+		var username = "";
+		var password = "";
+		var zhid = "";
+		//取得用户保存用户名、密码
+		if (isAndriod) {
+			username = window.webview.getUsername();
+			password = window.webview.getPassword();
+			zhid = window.webview.getZhid();
+		}
+		if (isIphone) {
+			window.location.href = 'iphoneSetUserInfo';
+			//电脑端获取用户名密码方法
+			username = window.localStorage.getItem("sdcncsi_ict_username_ls");
+			password = window.localStorage.getItem("sdcncsi_ict_password_ls");
+		}
+		//电脑端是放到iframe里面的
+		if (isPC) {
+			username = window.localStorage.getItem("sdcncsi_ict_username_ls");
+			password = window.localStorage.getItem("sdcncsi_ict_password_ls");
+		}
+		if (username != null && username != "") {
+			var usernameD = SM4CryptECBWithPKCS7Padding(username,0)
+			$("#username").val(usernameD);
+		}
+		if (password != null && password != "") {
+			var passwordD = SM4CryptECBWithPKCS7Padding(password,0)
+			$("#password").val(passwordD);
+			$("#check_img").attr("src", "img/login/check.png");
+		}
+		if (zhid != null && zhid != "") {
+			$("#zhid").val(zhid);
+		}
+		if (isIphone) {
+			window.location.href = "obj-c://getmei/";
+		}
+		$('body').height($('body')[0].clientHeight);
+	});
+	function fn() {
+		var _height = getListHeight();
+		$("#maindiv").height(window.innerHeight - _height );
+		innerscroll = new iScroll("maindiv", {
+			click : true
+		});
+		sys_autoTextarea(innerscroll);
+	
+		setTimeout(function() {
+			document.body.scrollTop = document.body.scrollHeight;
+		}, 300);
+		var viewTop = $(window).scrollTop(), // 可视区域顶部
+			viewBottom = viewTop + window.innerHeight; // 可视区域底部
+		var elementTop = $('#password').offset().top, // $element是保存的input
+			elementBottom = elementTop + $('#password').height();
+		
+		$("#password")[0].scrollIntoView();
+		
+		$("html,body").animate({
+			scrollTop : $("#password").offset().top - 100
+		}, 500);
+
+	}
+
+	function denglu() {
+		var username = $("#username").val();
+		username = username.toLowerCase();
+		var password = $("#password").val();
+		var device = "U9200*android_4.0.3";
+		var mei = "123we";
+		var msi = "46001123456";
+		var zhid = "0";
+		// zhid=$("#zhid").val();
+		if (zhid == "") {
+			sys_alert("客户ID不能为空!");
+			return;
+		} else if (username == "") {
+			sys_alert("账号不能为空!");
+			return;
+		} else if (password == "") {
+			sys_alert("密码不能为空!");
+			return;
+		}
+		//验证码判断
+		 var captchaStatus = document.getElementById("captcha_div").style.display;
+		 var captchaCode = "";
+		 if(captchaStatus === 'block'){
+		    captchaCode = $("#captchaCode").val();
+		    if(captchaCode == ""){
+		    	sys_alert("验证码不能为空!");
+		    	return;
+		    }
+		 }
+
+		if (isAndriod) {
+			device = window.webview.getDeviceInfo();
+			mei = window.webview.getMei();
+			msi = window.webview.getImsiLogin();
+			if(mei==''||mei=='123456789'){
+			    mei=username;
+			}
+		} else if (isIphone) {
+			//需要iphone壳上获取
+			mei = __mei;
+			device = __device;
+			window.location.href = "xtbg310:getloadpage";
+		}
+		var iname = SM4CryptECBWithPKCS7Padding(username,1);
+		var ipassword = SM4CryptECBWithPKCS7Padding(password,1);
+		/* sys_ajaxGet('/loginValidate.do?method=validate', {
+			dlmc : username
+		}, function(json) {
+			if (json.ltz) { */
+				sys_ajaxPost("/khdNew/login.do?method=login&mei=" + mei + "&device=" 
+						+ device + "&msi=46001123456&username=" + iname + "&password=" 
+						+ ipassword + "&zhid=" + zhid + "&codeValue=" + captchaCode + "&guid=" + codeGuid, 
+						function(json) {
+					if (json && json.result == 1) {
+						//alert(window.localStorage);
+						//window.localStorage.removeItem("bmid");
+						window.localStorage.setItem("bmid", json.bmid);
+						window.localStorage.setItem("yhid", json.yhid);
+						if (isAndriod) {
+							window.webview.saveUsername(iname, json.yhxm);
+							window.webview.savePwdForLock(ipassword);
+							window.webview.saveYhid(json.yhid);
+							window.webview.saveZhid(zhid);
+							var khd_pushServerUrl = json.khd_pushServerUrl;
+							//var khd_pushServerUrl="http://172.16.8.146:8050";
+							//消息推送启动******
+							window.webview.saveImNameAndPsd(zhid, username, password, device, mei, msi, khd_pushServerUrl);
+							window.webview.startIMService();
+							var imgsrc = $("#check_img").attr("src");
+							if (imgsrc.indexOf('nocheck.png') > -1) {
+								window.webview.savePassword("");
+							} else {
+								window.webview.savePassword(ipassword);
+							}
+							window.webview.saveToken(json.sys_token_khd);
+							if (window.webview.getPushmsgPara() != "") {
+								var pushmsg = window.webview.getPushmsgPara();
+								//sys_goURL("im/chat/list.html");
+								window.webview.savePushmsgPara("");
+							} else {
+								gotoDeskUrl();
+							}
+						} else if (isIphone) {
+							//苹果端用电脑端的记住密码
+							window.localStorage.setItem("sdcncsi_ict_username_ls", iname);
+							var imgsrc = $("#check_img").attr("src");
+							if (imgsrc.indexOf('check.png') > -1) {
+								window.localStorage.setItem("sdcncsi_ict_password_ls", ipassword);
+							//window.localStorage.setItem("sdcncsi_ict_zhid_ls",zhid);
+							} else {
+								window.localStorage.setItem("sdcncsi_ict_password_ls", "");
+							//window.localStorage.setItem("sdcncsi_ict_zhid_ls","");						     
+							}
+
+							if (msgLogin == '') {
+								gotoDeskUrl();
+							} else {
+								msgLogin = '';
+							// sys_goURL("im/chat/list.html");
+							}
+						} else if (isPC) { //电脑端               	               	
+							window.localStorage.setItem("sdcncsi_ict_username_ls", iname);
+							var imgsrc = $("#check_img").attr("src");
+							if (imgsrc.indexOf('nocheck.png') > -1) {
+								window.localStorage.setItem("sdcncsi_ict_password_ls", "");
+
+							} else {
+								window.localStorage.setItem("sdcncsi_ict_password_ls", ipassword);
+							}
+							gotoDeskUrl();
+						} else {
+
+							gotoDeskUrl();
+						}
+
+					}
+					else if(json && json.result == -1){
+						sys_alert('您需要修改密码！');
+						sys_goURL("modpwd.html?username=" + username);
+					}
+					else if(json && json.result == -2) {
+						sys_alert('用户名密码已错误超过3次，需要输入验证码！');
+						codeGuid = json.codeGuid;
+						$("#captchaCode").val("");
+						document.getElementById("captcha_div").style.display = "block";
+						var imgs = document.getElementsByTagName("img");
+						var img = imgs[0];
+						img.src="data:image/png;base64," + json.code ;
+						return false;
+					}
+					else if(json && json.result == -3){
+						sys_alert('验证码错误！');
+						return false;
+					}
+					else if(json && json.result == 0){
+						sys_alert('用户名密码错误！');
+						return false;
+					}
+					else if(json && json.result == -4){
+						sys_alert('验证码失效，请刷新验证码！')
+					}
+					
+					
+					
+					else if(json && json.result == -5){
+						sys_alert('用户已被锁定20分钟!');
+						return false;
+					}
+					else if(json && json.result == -6){
+						sys_alert('20分钟内密码错误次数超过5次，账号被锁定！');
+						return false;
+					}
+					
+					
+					
+					else {
+						sys_alert('请求失败！');
+						return false;
+					}
+				});
+				
+			/* } else {
+				if (json.result) {
+					sys_alert("用户名或密码错误!");
+				} else {
+					sys_alert("用户名或密码错误!");
+				}
+				
+				
+			}
+		}); */
+
+
+	}
+
+	function changecheckimg() {
+		var imgsrc = $("#check_img").attr("src");
+		if (imgsrc.indexOf('nocheck.png') > -1) {
+			$("#check_img").attr("src", "img/login/check.png");
+		} else if (imgsrc.indexOf('check.png') > -1) {
+			$("#check_img").attr("src", "img/login/nocheck.png");
+		}
+	}
+
+	var __mei = "",
+		msgLogin = "",
+		__device = "";
+	function setMei(_mei, _sp, _device) {
+		__mei = "ios_" + _mei;
+		__device = _device;
+		window.location.href = "xtbg310:iphoneSetUserInfo";
+	}
+	function setLoadPage(_msgLogin) {
+		msgLogin = _msgLogin;
+	}
+	function gotoDeskUrl() {
+		if (isPad) {
+			window.location.href = padDeskUrl;
+		} else {
+			sys_goURL(phoneDeskURL);
+		}
+	}
+	function wangjimima() {
+		var div = $("#wangjimima");
+		if (div.length == 0) {
+			$("body").append('<div id="wangjimima"><p>请联系管理员</p></div>');
+		}
+		var alert_dialog = $('#wangjimima').dialog({
+			autoOpen : false,
+			closeBtn : false,
+			title : '信息提示',
+			buttons : {
+				'确定' : function() {
+					this.close();
+				}
+			}
+		});
+		$('#wangjimima').dialog('open');
+	};
+	function getCaptchaCode(){
+		sys_ajaxPost("/khdNew/login.do?method=imagecode", 
+				function(json) {
+				if(json && json.codeGuid != "" && json.codeGuid != null){
+					codeGuid = json.codeGuid;
+					$("#captchaCode").val("");
+					document.getElementById("captcha_div").style.display = "block";
+					var imgs = document.getElementsByTagName("img");
+					var img = imgs[0];
+					img.src="data:image/png;base64," + json.code ;
+				}else{
+					sys_alert('验证码获取失败！');
+					return false;
+				}
+					
+		});
+		
+	}
+</script>
+<style type="text/css">
+html, body {
+	padding: 0;
+	margin: 0;
+	border: 0;
+	width: 100%;
+	font-family: 微软雅黑;
+}
+
+body {
+	font-family: 20px arial, sans-serif;
+	color: #797979;
+	background-color: white;
+	text-align: center;
+}
+
+.div_logo {
+	height: 240px;
+	background: url("img/login/hmlogo.png") no-repeat;
+	background-position: center center;
+	background-size: 100%;
+}
+
+.div_name {
+	width: 90%;
+	margin: 0px auto 0px auto;
+	border-bottom: 1px solid #ddd;
+	height: 75px;
+}
+
+.div_pas {
+	width: 90%;
+	margin: 0px auto;
+	border-bottom: 1px solid #ddd;
+	height: 75px;
+}
+
+.div_jzmm {
+	width: 90%;
+	margin: 0px auto;
+	height: 55px;
+	display: -webkit-box;
+	-webkit-box-align: end;
+}
+
+.div_text_3 {
+	background-color: #ddd;
+	border: 0;
+	height: 55px;
+	background: url("img/login/kehuID.png") no-repeat 0 80%;
+	background-size: 25px 25px;
+}
+
+.div_text_1 {
+	background-color: #ffffff;
+	border: 0;
+	height: 48px;
+	background: url(img/login/username.png) no-repeat 0 90%;
+	background-size: 25px 25px;
+	color: #333;
+	font-size: 18px;
+}
+
+.div_text_2 {
+	background-color: #ffffff;
+	border: 0;
+	height: 48px;
+	background: url(img/login/password.png) no-repeat 0 90%;
+	background-size: 25px 25px;
+	color: #333;
+	font-size: 18px;
+}
+
+.input_text_1 {
+	height: 35px;
+	width: 65%;
+	border: 0px;
+	font-size: 18px;
+	outline: 0;
+	margin-left: 5px;
+	margin-top: 20px;
+	font-family: 微软雅黑;
+	background: rgba(255, 255, 255, 0);
+	color: #666;
+}
+
+.input_text_2 {
+	height: 35px;
+	width: 65%;
+	border: 0px;
+	font-size: 18px;
+	outline: 0;
+	margin-left: 5px;
+	margin-top: 20px;
+	font-family: 微软雅黑;
+	background: rgba(255, 255, 255, 0);
+	color: #666;
+}
+
+.input_text_3 {
+	height: 35px;
+	width: 54%;
+	border: 0px;
+	font-size: 18px;
+	outline: 0;
+	margin-left: 5px;
+	margin-top: 20px;
+	font-family: 微软雅黑;
+	background: rgba(255, 255, 255, 0);
+	color: #666;
+}
+
+.captcha_code{
+	width: 26%;
+	max-height: 100%;
+	vertical-align: middle;
+}
+
+#captcha_div{
+	 display: none;
+}
+
+input {
+	/* color: #b3b3b3; */
+	
+}
+
+.input_text:focus {
+	outline: 0;
+}
+
+.div_check {
+	width: 80%;
+	height: 35px;
+	margin: 15px auto 0px auto;
+	text-align: left;
+	font-size: 16px;
+	color: #b3b3b3;
+	-webkit-border-radius: 5px;
+}
+
+.box {
+	height: 30px;
+	border-bottom: 1px solid #dbdbdb;
+}
+
+.box img {
+	padding: 2px;
+}
+
+.div_button {
+	width: 65%;
+	height: 50px;
+	line-height: 50px;
+	margin: 35px auto 0px auto;
+	background-color: #d40d02;
+	font-family: 微软雅黑;
+	color: #fff;
+	font-size: 19px;
+	font-weight: bold;
+	border-radius: 25px;
+}
+
+.div_main {
+	width: 100%;
+}
+
+.div_bottom {
+	/* margin-bottom: 1px;
+		 	 position: absolute;
+		  	background: url("img/login/bottom.png") no-repeat;
+		  */
+	background-position: center center;
+	background-size: cover;
+	height: 90px;
+	width: 100%;
+	padding-bottom: 10px;
+}
+
+.div_bottom>div {
+	text-align: center;
+	font-size: 12px;
+	color: #ffffff;
+	font-family: 微软雅黑;
+	padding-top: 70px;
+}
+
+.main {
+	z-index: -1;
+	left: 0;
+	height: 100%;
+}
+
+.div_sanjiao {
+	height: 14px;
+	position: relative;
+	background-position: center center;
+}
+
+.shadeDiv {
+	width: 100%;
+	height: 100%;
+	background-color: #ffffff;
+	opacity: 0.3;
+	filter: alpha(opacity = 57);
+	position: absolute;
+	z-index: -99;
+}
+
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+	color: #b3b3b3;
+}
+
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+	color: #b3b3b3;
+}
+
+input:-ms-input-placeholder {
+	color: #b3b3b3;
+}
+
+input::-webkit-input-placeholder {
+	color: #b3b3b3;
+}
+</style>
+</head>
+<body>
+	<div class="main" id="maindiv">
+		<div class="div_main">
+			<div class="div_logo"></div>
+
+			<form id="form_show"
+				style="width:100%; margin:0px 1px; z-index:10; padding-top:10px; position:absolute; top:255px;">
+				<div class="shadeDiv"></div>
+				<div class="div_name">
+					<div class="div_text_1">
+						账号：<input type="text" name="username" id="username"
+							placeholder="请输入您的账号" class="input_text_1" />
+					</div>
+				</div>
+				<div class="div_pas">
+					<div class="div_text_2">
+						密码：<input type="password" name="password" id="password"
+							placeholder="请输入您的密码" class="input_text_2" onfocus="fn();" />
+					</div>
+				</div>
+				<div class="div_pas" id="captcha_div">
+					<input type="text" name="captchaCode" id="captchaCode"
+								placeholder="请输入验证码" class="input_text_3" />
+					<img src="" class="captcha_code" onclick="getCaptchaCode();" />
+				</div>
+				<div class="div_jzmm">
+					<div>
+						<img src="img/login/check.png" id="check_img" width="24px"
+							height="24px" onclick="changecheckimg();" />
+					</div>
+					<div
+						style="line-height: 28px;color:#666;font-family:微软雅黑;font-size:16px;padding-bottom: 3px;padding-left: 4px;"
+						id="zhongwen">记住</div>
+				</div>
+				<div class="div_button" onclick="denglu()">登 录</div>
+			</form>
+		</div>
+		<div class="div_bottom">
+			<div></div>
+		</div>
+		<!-- 联通系统集成有限公司山东省分公司 技术支持 -->
+	</div>
+</body>
+</html>

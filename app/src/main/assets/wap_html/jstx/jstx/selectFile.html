@@ -1,0 +1,252 @@
+<!doctype html>
+<html>
+<head>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+<title>选取文件</title>
+<link rel="stylesheet" type="text/css" href="css/oa.css?v=2" />
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="./css/chat.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="js/touch.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="js/custom.js"></script>
+<script type="text/javascript" src="js/datadumper.js"></script>
+<script type="text/javascript" src="./js/getPath.js"></script>
+
+<link rel="stylesheet" type="text/css" href="./css/scrollbar.css">
+<script type="application/javascript" src="./js/iscroll.js"></script>
+<style type="text/css">
+	body{
+		background-color: #F2F1F6;
+	}
+	.box{
+		position: fixed;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        z-index:3000;
+        display: none;
+        top: 0;
+	}
+	
+/*    	.gundong{ */
+/*    		height: 200; */
+/*    		overflow-y:auto; */
+/*    		bottom: 0; */
+/*    		display: none; */
+/*    		background-color: #fff; */
+/*    		position:relative; */
+/*    	} */
+   
+/*    	.img{ */
+/*    		-webkit-box-flex:1; */
+/*    		width: 1px; */
+/*    		text-align: center; */
+/*    		padding-top: 3px; */
+/*    	} */
+   
+	
+/* 	.line{ */
+/* 		float:left; */
+/* 	 	height: 35px; */
+/*     	width: 1px; */
+/*     	background: white; */
+/*     	margin-left:50px; */
+/*     	position:absolute; */
+/*     	margin-top:-35px; */
+/*     	} */
+/*     		.line2{ */
+/* 		float:left; */
+/* 	 	height: 35px; */
+/*     	width: 1px; */
+/*     	background: white; */
+/*     	margin-left:100px; */
+/*     	position:absolute; */
+/*     	margin-top:-35px; */
+/*     	} */
+/*     	.chat_name{ */
+    		
+  
+    		
+/*     	} */
+    	
+    	.content_top{
+	margin-top:13px;
+}
+/* #imgzoom{ */
+/* 	width: auto;height: 80px; */
+/* } */
+ 
+/* .child_page_title1 */
+/* { */
+/* 	float: left; */
+/*     height: 65%; */
+/*     color: white; */
+/*     font-size: 16px; */
+/*     text-align: center; */
+/*     line-height: 25px; */
+/*     margin-top: 12px; */
+/*   	width:70%; */
+/* } */
+
+
+/* .child_page_title2 */
+/* { */
+/* 	border-radius:6px; */
+/* 	width:100%; */
+/* } */
+</style>    
+<script type="text/javascript">
+	var from = getQueryStringRegExp("from");
+	var groupId = getQueryStringRegExp("groupId");
+	var groupName = getQueryStringRegExp("groupName");
+	var yhid = getQueryStringRegExp("yhid");
+	var guid = getQueryStringRegExp("guid");
+    
+	$(function(){
+	  	$('#selectFile_toolbar').toolbar();
+	  	my_chooseUploadFile('','');
+	});
+	
+	//返回上一步
+	function goback(){
+		if("groupChat.html"==from){
+			sys_goURL(from+"?groupId="+groupId+"&groupName="+groupName);
+		}else if("chat.html"==from){
+			sys_goURL(from+"?yhid="+yhid+"&guid="+guid);
+		}
+	}
+	var my_curFolderPath;
+	function my_chooseUploadFile(folderpath,callback) {
+        if(isIphone){
+            alert("您好，iphone系统暂不支持上传文件！");
+        }else{
+//         	var data = '[{"name":"1log.txt","flag":"0","size":"280.00B","time":"2017-08-30 10:02:35"},{"name":"360","flag":"1"},{"name":"360Log","flag":"1"},{"name":"360launcher","flag":"1"},{"name":"4ad8be0964ca81d4","flag":"0","size":"21.00B","time":"2017-08-08 11:59:31"},{"name":"5A968A4B377F25ED0A1FD3C67B0CEE31","flag":"0","size":"32.00B","time":"2017-09-29 16:08:44"},{"name":"A25A926AD09E2A2","flag":"1"},{"name":"ANRSnap","flag":"1"},{"name":"AnZoLOL","flag":"1"},{"name":"Android","flag":"1"},{"name":"AndroidOptimizer","flag":"1"},{"name":"Autohome","flag":"1"},{"name":"BaiduAs6c56bbff","flag":"1"},{"name":"BaiduMap","flag":"1"},{"name":"BaiduMapSdk","flag":"1"},{"name":"BaiduNavi","flag":"1"},{"name":"BaiduPanoSDK","flag":"1"},{"name":"BaiduWenku","flag":"1"},{"name":"CGB","flag":"1"},{"name":"Catfish","flag":"1"},{"name":"CloudDrive","flag":"1"},{"name":"CpsLite","flag":"1"},{"name":"DCIM","flag":"1"},{"name":"Dianxinos","flag":"1"},{"name":"DidiScreenAd","flag":"1"},{"name":"Download","flag":"1"},{"name":"Downloads","flag":"1"},{"name":"EFiles","flag":"1"},{"name":"Fonts","flag":"1"},{"name":"GDTDOWNLOAD","flag":"1"},{"name":"HWThemes","flag":"1"},{"name":"Herbalife","flag":"1"},{"name":"Himovie","flag":"1"},{"name":"Huawei","flag":"1"},{"name":"HuaweiBackup","flag":"1"},{"name":"HwOUC","flag":"1"},{"name":"INSTALLATION_NEW","flag":"0","size":"96.00B","time":"2018-02-15 20:03:23"},{"name":"Immortal","flag":"1"},{"name":"MQ","flag":"1"},{"name":"MagazineUnlock","flag":"1"},{"name":"MagazineUpdate","flag":"1"},{"name":"MedApp","flag":"1"},{"name":"Mob","flag":"1"},{"name":"Music","flag":"1"},{"name":"PandaHome2","flag":"1"},{"name":"PhotoRecovery","flag":"1"},{"name":"Pictures","flag":"1"},{"name":"Pindd","flag":"1"},{"name":"PinealGland","flag":"1"},{"name":"QQBrowser","flag":"1"},{"name":"QQSecureDownload","flag":"1"},{"name":"QTAudioEngine","flag":"0","size":"328.00B","time":"2018-05-02 09:12:47"},{"name":"QiYiVideo_Local","flag":"1"},{"name":"Qmap","flag":"1"},{"name":"Recordings","flag":"1"},{"name":"SHLog","flag":"1"},{"name":"Sdk","flag":"1"},{"name":"SogouExplorer","flag":"1"},{"name":"Superroot","flag":"1"},{"name":"TMRI_12123","flag":"1"},{"name":"TuSDK","flag":"1"},{"name":"UCDownloads","flag":"1"},{"name":"Undownload","flag":"1"},{"name":"UnicomLog","flag":"1"},{"name":"Unlog","flag":"1"},{"name":"UploadImage","flag":"1"},{"name":"WChat","flag":"1"},{"name":"WLAN Direct","flag":"1"},{"name":"_2XgSdkReceiveFromXGService.txt","flag":"0","size":"320.00B","time":"2018-04-11 14:55:54"},{"name":"_3SdkSendAckToService.txt","flag":"0","size":"960.00B","time":"2018-04-11 14:55:55"},{"name":"alipay","flag":"1"},{"name":"amap","flag":"1"},{"name":"amap_ams","flag":"1"},{"name":"anchovy","flag":"1"},{"name":"app-update","flag":"1"},{"name":"appubk","flag":"1"},{"name":"at","flag":"1"},{"name":"audiorecord","flag":"1"},{"name":"autofupan2","flag":"1"},{"name":"autohomemain","flag":"1"},{"name":"autonavi","flag":"1"},{"name":"autonavidata70","flag":"1"},{"name":"autoprice","flag":"1"},{"name":"backup","flag":"1"},{"name":"backups","flag":"1"},{"name":"baidu","flag":"1"},{"name":"baiduASR","flag":"1"},{"name":"boyaa","flag":"1"},{"name":"bytedance","flag":"1"},{"name":"cainiao","flag":"1"},{"name":"chatDownload","flag":"1"},{"name":"cmb","flag":"1"},{"name":"cmb.pb","flag":"1"},{"name":"cn.idongri.customer","flag":"1"},{"name":"com.baidu.appsearch.log","flag":"0","size":"0.00B","time":"2017-10-30 09:44:17"},{"name":"com.baidu.appsearch.log.lck","flag":"0","size":"0.00B","time":"2017-12-14 11:12:12"},{"name":"com.baidu.appsearch_bdservice_v1.log","flag":"0","size":"0.00B","time":"2017-10-30 09:44:26"},{"name":"com.baidu.appsearch_bdservice_v1.log.lck","flag":"0","size":"0.00B","time":"2017-12-14 11:30:16"},{"name":"com.baidu.appsearch_gptInstaller.log","flag":"0","size":"0.00B","time":"2017-10-30 09:44:18"},{"name":"com.baidu.appsearch_gptInstaller.log.lck","flag":"0","size":"0.00B","time":"2017-12-14 11:12:12"},{"name":"com.baidu.appsearch_gptext.log","flag":"0","size":"0.00B","time":"2017-10-18 12:32:50"},{"name":"com.baidu.appsearch_gptext.log.lck","flag":"0","size":"0.00B","time":"2017-10-18 12:32:50"},{"name":"com.baidu.appsearch_patch.log.lck","flag":"0","size":"0.00B","time":"2017-07-22 10:53:33"},{"name":"com.baidu.plaformsdk","flag":"1"},{"name":"com.boyaa.chinesechess.baidugame","flag":"1"},{"name":"com.cainiao.wireless","flag":"1"},{"name":"com.cubic.autohome","flag":"1"},{"name":"com.dp.android.elong_PushId.txt","flag":"0","size":"40.00B","time":"2017-12-14 14:59:58"},{"name":"com.dp.android.elong_identifyid.txt","flag":"0","size":"31.00B","time":"2017-12-14 14:59:52"},{"name":"com.happy.chinesechess","flag":"1"},{"name":"com.lincomb.licai","flag":"1"},{"name":"com.qihoo.loan","flag":"1"},{"name":"com.taobao.taobao","flag":"1"},{"name":"com.tencent.mobileqq","flag":"1"},{"name":"com.tencent.mtt","flag":"1"},{"name":"com.tencent.qqgame.xq","flag":"1"},{"name":"com.tencent.qqmusic","flag":"1"},{"name":"com.tencent.tgp","flag":"1"},{"name":"config_system_switchs.txt","flag":"0","size":"5.00B","time":"2018-05-22 17:16:11"},{"name":"ctaccount","flag":"1"},{"name":"data","flag":"1"},{"name":"dianxin","flag":"1"},{"name":"didi","flag":"1"},{"name":"didiImg","flag":"1"},{"name":"documents","flag":"1"},{"name":"duoku","flag":"1"},{"name":"duoku_singlesdk_download","flag":"1"},{"name":"dzzw","flag":"1"},{"name":"emlibs","flag":"1"},{"name":"games","flag":"1"},{"name":"hawaii","flag":"1"},{"name":"hawaii_log","flag":"1"},{"name":"hawii","flag":"1"},{"name":"hce_minidmp","flag":"1"},{"name":"hello.log","flag":"0","size":"622.29K","time":"2017-12-26 16:22:12"},{"name":"hmdj","flag":"1"},{"name":"holavideowallpaper","flag":"1"},{"name":"iappppdf","flag":"1"},{"name":"idrcustomer","flag":"1"},{"name":"im","flag":"1"},{"name":"image","flag":"1"},{"name":"img_tmp","flag":"1"},{"name":"imoa","flag":"1"},{"name":"jianshenba","flag":"1"},{"name":"jstx_folder","flag":"1"},{"name":"kacha","flag":"1"},{"name":"kedacom","flag":"1"},{"name":"keep","flag":"1"},{"name":"kgpdffiles","flag":"1"},{"name":"kinggridoa","flag":"1"},{"name":"klogger","flag":"1"},{"name":"libs","flag":"1"},{"name":"livestream","flag":"1"},{"name":"localfiles","flag":"1"},{"name":"locker_test","flag":"1"},{"name":"mfcache","flag":"1"},{"name":"mipush","flag":"1"},{"name":"mmcache","flag":"1"},{"name":"moji","flag":"1"},{"name":"moxiu","flag":"1"},{"name":"moxiu4.0_err.txt","flag":"0","size":"2.20K","time":"2018-05-20 13:06:47"},{"name":"msc","flag":"1"},{"name":"news_article","flag":"1"},{"name":"now","flag":"1"},{"name":"nqhpns","flag":"1"},{"name":"oadownload","flag":"1"},{"name":"oalog","flag":"1"},{"name":"oms.mmc.fortunetelling","flag":"1"},{"name":"ooudide","flag":"0","size":"36.00B","time":"2017-09-10 09:54:42"},{"name":"oray","flag":"1"},{"name":"phoneservice","flag":"1"},{"name":"popular","flag":"1"},{"name":"pushNotification","flag":"1"},{"name":"qmt","flag":"1"},{"name":"qqmusic","flag":"1"},{"name":"qt","flag":"1"},{"name":"qytxl","flag":"1"},{"name":"qz24819","flag":"0","size":"0.00B","time":"2017-09-04 19:34:56"},{"name":"record","flag":"1"},{"name":"sdk_kuang_baidu_tieba","flag":"1"},{"name":"setup","flag":"1"},{"name":"shumei.txt","flag":"0","size":"62.00B","time":"2018-04-11 22:04:03"},{"name":"sitemp","flag":"1"},{"name":"sogou","flag":"1"},{"name":"soufun","flag":"1"},{"name":"sysdata","flag":"1"},{"name":"system","flag":"1"},{"name":"tad","flag":"1"},{"name":"tbs","flag":"1"},{"name":"tbslog","flag":"1"},{"name":"temp","flag":"1"},{"name":"tencent","flag":"1"},{"name":"test.txt","flag":"0","size":"357.00B","time":"2018-05-16 13:48:46"},{"name":"tianditu","flag":"1"},{"name":"tieba_sdk","flag":"1"},{"name":"ttpreloader","flag":"1"},{"name":"tuyoo.dev.json","flag":"0","size":"31.00B","time":"2018-02-27 14:21:03"},{"name":"tuyoochess","flag":"1"},{"name":"umeng_cache","flag":"1"},{"name":"unicom_cache_image","flag":"1"},{"name":"userexperience","flag":"1"},{"name":"voicenote","flag":"1"},{"name":"xpush","flag":"1"},{"name":"ydxs","flag":"1"},{"name":"ydxs_evaluate","flag":"1"},{"name":"ydxs_log","flag":"1"},{"name":"五处对APP的修改建议.docx","flag":"0","size":"589.18K","time":"2018-05-17 18:27:51"},{"name":"棋谱","flag":"1"},"\/storage\/emulated\/0"]';
+//        	 var moduls = $.parseJSON( data );
+//        	 my_cardFileExplorer(moduls);
+            window.webview.getAllFiles(folderpath, "my_cardFileExplorer");
+        }
+	}
+
+	function my_clickFile(filename) {
+		var filepath = my_curFolderPath + "/" + filename;
+		sys_confirm("确定要上传该文件吗？", function(btn) {
+			if (btn == true) {
+				window.localStorage.setItem("filename", filename);
+				window.localStorage.setItem("filepath", filepath);
+				goback();
+			}
+		});
+	}
+	
+	//判断文件名称长度，超过25，中间显示省略号,中文翻倍，这里暂时只做纯英文或中文处理
+	function estimateFileLength(fileName){
+		var len = fileName.replace(/[^\x00-\xff]/g,"aa").length;
+		var len2 = fileName.length;
+		var font;
+		var tail;
+		if(len > 25 && (len == len2)){
+			font = fileName.substring(0,fileName.lastIndexOf(".") - 6);
+			tail = fileName.substring(fileName.lastIndexOf(".") - 3);
+			return font + "..." + tail;
+		}else if(len > 25 && (len > len2)){
+			font = fileName.substring(0,fileName.lastIndexOf(".") - 18);
+			tail = fileName.substring(fileName.lastIndexOf(".") - 3);
+			return font + "..." + tail;
+		}else{
+			return fileName;
+		}
+	}
+ 
+	function my_goBackFile(obj) {
+		var folderpath = my_curFolderPath;
+		folderpath = folderpath.substring(0, folderpath.lastIndexOf("/"));
+		if (folderpath == "") {
+			folderpath = "/";
+		}
+		my_chooseUploadFile(folderpath);
+	}
+	function my_cardFileExplorer(json) {
+		my_curFolderPath = json[json.length - 1];
+		
+		var output = new Array();
+		var output1 = new Array();
+		var sys_selectFileinnerScoll = null;
+		if ($("#div_header_path").length > 0) {
+			$("#span_cur_path").text(my_curFolderPath);
+		} else {
+			output1.push("<div id='div_header_path' onclick=my_goBackFile(this)>");
+			output1.push("<img src='../img/uploadback.png' width='35' height='35' style='position: absolute;left: 10px;top:6px;'/>");
+			output1.push("<span id='span_cur_path' style='position: absolute;left: 70px;'>"
+							+ json[json.length - 1] + "</span>");
+			output1.push("</div>");
+			$("#selectFile_toolbar").append(output1.join(""));
+		}
+		if (my_curFolderPath == "/") {
+			my_curFolderPath = "";
+		}
+		for ( var i = 0; i < json.length - 1; i++) {
+			output.push("<li>");
+			if (json[i].flag == "1") {
+				output.push("<div class='div_filelist_main' onclick=my_chooseUploadFile('"
+								+ my_curFolderPath + "/" + json[i].name + "')>");
+				output.push("<div class='div_filelist_icon'>");
+				output.push("<img src='../img/folderpic.png' width='45' height='45'/>");
+			} else {
+				output.push("<div class='div_filelist_main' onclick=my_clickFile('"
+								+ json[i].name + "')>");
+				output.push("<div class='div_filelist_icon'>");
+				output.push("<img src='../img/filepic.png' width='45' height='45'/>");
+			}
+			output.push("</div>");
+			output.push("<div class='div_filelist_content'>");
+			output.push("<div class='content_top'><span class='filetitle'>"
+					+ json[i].name + "</span></div>");
+			output.push("<div class='content_btn'><span class='filetitle'>");
+			if (json[i].flag == "0") {
+				output.push("[文件]" + json[i].size + "&nbsp;&nbsp;" + json[i].time);
+			} else {
+				output.push("[文件夹]");
+			}
+			output.push("</span></div>");
+			output.push("</div></div></li>");
+		}
+		$("#div_sys_selectFile").empty().html(output.join(""));
+		// 设置内滚动
+		if (sys_selectFileinnerScoll) {
+			sys_selectFileinnerScoll.refresh();
+		} else {
+			$("#sys_selectFileScoll").height(window.innerHeight - 150);
+			sys_selectFileinnerScoll = new iScroll("sys_selectFileScoll", {
+				click : true
+			});
+		}
+	}
+ 
+</script>
+
+</head>
+
+<body>
+	<div class="div_body">
+
+		<div id="selectFile_toolbar">
+			<span class="btn_bak" onclick="goback();"></span> <span
+				style="font-size: 16px;font-weight:bold;" class="btn_toolbar_font">选择文件</span>
+			<h1 class="toolbar_title"></h1>
+		</div>
+
+		<div style="height:47px;"></div>
+		<div id="sys_selectFileScoll">
+			<div id="div_sys_selectFile"></div>
+		</div>
+	</div>
+</body>
+</html>

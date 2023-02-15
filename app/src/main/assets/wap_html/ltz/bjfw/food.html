@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>订餐送餐</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+<script type="text/javascript">
+	sys_addMeun = true;
+	var nm = getQueryStringRegExp("nm");
+	$(function() {
+		$('#toolbar').toolbar();
+		var _height = getListHeight();
+		$("#sys_innerscoll").height(window.innerHeight - _height);
+		var innerscroll = new iScroll("sys_innerscoll", {
+			click : true
+		});
+		if (nm == '') {
+			nm = 0;
+		}
+		$(".c_tabs_text").eq(nm).addClass("c_tabs_active");
+	});
+	function go_back() {
+		sys_goURL("../../main.html");
+	}
+	function getNm(dm){
+		   if(dm=="shfw"){
+			    sys_goURL(getBaseURL()+"ltz/bjfw/myLive.html");		
+			}else if(dm=="dcsc"){
+			 	sys_goURL(getBaseURL()+"ltz/bjfw/food.html");
+			}		
+		}
+	function showDetail() {
+		var url= "/ltz/bjfw/show.html?&backUrl=food&lx=dcsc";
+		sys_showDetail(url);
+	}
+	function dadianhua(sj){
+		if(!sj || sj=="undefined" || sj=="null"){
+			sj = "";
+		}
+		var v = "tel:"+sj;
+		window.location.href = v;
+		event.stopPropagation(); 
+	}
+
+</script>
+<style>
+.ui-toolbar-wrap {
+	border: 0px;
+}
+#sys_innerscoll{font-size: 14px;}
+
+.content_text {
+    padding: 3%;
+    text-indent: 29px;
+    line-height: 27px;
+    padding-top: 17px;
+    letter-spacing: 1px;
+}
+.href{
+	padding: 12px;
+	
+}
+img{
+	width: 12px;
+    
+}
+hr{ 
+	-webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
+    background: #e5e5e5;
+    border: none;
+    height: 1px;
+    }
+header>div> span{
+    	padding-left:12px;
+    }
+</style>
+</head>
+<body>
+	<div id="toolbar">
+		<i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+		<h1 class="toolbar_title">便捷服务</h1>
+	</div>
+	<div class="c_tabs div_other_40" id="div_tabs">
+		<div id='div_list0'>
+			<div class='c_tabs_text' onclick=getNm('dcsc')>订餐送餐</div>
+		</div>
+		<div id='div_list1'>
+			<div class='c_tabs_text' onclick=getNm('shfw')>生活服务</div>
+		</div>
+		
+	</div>
+	<div id="sys_innerscoll">
+		<header>
+			<div class="content_text" >
+				老干部局与驻背阴胡同37号院和万寿路8号院的“中组部社区餐厅（溢香半街）”进行了协商，
+				他们表示将在保证饭菜品质、安全卫生的前提下，对订餐离退休干部给予价格优惠，并提供及时送餐服务。
+				如果您有订餐送餐需求，请您直接电话联系，明确身份后他们将给予适当照顾。
+			</div>
+			<hr style=" height: 5px;"/>
+			<div class="href">
+				<img src="logo/Pin.png"><span>背阴胡同37号院（可配送宏汇园、辟才胡同）</span>
+			</div>
+			<hr/>
+			<div class="href">
+				<img src="logo/Phone.png"><span>订餐电话：
+				<span onclick="dadianhua('010-58588927')" style="color:#ffb43f;"><u>58588927</u></span>&nbsp;&nbsp;\&nbsp;
+				<span onclick="dadianhua('010-66055917')" style="color:#ffb43f;"><u>66055917</u></span></span>
+			</div>
+			<hr/>
+			<div class="href">
+				<img src="logo/Pin.png"><span>万寿路8号院（可配送附近的住户）</span>
+			</div>
+			<hr/>
+			<div class="href">
+				<img src="logo/Phone.png"><span>订餐电话：
+				<span onclick="dadianhua('17801051440')" style="color:#ffb43f;"><u>17801051440</u></span>&nbsp;&nbsp;\&nbsp;
+				<span onclick="dadianhua('13718252205')" style="color:#ffb43f;"><u>13718252205</u></span></span>
+			</div>
+			<hr  style=" height: 5px;"/>
+			<div class="href">
+				<img src="logo/Notepad.png"><span onclick="showDetail()">常用菜单（两餐厅通用）</span>
+			</div>
+			<hr/>
+			<div class="href">
+				<img src="logo/Ribbon.png"><span onclick="sys_goURL('certificate.html');">中组部社区餐厅（溢香半街）有关资质证书</span>
+			</div>
+		</header>
+	</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

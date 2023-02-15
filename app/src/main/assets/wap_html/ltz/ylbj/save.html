@@ -1,0 +1,243 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+<title>住院登记</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/mobiscoller.css" />
+
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/mobiscroll.js"></script>
+<script type="text/javascript" src="../../../js/validate.js?v=123"></script>
+
+<script type="text/javascript">
+	  
+	var innerscroll = null;
+	var guid = null;
+	var from = null;
+	var sfcy = null;//是否出院
+	$(function() {
+		//生成toolbar
+		$('#toolbar').toolbar();
+		 guid = getQueryStringRegExp("guid");
+		 from = getQueryStringRegExp("from");
+		setCurrentDate("#rysj");
+		setCurrentDate("#cysj");
+		// $("#cysj").val("");
+		if(guid&&guid!=null&&""!=guid){
+			 
+			$("#xm").attr("readonly","true").removeAttr("onclick");
+			 sys_ajaxGet("/ltz/ylfw/zygl/default.do?method=wapShow&guid=" + guid, function(json) {
+				bind(json);
+			});
+			 
+		}else {
+            sys_ajaxGet("/ltz/ylfw/zygl/default.do?method=wapLtzShow&guid=" + guid, function(json) {
+                bind(json);
+            });
+		}
+		
+		var _height = getListHeight();
+		$("#sys_innerscoll").height(window.innerHeight - _height);
+		innerscroll = new iScroll("sys_innerscoll", {
+			click : true
+		});
+		sys_autoTextarea(innerscroll);
+
+	});
+	
+	function setCurrentDate(elementID){
+		if(!$(elementID)){
+			return ;
+		}
+    	var myDate = new Date();
+		var mon = myDate.getMonth()+1;
+		var day = myDate.getFullYear()+"-"+mon+"-"+myDate.getDate();
+		$(elementID).val(day);
+		$(elementID).scroller({
+            preset: 'date',//日期 date 时间 time  时间日期datetime
+          	lang: 'zh',
+    		theme:'ios',
+    		display:'inline'
+         });
+    }
+    function CheckForm() {
+        if (trim($("#xm").val())==='') {
+            sys_alert('请输入姓名');
+            return false;
+        }
+        if (trim($("#yiyuan").val())==='') {
+            sys_alert('请输入医院');
+            return false;
+        }
+        if (trim($("#ksbc").val())==='') {
+            sys_alert('请输入科室病床');
+            return false;
+        }
+
+        return true;
+    }
+    //去掉前后空格
+    function trim(str)
+    {
+        return str.replace(/(^\s*)|(\s*$)/g, "");
+    }
+
+    function getVal(val) {
+		sfcy = val;
+    }
+	function save() {
+		if (!CheckForm()) {
+			return;
+		}
+		// alert($("input[type=radio]").val())
+		if (sfcy=="0"){
+		    $("#cysj").val("");
+		}else {
+            if ($("#cysj").val()=='') {
+                sys_alert('请输入出院时间');
+                return false;
+            }
+		}
+		var queryString = $("#frm1").serialize();
+		sys_ajaxPost("/ltz/ylfw/zygl/default.do?method=wapLtzSave" , queryString, function(data) {
+			if (data.result === true) {
+				sys_alert("提交成功");
+				setTimeout(function() {
+					sys_goURL("zygl.html");
+				}, 1000);
+			} else {
+				sys_alert_xgmm(data.msg);
+			}
+		});
+	}
+
+	function back() {
+		sys_goURL("zygl.html");
+	}
+	
+	function sys_txlcx(sys_fsfw, sys_fsfw_mc) { 
+		sys_ryxz(sys_fsfw, sys_fsfw_mc, 1, 30000, '');
+		return;
+	}
+
+    function showing() {
+        $("#cysjs").show();
+        $("#cysj").attr("required");
+    }
+    function hiding() {
+        $("#cysjs").hide();
+        $("#cysj").removeAttr("required");
+    }
+</script>
+<style type="text/css">
+.form_cell_label{
+	color:#000000;
+	width: 130px;
+	font-size: 17px;
+}
+
+ .form_cell_item input, textarea {
+    font-size: 17px;
+}
+ .ui-toolbar-wrap{
+ 	border:0px;
+ }
+ .c_form_show>div {
+    min-height: 55px;
+}
+
+</style>
+</head>
+<body>
+	<div id="toolbar">
+		<span id="btn_bak" class="btn_bak" onclick="back();"></span>
+		<h1 class="toolbar_title">住院登记</h1>
+		<span class="btn_toolbar_font" style="color:#ffffff;" onclick="save()">保存</span>
+	</div>
+	
+	<div id="sys_innerscoll">
+		<form id="frm1">
+			<input type="hidden" name="guid" id="guid" /> 
+				<div class="c_form_show" >
+					<div style="margin-top:10px;">
+						<div class="form_cell_label" ><span style="color:red">&nbsp;&nbsp;&nbsp;*&nbsp;</span>姓名</div>
+						<div class="form_cell_item">
+							<input readonly type="text" class="form-control" name="xm" id="xm" value=""  placeholder="请填写" >
+							<input type="hidden" name="ltzid" id="ltzid" value="" />
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label" ><span style="color:red">&nbsp;&nbsp;&nbsp;*&nbsp;</span>医院名称</div>
+						<div class="form_cell_item">
+							<input type="text" class="form-control" name="yiyuan" id="yiyuan" required="true"  maxlength="100"  showName="医院名称"  placeholder="请填写" />
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label" ><span style="color:red">&nbsp;&nbsp;&nbsp;*&nbsp;</span>科室病床</div>
+						<div class="form_cell_item">
+							<input type="text"  class="form-control" name="ksbc" required="true"  maxlength="100"  showName="科室病床"  id="ksbc" placeholder="请填写" >
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label" ><span style="color:red">&nbsp;&nbsp;&nbsp;*&nbsp;</span>入院时间</div>
+						<div class="form_cell_item">
+							<input type="text" class="form-control" required="true" name="rysj" id="rysj" placeholder="请选择" >
+						</div>
+						<div class="form_cell_jiantou"></div>
+					</div>
+					<div>
+						<div class="form_cell_label" ><span style="color:red">&nbsp;&nbsp;&nbsp;*&nbsp;</span>病情</div>
+						<div class="form_cell_item">
+							<input id="bq" name="bq"  placeholder="请填写" required="true"  maxlength="250"  showName="病情"  class="form-control"/>
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;陪护人</div>
+						<div class="form_cell_item">
+							<input type="text" class="form-control"  maxlength="100"  showName="陪护人"  name="phr" id="phr" placeholder="请填写" >
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;陪护人电话</div>
+						<div class="form_cell_item">
+							<input type="text" class="form-control" name="phrdh"  maxlength="100"  showName="陪护电话"  id="phrdh" placeholder="请填写" >
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;是否出院</div>
+						<div class="form_cell_item">
+							&nbsp;&nbsp;&nbsp;<input type="radio" name="sfcy" value="0" onclick="hiding()" checked>否<!--onclick="getVal(this.value)"-->
+							&nbsp;&nbsp;&nbsp;<input type="radio" name="sfcy" value="1" onclick="showing()">是<!--onclick="getVal(this.value)"-->
+						</div>
+					</div>
+					<div id="cysjs" style="display: none;">
+						<div class="form_cell_label" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;出院时间</div>
+						<div class="form_cell_item">
+							<input type="text" class="form-control wDate" name="cysj" id="cysj" placeholder="请选择" >
+						</div>
+						<div class="form_cell_jiantou"></div>
+					</div>
+					<!--<div>-->
+						<!--<div class="form_cell_label" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;治疗结果</div>-->
+						<!--<div class="form_cell_item">-->
+							<!--<input  class="form-control" name="zljg" maxlength="250"  showName="治疗结果"  id="zljg" placeholder="治疗结果" />-->
+						<!--</div>-->
+					<!--</div>-->
+					<!--<div>-->
+						<!--<div class="form_cell_label" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;未看望原因</div>-->
+						<!--<div class="form_cell_item">-->
+							<!--<input class="form-control" name="wkwyy" id="wkwyy" maxlength="250"  showName="未看望原因"  placeholder="未看望原因" >-->
+						<!--</div>-->
+					<!--</div>-->
+			 	</div>
+			</form>
+		</div>
+	 
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+    <title>医疗专家</title>
+    <link rel="stylesheet" type="text/css" href="../../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+
+    <script type="text/javascript" src="../../../gmu/js/gmu.js"></script>
+    <script type="text/javascript" src="../../../js/ict.js"></script>
+    <script type="text/javascript" src="../../../js/local.js"></script>
+    <script type="text/javascript" src="../../../js/list.js"></script>
+    <script type="text/javascript" src="../../../js/touchslider.dev.js"></script>
+    <script type="text/javascript">
+        sys_addMeun = true;
+        var list = {};
+        var nm = getQueryStringRegExp("nm");
+        var ksid = getQueryStringRegExp("ksid");
+        var server_url =  window.location.protocol + "//" + window.location.host + "/";
+        $(function() {
+            //生成toolbar
+            $('#toolbar').toolbar();
+            sys_renderList('table_list', '/ltz/ylfw/ylzj/default.do?method=wapZjList&server_url='+server_url+'&page_size=15&page_goto=', {ksid:ksid}, list);
+
+
+        });
+
+
+
+        function callback_trclick_table_list(param) {
+            sys_goURL("show.html?guid=" + param+"&ksid="+ksid);
+
+        }
+        function go_back() {
+            sys_goURL("ghjl.html");
+        }
+        function search(){
+            var zjxm = $("#zjxm").val();
+            sys_ajaxGet("/ltz/ylfw/ylzj/default.do?method=wapZjList&server_url="+server_url+"&zjxm="+zjxm+"&page_size=15&page_goto=",function(json){
+                bind(json,'up');
+                list["table_list"].refresh();
+                list['table_list'].scrollTo(0,0,500,false);
+            });
+        }
+    </script>
+
+    <style type="text/css">
+        .ui-toolbar-wrap {
+            border: none !important;
+        }
+
+        li {
+            list-style-type: none;
+        }
+
+        .add {
+            width: 50px;
+            height: 50px;
+            background: url("../../../img/jiahao.png") no-repeat;
+            background-position: center center;
+            background-size: 28px 28px;
+            border: 0px !important;
+        }
+    </style>
+
+</head>
+<body>
+<div id="toolbar">
+    <i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+    <h1 class="toolbar_title">挂号服务</h1>
+</div>
+<div id="div_search" class="list_div_search div_other_50">
+    <input type="text" id="zjxm" class="list_search_input" style="width: 93%;margin-left: 3%;" placeholder="输入专家姓名查询" >
+    <div class="list_search_img" id="btn_search" onclick="search()"></div>
+</div>
+<div class="ui-refresh" id="div_table_list">
+    <ul class="data-list" id="table_list" style="list-style-type:none">
+        <li style="display: none;">
+            <div style="display: none;">{guid}</div>
+            <!-- 点击行的参数 -->
+            <div class="list_row_con" style="height:95px;min-height:95px;background-color: #ffffff;">
+
+                <div class="list_row_col1" style="margin-left: 10px;width: 80px;"><img src="{slt}" style="width: 67px;height: 90px;"></div>
+                <div class="list_row_col2" style="width:100%;">
+                    <div class="list_row_col2_1 overflow" style="padding-top: 12px;">
+                        <span>{expert_name}</span>
+                        <span class="overflow" style="width:65%;float:right;">职称：{staff}</span>
+                    </div>
+                    <div class="list_row_col2_2" style="top:6px;">
+                        <div style="width: 185%;overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;font-size:14px;margin-top:5px;">特长：{speciality}</div>
+                    </div>
+                </div>
+                <!--<div class="list_row_col1" style="width:50px;margin-top: 20px;color: #ff6600;">{zt}</div>-->
+                <div class="list_row_col3" style="width:30px;">
+                </div>
+            </div>
+        </li>
+    </ul>
+    <div class="ui-refresh-down"></div>
+</div>
+</body>
+</html>

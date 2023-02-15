@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=0.5, maximum-scale=2.0">
+<title>密码修改</title>
+<link rel="stylesheet" type="text/css" href="gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="css/base.css" />
+<script type="text/javascript" src="gmu/js/gmu.js"></script>
+<script type="text/javascript" src="js/ict.js"></script>
+<script type="text/javascript" src="js/local.js"></script>
+<script type="text/javascript" src="js/sm4.js"></script>
+<script type="text/javascript">  
+		sys_addMeun = true;
+		var username = getQueryStringRegExp("username");	    	   
+		$(function(){
+			//生成toolbar
+		  	$('#toolbar_mm').toolbar();				
+		  	
+			 //保存成功后的业务处理
+			$("#btn_save").click(function(){
+				var new_pwd = $("#new_pwd").val()
+				if(new_pwd == ''){
+					sys_alert("请输入新密码!");
+					$("#khmc").focus();
+					return;
+				}
+				 if(!pwdCheck()){
+					sys_alert("密码必须为大写字母+小写字母+数字+特殊字符组合，最少8位最长15位");
+					$("#khmc").focus();
+					return;
+				} 
+				var new_pwd2 = $("#new_pwd2").val()
+				if(new_pwd2 == ''){
+					sys_alert("请输入确认密码!");				 
+					return;
+				}				
+				if(new_pwd != new_pwd2){
+					sys_alert("两次输入密码不一致");
+					return;
+				}
+				
+				var ipassword = SM4CryptECBWithPKCS7Padding(new_pwd,1);
+									
+				sys_ajaxPost("/khdNew/login.do?method=updatePwdKhd&password="+ipassword+"&username="+username,function(msg){
+					sys_alert(msg.msg);
+					sys_goURL("login.html");
+				});			
+			});			
+		});		
+	
+		function pwdCheck(){
+			var pwd = $("#new_pwd").val();
+			var reg = new RegExp("^(?:(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])).{8,15}$");//：      /^(\w){4,15}$/
+			if(reg.test(pwd)){
+				return true;
+			}else{
+				return false;
+			}
+		}
+
+		function goback(){
+			sys_goURL("login.html");
+		}
+    </script>
+    <style type="text/css">
+    	.ui-toolbar-wrap {
+			//background-color: #ff0000;
+			border: none !important;
+		}
+    </style>
+</head>
+<body>
+    
+	<div id="toolbar_mm">
+		<span class="btn_bak" onclick="goback();"></span>
+		<h1 class="toolbar_title">密码修改</h1>
+		<!-- <span class="btn_save" id="btn_save"></span> -->
+		<span class="btn_toolbar_font" id="btn_save" style="color:#fff;">提交</span>
+	</div>
+
+	<div>
+		<!--<form id="frm_mm">  -->
+			<div class="c_form_show">
+			    <div style="color: red;padding: 8px">密码规则提示：必须为大写字母+小写字母+数字+特殊字符组合，最少8位最长15位</div> 
+				<div style="height:60px">
+					<div class="form_cell_label" style="padding-left: 15px;font-family:微软雅黑;color: #a5a3a3;font-size:18px">新密码:</div>
+					<div class="form_cell_item">
+						<input type="password" id="new_pwd" name="new_pwd" required="true" />
+					</div>
+				</div>
+				<div style="height:60px">
+					<div class="form_cell_label" style="padding-left: 15px;font-family:微软雅黑;color: #a5a3a3;font-size:18px">密码确认:</div>
+					<div class="form_cell_item">
+						<input type="password" name="new_pwd2" id="new_pwd2"
+							required="true" />
+					</div>
+				</div>
+			</div>
+		<!-- </form> -->
+	</div>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+    <title>应急电话</title>
+    <link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/list.css" />  
+    <script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+    <script type="text/javascript" src="../../js/local.js"></script>
+    <script type="text/javascript" src="../../js/ict.js"></script>
+    <script type="text/javascript" src="../../js/list.js"></script>
+    <script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+    <script type="text/javascript">
+        var list = {};
+        $(function() {
+        	 //生成toolbar
+            $('#toolbar').toolbar();
+        	//sys_renderList('table_list', "/ltz/telphone/default.do?method=list&lb_dm=02&page_goto=",{},list);
+        	//重新渲染list
+        	sys_ajaxGet("/ltz/telphone/default.do?method=list&lb_dm=02&page_goto=", function(data) {
+    			if(data.result){
+            		var arr = data.gridData.table_list.data,str="";
+            		for(var i=0;i<arr.length;i++){
+            			var val = arr[i];
+            			str+="<li onclick='callback_trclick_table_list("+val.phone+");'>"
+        				+"<div style='display: none;'>"+val.phone+"</div>"
+        				+"<div class='list_row_con' style='height:65px;min-height:65px;margin:0 20px;background-color: #ffffff;'>"				
+        				+"<div class='list_row_col2' >"				
+        					    +"<div class='list_title' style='width:30%;'>"+val.mc+"</div>"
+        						+"<div class='list_title tel' style='width:30%; text-align:center;'><a href='tel:"+val.phone+"'>"+val.phone+"</a></div>"
+        						+"<div class='list_title' style='float: right;margin-top: 10px;'>"
+        						+"<a href='tel:"+val.phone+"'>"
+        						      +"<img src='../../img/tel.jpg' style='height: 45px;width:45px;'/>"
+        						   +"</a>"
+        						+"</div>"																	
+        					+"</div>"      					
+        				+"</div>"
+        			+"</li>";
+            		}
+            	console.log(str);
+				$('#table_list').html(str);
+    			}
+    		});
+        });
+        function callback_trclick_table_list(param) {	
+    		//alert(param);
+        	window.location.href = 'tel://' +param;
+    	} 
+    </script>
+	<style type="text/css">
+	        .ui-toolbar-wrap{
+		    	border: none !important;
+	    	} 
+	    	.list_title{
+	    		display:inline-block;
+	    		line-height:65px;
+	        }
+	        .tel a{
+	           text-decoration:none;
+	        }	
+	</style>
+</head>
+<body>
+<div id="toolbar">
+    <h1 class="toolbar_title">应急电话</h1>
+</div>
+<div class="ui-refresh" id="div_table_list">
+	<ul class="data-list" id="table_list" style="list-style-type:none">
+			<li style="display: none;">
+				<div style="display: none;">{phone}</div> <!-- 点击行的参数 -->
+				<div class="list_row_con" style="height:65px;min-height:65px;margin:0 20px;background-color: #ffffff;">					
+					<div class="list_row_col2" >						
+					    <div class="list_title" style="width:30%;">{mc}</div>
+						<div class="list_title tel" style="width:30%; text-align:center;"><a href="tel:{phone}">{phone}</a></div>
+						<div class="list_title" style="float: right;margin-top: 10px;">
+						   <a href="tel:{phone}">
+						      <img src="../../img/tel.jpg" style="height: 45px;width:45px;"/>
+						   </a>
+						</div>																		
+					</div>
+					<!-- <div class="list_row_col3" style="width:50px;">
+					</div> -->
+				</div>
+			</li>
+	</ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title></title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<!--<script type="text/javascript" src="../../js/touchslider.dev.js"></script>-->
+<script type="text/javascript">
+
+	var innerscroll = null;
+	var list = {};
+	var mbid = getQueryStringRegExp("guid");
+	var yhid = window.localStorage.getItem("yhid");
+	var cx_bmid = window.localStorage.getItem("bmid");
+	var server_url =  window.location.protocol + "//" + window.location.host + "/";
+	$(function() {
+	initScroll();
+		//生成toolbar
+		$('#toolbar').toolbar();
+
+		sys_ajaxGet("/ltz/zbgl/default.do?method=wapShowZbxx",
+				function(data) {
+					bind(data);
+
+				});
+		/* sys_ajaxGet('/ltz/zbgl/default.do?method=wapDyList&page_size=1&page_goto=',{server_url:server_url},
+				function(json) {
+				if (json.gridData.table_list) {
+				var html = '';
+				var dataArr = json.gridData.table_list.data;
+				$.each(dataArr, function(i, v) {
+
+					html+="<li onclick=showDetail(2,'"+v.guid+"')>"+
+					"<div style='display: none;'>"+v.guid+"</div>"+
+					"<div class='list_row_con' style='height:55px;'>"+
+					"<div class='list_row_slt' style='margin-top:2px;margin-left: 25px;'>"+
+				       "<img src='"+v.imgurl+"' style='height: 46px;width:46px;border-radius: 23px;' onerror='../address/img/person.png' /></div>"+
+					"<div class='list_row_col2' style='margin-top:6px;margin-left:8px;height:45px;'>"+
+					"<div class='list_row_col2_1 overflow'>"+v.xm+"</div>"+
+					"<div class='list_row_col2_2 line_2' style='top:0px;clear:none;width: 65%;float: left;height: 15px;line-height: 15px;'>"+
+					"<span style='float: left;font-size: 12px;width:100%' class='overflow'>"+v.sj +"</span>"+"</div>"+
+					"</div></div></li>";
+				});
+				$('#table_list').html(html);
+			}
+
+
+				}); */
+		sys_renderList('table_list', '/ltz/zbgl/default.do?method=wapDyList&page_size=100&page_goto=', {server_url:server_url}, list);
+		/*sys_ajaxGet('/ltz/zbgl/default.do?method=wapDyList&page_size=15&page_goto=', {server_url:server_url}, function(data){
+			bind(data);
+			$("img").each(function(){
+				$this = $(this);
+				if($this.attr("imgurl")){
+					$this.attr("src",$this.attr("imgurl"));
+				}
+				initScroll();
+			});
+		});*/
+
+		// 刷新时选中刷新前选中的tab页
+		$(".c_tabs_text").eq(0).addClass("c_tabs_active");
+	});
+
+function sys_renderList(tableid,url,params,_refresh){
+	var refreshDown = $("#div_"+tableid).find(".ui-refresh-down");
+	if(refreshDown.length>0){
+		refreshDown.hide();
+	}
+	if(!tableid){
+		alert("请设置tableid");
+		return false;
+	}
+	if(!url){
+		alert("请设置url");
+		return false;
+	}
+	var refreshDIV = "div_"+tableid;
+	var height = getListHeight();
+	// var toolHeight = $("#toolbar").height();
+	var formHeight = $("#divForm").height();
+	//var swipeHeight = $("#swipe").height();
+	/*
+	  var toolbarBlank = $(".toolbar-blank");
+	  if(toolbarBlank.length>0){
+	  	height = toolbarBlank.eq(0).height();
+	  }
+	  var tabsBlank = $(".div_tabs_blank");
+	  if(tabsBlank.length>0){
+	  	height = height+tabsBlank.eq(0).height();
+	  }
+	  var bottomMenuBlank = $(".div_bottomMenu_blank");
+	  if(bottomMenuBlank.length>0){
+	  	height = height+bottomMenuBlank.eq(0).height();
+	  }
+	  */
+	var removeStyle = (typeof(_refresh.removeStyle)!='undefined')?_refresh.removeStyle:true;
+    $('#'+refreshDIV).css('height',window.innerHeight-formHeight-height-25).refresh({
+		  load:function(dir,type){
+               var me = this;
+               var page_goto = sys_getPageNum(tableid,dir);
+               if(!page_goto){
+               		me.afterDataLoading(dir);
+               		me.disable('down',false);
+               		return ;
+               }
+               var URLParams = {
+               		url:url+page_goto,
+               		dir:dir
+               }
+               sys_ajaxGet(URLParams,params?params:"",function(json){
+               		bind(json,{'dir':dir,'removeStyle':removeStyle});
+					_refresh[tableid] = me._options.iScroll;
+               	 	if(!sys_hideLoadMore[tableid]){
+	               	 	if(refreshDown.length>0){
+							refreshDown.show();
+						}
+					}
+                   $("img").each(function(){
+                       $this = $(this);
+                       if($this.attr("imgurl")){
+                           $this.attr("src",$this.attr("imgurl"));
+                       }
+                   });
+                   innerscroll.refresh();
+			        me.afterDataLoading(dir);
+               });
+           },
+           ready:function(){
+           		this.trigger("load");
+           },
+           statechange:function(event,elem,state,dir){
+
+          }
+      });
+
+}
+
+	// tab左右滑动后记录滑动位置(末屏未填满时滚动填满)
+	function doSlideAfter(newIndex, newSlide) {
+		slideIndex = newIndex;
+		if (lastLoacl <= 0) {
+			slider.slide(0);
+			slideIndex = 0;
+		} else if (newIndex > lastLoacl && lastLoacl > 0) {
+			slider.slide(lastLoacl);
+			slideIndex = lastLoacl;
+		}
+	}
+	function getNm(num){
+		if(num==0){
+			sys_goURL("zbxx.html");
+		}else if (num == 1){
+			sys_goURL("zbhd.html");
+		} else if (num == 2) {
+			sys_goURL("zbkqList.html");
+		} else if (num == 3) {
+			sys_goURL("branchExchange/branchExchange.html");
+		}
+	}
+
+	/*function callback_trclick_table_list(param) {
+		// alert(param);
+		sys_goURL("unfinishShow.html?jhid=" + param + "&rwlxdm=" + rwlxdm);
+
+	}*/
+	function go_back() {
+		sys_goURL("main.html");
+	}
+	//设定界面可拖动
+	function initScroll(){
+	// var toolHeight = $("#toolbar").height();
+	var _height = getListHeight();
+	var formHeight = $("#divForm").height();
+	//var swipeHeight = $("#swipe").height();alert(toolHeight);alert(formHeight);alert(swipeHeight);
+		 $("#div_main").height(window.innerHeight-_height-formHeight-32);
+		 innerscroll = new iScroll("div_main", {
+			click : true
+		});
+	}
+	function go_sphy() {
+		var url = "http://cloud.xylink.com/page/j/TUI0QPKH?from=singlemessage&isappinstalled=0&sysbrowser";
+
+		 if(isAndriod){
+		 	window.webview.openXiaoyu(url);
+                	//window.webview.loadurl_new(url);
+                }else if(isIphone){
+                	window.location.href='obj-c://outside//'+url;
+                }else{
+                   var iTop = (window.screen.availHeight - 30 - 365) / 2;
+		           var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+		           window.open(url, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+                }
+                return;
+	}
+	function callback_trclick_table_list(param){
+	  return;
+	}
+</script>
+
+<style type="text/css">
+.ui-toolbar-wrap {
+	border: none !important;
+}
+
+li {
+	list-style-type: none;
+}
+</style>
+
+</head>
+<body>
+	<div id="toolbar" class="ui-toolbar">
+		<i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+		<h1 class="toolbar_title">支部信息</h1>
+	</div>
+	<!-- <div class="c_tabs div_other_40" id="div_tabs">
+		<div class="slideritem" id="div_list1">
+			<div class="c_tabs_text" onclick="getNm(0)">支部信息</div>
+		</div>
+		<div class="slideritem" id="div_list2">
+			<div class="c_tabs_text" onclick="getNm(1)">支部活动</div>
+		</div>
+		<div class="slideritem" id="div_list3">
+			<div class="c_tabs_text" onclick="getNm(2)">出勤情况</div>
+		</div>
+		<div class="slideritem" id="div_list3">
+			<div class="c_tabs_text" onclick="getNm(3)">交流互动</div>
+		</div>
+	</div> -->
+		<div id="divForm" class="div_other_defined">
+
+				<table style="width:100%;margin-top:15px;font-size:14px;color:#666;">
+					<tr>
+						<td style="width:60%;text-indent:2em;height:30px;" colspan="2">
+							支部名称：<span id="zbmc"></span>
+						</td>
+					</tr>
+					<tr>
+						<td style="width:60%;text-indent:2em;height:30px;">
+							书记：<span id="zbsj"></span>
+						</td>
+						<td>
+							副书记：<span id="zbfsj"></span>
+						</td>
+					</tr>
+					<tr>
+						<td style="width:60%;text-indent:2em;height:30px;">
+							组织委员：<span id="zzwy"></span>
+						</td>
+						<td>
+							宣传委员：<span id="xcwy"></span>
+						</td>
+					</tr>
+					<tr>
+						<td style="width:60%;text-indent:2em;height:30px;">
+							纪检委员：<span id="jjwy"></span>
+						</td>
+						<td>
+							换届时间：<span id="hjsj"></span>
+						</td>
+					</tr>
+					<tr>
+						<td style="width:60%;text-indent:2em;height:30px;" colspan="2">
+							活动地点：<span id="hddd"></span>
+						</td>
+					</tr>
+				</table>
+
+		</div>
+
+	<div id="div_main" >
+	<div class="ui-refresh" id="div_table_list">
+		<ul class="data-list" id="table_list" style="list-style-type:none">
+			<li style="display: none;">
+				<div style="display: none;">{guid}</div>
+				<div class="list_row_con"
+					style="height:55px;background-color: #ffffff;min-height:55px;">
+					  <div class="list_row_slt" style="margin-top:2px;margin-left: 25px;">
+				       <img src="{imgurl}" imgurl="{imgurl}" style="height: 46px;width:46px;border-radius: 23px;" onerror="this.src='../address/img/person.png'" />
+				    </div>
+					<div class="list_row_col2" style="margin-top:6px;margin-left:8px;height:45px;">
+						<div class="list_row_col2_1 overflow">{xm}</div>
+						<div class="list_row_col2_2 line_2"
+							style="top:0px;clear:none;width: 65%;float: left;height: 15px;line-height: 15px;">
+							<span style="float: left;font-size: 12px;width:100%"
+								class="overflow">{sj}</span>
+						</div>
+					</div>
+				      <a href="tel:{sj}"> <img src="../../img/tel.jpg" style="height: 35px;width:35px;margin-right:20px;margin-top:10px;"/></a>
+				</div>
+			</li>
+		</ul>
+		<div class="ui-refresh-down"></div>
+		</div>
+		<!-- <div  class="div_other_40" style="height:80px;position:fixed;bottom:50px;background-color:#fff;width:100%;line-height:40px;" >
+		<span style="width:50%;text-align:center;display:inline-block;float:left;margin-top:25px;" onclick="sys_alert('暂未开通');">
+
+			<img src="img/dfjn.png" style="height:30px;display:inline-block;">
+		</span>
+
+		<span style="width:100%;text-align:center;display:inline-block;margin-top:25px;" onclick="go_sphy();">
+			<img src="img/sphy.png" style="height:30px;display:inline-block;">
+		</span>
+	 </div> -->
+		</div>
+
+
+</body>
+</html>

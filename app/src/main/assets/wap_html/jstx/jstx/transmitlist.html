@@ -1,0 +1,899 @@
+<!doctype html>
+<html>
+<head>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+<title>列表</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="css/oa.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="js/touch.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="js/custom.js"></script>
+<script type="text/javascript" src="js/datadumper.js"></script>
+<style>
+a{
+    text-decoration:none;
+}
+.txl_ry{
+	width:90%;
+	margin-left:10%;
+}
+
+</style>
+<script type="text/javascript">
+    	var sjid = getSjid();
+    	//alert(sjid);
+        var iobj=null;
+        var iobj2=null;
+        var iobj3=null;
+	   	var addr_list = {};
+	   	var text = gettext();//标题
+	   	var jzbz = getjzbz();//标题
+        var flag = getQueryStringRegExp("flag");
+        var currId = window.localStorage.getItem("yhid");
+    	var currUsername = getQueryStringRegExp("senderName");
+        var sendcontent = getQueryStringRegExp("sendcontent");
+		var receiverIdfrom = getQueryStringRegExp("receiverIdfrom");
+		var receivernamefrom = getQueryStringRegExp("receivernamefrom");
+		var url = getQueryStringRegExp("url");
+		var filename = getQueryStringRegExp("filename");
+		var senderId = getQueryStringRegExp("senderId");
+		var senderName = getQueryStringRegExp("senderName");
+		
+        function getflag(){
+            var flag = getQueryStringRegExp("flag");
+            if(flag=='undefined' || flag=='' || flag==null){
+                flag=0;
+            }
+            return flag;
+        }
+		var iscr_from = null;
+	   	//sys_expendRow['table_list']=false;
+	    //加载标志
+	    function getjzbz(){
+			var jzbz = getQueryStringRegExp("jzbz");
+			if(jzbz=='undefined' || jzbz=='' || jzbz==null){
+				jzbz=0;
+			}
+			return jzbz;
+	    }
+	   	
+	    if(sys_pageData["table_list"]){
+	     	sys_pageData["table_list"] = null;
+	     	
+	    }
+	    
+	    function getSjid(){
+			var sjid = getQueryStringRegExp("sjid");
+			if(sjid=='undefined' || sjid=='' || sjid==null){
+				sjid=0;
+			}
+			return sjid;
+	    }
+	    
+	    //标题
+	    function gettext(){
+			var text = getQueryStringRegExp("text");
+			if(text=='undefined' || text=='' || text==null){
+				text=0;
+			}
+			return text;
+	    }
+	    
+	  //跳转聊天页面
+    	function goChat(id){
+    		var currId = window.localStorage.getItem("yhid");
+    		sys_ajaxPost("/jstx/default.do?method=updateReadStatus&senderId=" + currId + "&receiverId=" + id + "&groupMessageSenderId=random",function(json){
+    			
+    		});
+    		window.event.stopPropagation();
+    		sys_goURL("chat.html?guid="+id+"&yhid="+window.localStorage.getItem("yhid")+"&backTarget=linkman");
+    	}
+	    
+    	$(function(){
+    		 
+    		if(jzbz=="dl"){
+    			 
+    				$("#jzz").css('display','block');
+    			 
+    		}
+    		else{
+    	   		 
+    				$("#jzz").css('display','none');
+    			 
+    	   	}
+    		//生成toolbar
+		  	$('#toolbar').toolbar({
+	            fixed: true
+	        });		 
+    		
+    		//一级部门页面不显示返回按钮
+		  	if(sjid == "0"){
+	    		$("#back").css('display','none');
+	    		$("#menu").css('display','block');
+	    	} else {
+	    		$("#menu").css('display','none');
+	    	}
+    		
+		  	 loadList() ;
+		  	 
+		  	setTimeout('refreshfirst()',1200);
+    		
+		  	$("td").click(function(){
+		 		$("td").css("background","#0973c5");  
+		 		$(this).css("background","white");
+		 		
+		  	});
+   		});
+  
+    	function refreshfirst(){
+    		$("#iscr_from").height(window.innerHeight-140);
+		  	iscr_from = new iScroll("iscr_from",{click:true, bounce:true});
+		  	sys_autoTextarea(iscr_from); 
+    	}
+  
+    	//设置内滚动
+    	function refreshinner(){
+			if(iscr_from!=null){
+				iscr_from.refresh();
+			}else{
+				$("#iscr_from").height(window.innerHeight-140);
+			  	iscr_from = new iScroll("iscr_from",{click:true, bounce:true});
+			  	sys_autoTextarea(iscr_from); 
+			}
+    	}
+    	
+    	 function cylxrfz(){
+    			if( $('#lxr_fz .txl_bm').length > 0){
+    				$("#lxr_fz").children().remove();		
+    			    $("#cylxr_jt").attr("src", "../img/txl/you.png");
+    	  		}else{
+    	  			$("#cylxr_jt").attr("src", "../img/txl/xia.png");
+    				sys_ajaxGet("/deskinfo/default.do?method=getCylxr", function(json){
+    					// Dumper.alert(json);
+    					// alert(json.gridData.table_list.data.length);
+    					 var strHtml = '';
+    					 var data = json.gridData.table_list.data;
+    					 for(var i=0;i<data.length ;i++){
+    					 	
+    					 	if(data[i].flag == "fz"){
+    					 		strHtml = strHtml + "<div class=\"txl_bm font-color-bm\" onclick=\"clickCylxrDiv(this,'" + data[i].guid + "','" + data[i].mc  + "')\">&nbsp;&nbsp;" + data[i].mc + "</div><div></div>";
+    					 	}else if(data[i].flag == "lxr"){
+    							var xxxx = Math.random();
+    							var guid = data[i].guid;
+    							var mc = data[i].mc;
+    							var mobile = data[i].sj;
+    							var id = data[i].yhid;
+    							
+    							strHtml += "		<div class=\"ui-refresh\" onclick=\"clickDiv('"+ id +"','204','"+ data[i].yhid +"','"+ mc +"')\">";
+    							strHtml += "			<div class=\"txl_ry\">";
+    							strHtml += "				<div class=\"txl_ry_img\">";
+    							strHtml += "					<img src=\" " + sys_ctxStr() + "/oainfo/ydyypt/yhface/pic/breviary" + data[i].yhid + ".jpg?xxxx=" + xxxx  + " \" onerror=\"javascript:this.src='../img/txl/03_09.png'\" class=\"txl_img\"></img>";
+    							strHtml += "				</div>";
+    							strHtml += "				<div class=\"txl_ry_rm\">" + mc;
+    							strHtml += "				</div>";
+    							
+    							strHtml += "			</div>";
+    							strHtml += "		</div>";		
+    											 		
+    					 	}
+    					 	
+    					 }
+    					 
+    					 //alert(strHtml);
+    					 
+    					 $("#lxr_fz").html(strHtml); 
+    					 iscr_from.refresh();
+    				});			  			
+    	  			
+    	  		}
+    	   }
+		function clickCylxrDiv(element,guid){
+			//alert(guid);
+// 			alert(element);
+ 			sys_ajaxGet("/deskinfo/default.do?method=getCylxrBysjguid&sjguid=" + guid, function(json){
+				//Dumper.alert(json);
+				var strHtml = '';
+				for(var i =0;i<json.list.length;i++){
+					var mc = json.list[i].mc;
+					var mobile = json.list[i].sj;
+					var guid = json.list[i].guid;
+					var xxxx = Math.random();
+					
+					strHtml += "		<div class=\"ui-refresh\" onclick=\"clickDiv('999999','204','"+json.list[i].yhid+"')\">";
+					strHtml += "			<div class=\"txl_ry\">";
+					strHtml += "				<div class=\"txl_ry_img\">";
+					strHtml += "					<img src=\" " + sys_ctxStr() + "/oainfo/ydyypt/yhface/pic/breviary" + json.list[i].yhid + ".jpg?xxxx=" + xxxx  + " \" onerror=\"javascript:this.src='../img/txl/03_09.png'\" class=\"txl_img\"></img>";
+					strHtml += "				</div>";
+					strHtml += "				<div class=\"txl_ry_rm\">" + mc;
+					strHtml += "				</div>";
+				
+					strHtml += "			</div>";
+					strHtml += "		</div>";
+				}
+				//alert(strHtml);
+				$(element).next().html(strHtml);
+				
+				iscr_from.refresh();
+			});
+ 			
+ 			
+		}  
+		
+		
+		function delCylxr(guid){
+			window.event.stopPropagation();
+			sys_ajaxGet("/deskinfo/default.do?method=delCylxrByguid&guid=" + guid, function(json){
+				sys_alert(json.msg);
+				$("#cylxrfz").trigger("click");
+			});
+		}
+   		
+   		function loadList(){
+   			sys_ajaxPost("/jstx/lxr/default.do?method=getAddressBm&sjid=70670_70680",function(json){
+                getTableHtml(json.gridData.table_list.data);
+    			$("#jzz").css('display','none');
+    			
+                iscr_from.refresh();
+   			});
+           
+		}
+	 
+    	function callback_trclick_table_list(param){
+    		
+    		var params = param.split(",");
+   			var type = params[1];
+   			var guid = params[2];
+   			var bmmc = params[3];
+   			
+	   			if(type == "201"){//单位
+	   				//标题显示上级单位
+	   				document.getElementById("toolbar_text").innerText=bmmc;
+	   	   			var text =document.getElementById("toolbar_text").innerText;
+	   	   			
+	   				sys_goURL("list.html?sjid="+guid+"&text="+text);
+	   			}else if(type == "204"){//个人
+	   				
+	   				sys_goURL("show.html?guid="+guid+"&from=list&sjid="+sjid);//+"&text="+text
+	   			}
+    	}
+    	
+    	
+    	function gobackIphone(sjbmid){
+    		sys_goURL("list.html?sjid="+sjbmid);
+    	}
+    	
+    	function sys_renderList2(tableid,url,params,_refresh){
+    		var refreshDown = $("#div_"+tableid).find(".ui-refresh-down");
+    		if(refreshDown.length>0){
+    			refreshDown.hide();
+    		}
+    		if(!tableid){
+    			alert("请设置tableid");
+    			return false;
+    		}
+    		var refreshDIV = "div_"+tableid;
+    		var height = getListHeight();
+    		var removeStyle = (typeof(_refresh.removeStyle)!='undefined')?_refresh.removeStyle:true;
+    	    $('#'+refreshDIV).css('height',window.innerHeight-parseInt(height)-65).refresh({
+    			  load:function(dir,type){
+    	               	var me = this;
+    	               	var page_goto = sys_getPageNum(tableid,dir);
+    	               	if(!page_goto){
+    	               		me.afterDataLoading(dir);  
+    	               		me.disable('down',false);
+    	               		return ;
+    	               	}
+    	               	if(isAndriod){
+	   						loadList();
+	   					}else if(isIphone){
+	   						window.location.href='obj-c://getAccessNoLxdm'+sjid;
+	   					}
+    	           	},
+    	           	ready:function(){
+    	           		this.trigger("load");
+    	           	},
+    	           	statechange:function(event,elem,state,dir){}
+    	      });
+    	      
+    	}
+    	function search_(){
+    		//sys_goURL("searchgroup.html?sjid="+sjid+"&py="+$("#search").val()+"&from=transmitlist");
+    		sys_goURL("searchgroup.html?receiverIdfrom="+receiverIdfrom+"&receivernamefrom="+receivernamefrom+"&senderId="+currId+"&senderName="+currUsername+"&sendcontent="+sendcontent+"&url="+url+"&filename="+filename+"&py="+$("#search").val()+"&from=transmitlist");
+    	}
+    	function showMenu(){
+    		$('#left_panel').panel('toggle', 'reveal');
+    	}
+		/*************************************/
+		//
+		function getTableHtml(data){
+			var list = data;
+			var strHtml = "";
+			for(var i=0;i<list.length;i++){
+				var lxdm=list[i].lx_dm;
+				var mc = list[i].mc;
+				var id = list[i].lxid;
+				var guid = list[i].guid;
+				
+				strHtml += "<div class=\"ui-refresh\" id=\"z_"+id+"\" onclick=\"clickDiv('"+id+"','"+lxdm+"','"+guid+"')\">";
+				strHtml += "	<ul class=\"data-list\" id=\"table_list\">";
+				strHtml += "		<li>";
+				
+				strHtml += "			<div>";
+				strHtml += "				<div class=\"txl_bm font-color-bm dis_sj\">&nbsp;" + "<img id='img_" + guid + "' src=\"../img/txl/you.png\"><div>" + mc+"</div></div>";
+				
+				//strHtml += "				<div class=\"txl_bm font-color-bm2 dis_sj\">&nbsp;&nbsp;&nbsp;" + "<img id='img_" + guid + "' src=\"../img/txl/you.png\"><div>" + mc+"</div></div>";
+
+				
+				
+				strHtml += "            </div>";				
+				
+				strHtml += "		</li>";
+				strHtml += "	</ul>";
+				strHtml += "</div>";
+				strHtml += "<div id=\"datahtml_"+guid+"\" style=\"display:none;\"></div>";
+			}
+	   	  	//$("#datahtml").html("");
+	   	  	//alert(strHtml);
+	   	 	$("#datahtml").html(strHtml);
+// 	   	 	clickDiv('1004521','201','1004521');
+		}
+		
+		function clickDiv(obj,obj2,obj3,obj4){
+			if(obj2=='204'){
+				goTrans(senderId,senderName,obj,obj4);
+			}else if(obj2=='201'){
+                 
+                	var o =document.getElementById("datahtml_"+obj3).style.display;
+    				if(o=='none'){
+    					sys_ajaxPost("/jstx/lxr/default.do?method=getAddressYh&sjid="+obj,function(json){
+                        var list = json.gridData.table_list.data;
+                        var strHtml = "";
+	    				for(var i=0;i<list.length;i++){
+	    					var lxdm=list[i].lx_dm;
+	    					var mc = list[i].mc;
+	    					var id = list[i].lxid;
+	    					var guid = list[i].guid;
+	    					
+	    					strHtml += "<div class=\"ui-refresh\" onclick=\"clickDiv('"+id+"','"+lxdm+"','"+guid+"','"+mc+"')\">";
+	    					strHtml += "	<ul class=\"data-list\">";
+	    					strHtml += "		<li>";
+	    					strHtml += "			<div>";
+	    					
+	    					if(lxdm=='201'){
+	    						var id_sz = list[i].id.split("_");
+	    						if(id_sz.length == 1){
+	    						strHtml += "				<div class=\"txl_bm font-color-bm2 dis_sj\">&nbsp;&nbsp;&nbsp;" + "<img id='img_" + guid + "' src=\"../img/txl/you.png\"><div>" + mc+"</div></div>";
+	    						}else
+	    						if(id_sz.length == 2){
+	    						strHtml += "				<div class=\"txl_bm font-color-bm2 dis_sj\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+"<img id='img_" + guid + "' src=\"../img/txl/you.png\"><div>" + mc+"</div></div>";
+	    						}else
+	    						if(id_sz.length == 3){
+	    						strHtml += "			    <div class=\"txl_bm font-color-bm2 dis_sj\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+"<img id='img_" + guid + "' src=\"../img/txl/you.png\"><div>" + mc+"</div></div>";
+	    						}else
+	    						if(id_sz.length == 4){
+	    						strHtml += "			    <div class=\"txl_bm font-color-bm2 dis_sj\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+"<img id='img_" + guid + "' src=\"../img/txl/you.png\"><div>" + mc+"</div></div>";
+	    						}
+	    						
+	    					}else if(lxdm=='204'){
+	    						var gwmc = list[i].gwmc;
+	    						var mobile = list[i].mobile;
+	    						
+	    						strHtml += "			<div class=\"txl_ry\">";
+	    						strHtml += "				<div class=\"txl_ry_img\">";
+	    						strHtml += "					<img src=\" " + sys_ctxStr() + "/oainfo/ydyypt/yhface/pic/breviary" + guid + ".jpg?xxxx=" + Math.random() + " \" onerror=\"javascript:this.src='../img/txl/03_09.png'\" class=\"txl_img\"></img>";
+	    						strHtml += "				</div>";
+	    						strHtml += "				<div class=\"txl_ry_rm\">" + mc;
+	    						strHtml += "				</div>";
+	    						
+	    						strHtml += "			</div>";
+	    						
+	    					}
+	    					
+	    					strHtml += "			</div>";
+	    					strHtml += "		</li>";
+	    					strHtml += "	</ul>";
+	    					strHtml += "</div>";
+	    					strHtml += "<div id=\"datahtml_"+guid+"\" style=\"display:none;\"></div>";
+	    				}
+    					document.getElementById("datahtml_"+obj3).style.display="block";
+    					document.getElementById("img_"+obj3).src = "../img/txl/xia.png";
+    					$("#datahtml_"+obj3).html(strHtml);
+    					setTimeout('refreshinner()',500);
+    					});
+    				}else{
+    					document.getElementById("datahtml_"+obj3).style.display="none";
+    					document.getElementById("img_"+obj3).src = "../img/txl/you.png";
+    					/* $("#iscr_from").height(window.innerHeight-140);
+    				  	iscr_from = new iScroll("iscr_from",{click:true, bounce:true}); */
+    				  	if(iscr_from!=null){
+    		                iscr_from.refresh();
+    		            } 
+    		            //sys_autoTextarea(iscr_from);
+    					if(obj2=='201'){
+    						document.getElementById('pic_'+obj3).style.backgroundImage="url(../img/sk.png)";
+    					}
+    				}
+			 
+			}
+// 			sys_autoTextarea(iscr_from);
+		}
+	
+		function showDiv(guid){
+			//alert(guid);
+			window.event.stopPropagation();
+			//document.getElementById("cylxr").style.display="block";
+			
+			sys_ajaxGet("/deskinfo/default.do?method=getCylxr", function(json){
+				 //Dumper.alert(json);
+				 //alert(json.gridData.table_list.data.length);
+				 var strHtml = '';
+				 var data = json.gridData.table_list.data;
+				 
+				 strHtml = strHtml + "<input type=\"hidden\" id=\"tjguid\" class=\"ky\" value=\"" + guid + "\" />";
+				 
+				 for(var i=0;i<data.length ;i++){
+				 	if(data[i].flag == "fz"){
+	 					if(i == (data.length - 1)){
+	 						strHtml = strHtml + "<div class=\"font-color-rm div-xz\" style=\"border-bottom:none;\" >";	
+	 					}else{
+	 						strHtml = strHtml + "<div class=\"font-color-rm div-xz\">";	
+	 					}
+	 					 
+					 	strHtml = strHtml + "	<span>&nbsp;" + data[i].mc + "</span>";
+					 	strHtml = strHtml + "	<input type=\"radio\" name=\"lxrfz\" class=\"ky\" value=\"" + data[i].guid + "\" style=\"margin-top:13px;\"/>";
+					 	strHtml = strHtml + "</div>";				 		
+				 	}
+				 	
+				 }
+	 
+/* 				 if(data.length == 0){
+					 alert("请先编辑常用联系人组");	 
+				 }else{ */
+					 $("#tc_lxr").html(strHtml);
+					 $("#cylxr").css("display", "block");
+					 $("#floatdiv").css("display", "block");
+				/*  } */
+			});				
+			
+		}
+		
+		function sys_list_open(guid){
+			sys_goURL("update.html?guid=" + guid);
+		}
+		
+		function xzlxr(){
+			//alert("xzlxr");
+			var tjguid = $("#tjguid").val();
+			var lxrfzguid = $("input[name='lxrfz']:checked").val();
+			//alert(tjguid + "-" + lxrfzguid); 
+			
+			if(lxrfzguid =='' || lxrfzguid == undefined || lxrfzguid == null){
+				alert("请选择分组");
+				return;
+			}
+			
+			sys_ajaxGet("/deskinfo/default.do?method=addCylxrfb&tjguid=" + tjguid + "&sjguid=" + lxrfzguid, function(json){
+				sys_alert(json.msg);
+				$("#cylxrfz").trigger("click");
+			});
+			
+			$("#cylxr").css("display", "none");
+			$('#floatdiv').css('display', 'none');
+		}
+		
+		function clickTel(mobile){
+			//取消列表行事件触发
+			window.event.stopPropagation();
+		}
+		
+		function clickSms(mobile){
+			window.event.stopPropagation();
+		}
+		
+    	function goback(){
+    		if((receiverIdfrom+"").length==11)
+    		{
+    			sys_goURL("transmit.html?receiverIdfrom="+receiverIdfrom+"&receivernamefrom="+receivernamefrom+"&sendcontent="+sendcontent);
+    		}else{
+    			sys_goURL("transmit.html?receiverIdfrom="+receiverIdfrom+"&sendcontent="+sendcontent);
+    		}
+    	}
+    	
+		function sys_ctxStr(){
+	           var count = 0;
+	           var end = 0;
+	           for(var i=0;i<sys_ctx.length;i++) {
+	               var c = sys_ctx.charAt(i);
+	               if(c == '/') {
+	                   count ++;
+	                   if(count == 3) {
+	                       end = i;
+	                   }            
+	               } 
+	           }
+	           var hostUrl=sys_ctx.substring(0, end);
+			   return hostUrl;			
+		}    	
+		 function iosload(){
+             if(isIphone){
+                 if(flag==1||flag=='1'){
+                     $("#jzz2").css("display", "block");
+                     var dqyh =window.localStorage.getItem("yhid");
+                     window.location.href='obj-c://getAccessUpdate'+dqyh;
+                 }else{
+                     $("#jzz2").css("display", "block");
+                     window.location.href='obj-c://getAccesslist'+sjid;
+                 }
+             }
+        }
+		 
+		 function changeDiv(flag)
+		 {
+			 if(flag=='xx')
+			 {
+				 //$("#xxlb").css("color","#0973c5");
+				 //$("#lxrlb").css("color","#FFF");
+				 //$("#qzlb").css("color","#FFF");
+				 sys_goURL("../jstx/message.html");
+				 
+			 }else if(flag=='lxr')
+			 {
+				// $("#xxlb").css("color","#FFF");
+				// $("#lxrlb").css("color","#0973c5");
+				// $("#qzlb").css("color","#FFF");
+				 sys_goURL("list.html");
+			 }else if(flag=='qz')
+			 {
+				 //$("#xxlb").css("color","#FFF");
+				 //$("#lxrlb").css("color","#FFF");
+				// $("#qzlb").css("color","#0973c5"); 
+				 sys_goURL("../jstx/group.html");
+			 }
+		 }
+		 
+		 
+		//websocket对象
+			var websocket = null;
+			//判断当前浏览器是否支持WebSocket
+			if("WebSocket" in window){
+			    websocket = new WebSocket(sys_ctx.replace("http","ws")+"/websocket/"+("mobile" + currId));
+			}else{
+			    alert("Not support websocket");
+			}
+			
+			//连接发生错误的回调方法
+			websocket.onerror = function(){
+			    
+			};
+			 
+			//连接成功建立的回调方法
+			websocket.onopen = function(event){
+				
+			};
+			 
+			//接收到消息的回调方法
+			websocket.onmessage = function(event){
+				var json = JSON.parse(event.data);
+				//如果被邀请人同意入群，并且当前邀请群在线，刷新群组成员信息
+				if(undefined != json.mobileOnline){
+					var str = json.refreshStatus == "agree" ? json.refreshBeInviterName + "同意了您的邀请!" : refreshBeInviterName + "拒绝了您的邀请!";
+					$("#datahtml > div:first-child").before(
+		   				"<div class='txl_ry' style='height:66px;'>" +
+		 	   				"<div class='txl_ry_img' style='padding-top:6px;'>" +
+		 	   					"<img height='40px' width='40px' style='margin:6px 16px;' src="+sys_ctxStr()+"/oainfo/ydyypt/yhface/pic onerror=\"javascript:this.src='../img/txl/03_09.png'\">" +
+		 	   				"</div>" +
+		 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+		 	   					"<div style='height:32px;width:100%;font-size:16px;font-weight:500;font-family:microsoft yahei;line-height:33px;padding-left:30px;overflow:hidden;'>群通知</div>" +
+		 	   					"<div style='height:32px;width:100%;color:gray;line-height:30px;padding-left:30px;overflow:hidden;' class='listSize'>" + 
+		 	   						str + 
+		 	   					"</div>" +
+		 	   				"</div>" +
+		 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+		 	   					"<div style='height:32px;width:100%;'></div>" +
+		 	   					"<div style='height:32px;width:100%;padding-bottom:6px;'>" +
+		 	   						"<div style='float:left;height:100%;width:50px;border:1px solid gray;line-height:26px;text-align:center;font-size:15px;margin-left:60px;' onclick='delGroupRelated("+json[i].member_id+","+json[i].group_id+",\""+json[i].group_name+"\",\""+json[i].event+"\",this)'>确定</div>" +
+		 	   					"</div>" +
+		 	   				"</div>" +
+			   			"</div>"
+		           	);
+					delGroupRelated(json.beInviterId,json.refreshGroupId,json.refreshGroupName,"invite");
+				}else if(undefined != json.inviteGroupId){
+					var str = json.inviterName + "邀请您加入" + json.inviteGroupName;
+					show = "<div style='float:left;height:100%;width:50px;border:1px solid gray;line-height:26px;text-align:center;font-size:15px;' onclick='agreeJoin("+json.inviterId+","+json.beInviterId+","+json.inviteGroupId+",\""+json.inviteGroupName+"\",this)'>同意</div>" +
+					   	   	"<div style='float:left;height:100%;width:50px;border:1px solid gray;line-height:26px;text-align:center;font-size:15px;margin-left:10px;' onclick='rejectJoin("+json.inviterId+","+json.beInviterId+","+json.inviteGroupId+",\""+json.inviteGroupName+"\",this)'>拒绝</div>";
+					if($("#datahtml").children().length > 0){
+						$("#datahtml > div:first-child").append(
+			   				"<div class='txl_ry' style='height:66px;'>" +
+			 	   				"<div class='txl_ry_img' style='padding-top:6px;'>" +
+			 	   					"<img height='40px' width='40px' style='margin:6px 16px;' src="+sys_ctxStr()+"/oainfo/ydyypt/yhface/pic onerror=\"javascript:this.src='../img/txl/03_09.png'\">" +
+			 	   				"</div>" +
+			 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+			 	   					"<div style='height:32px;width:100%;font-size:16px;font-weight:500;font-family:microsoft yahei;line-height:33px;padding-left:30px;overflow:hidden;'>群通知</div>" +
+			 	   					"<div style='height:32px;width:100%;color:gray;line-height:30px;padding-left:30px;overflow:hidden;' class='listSize'>" + 
+			 	   						str + 
+			 	   					"</div>" +
+			 	   				"</div>" +
+			 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+			 	   					"<div style='height:32px;width:100%;'></div>" +
+			 	   					"<div style='height:32px;width:100%;padding-bottom:6px;'>" +
+			 	   						show +
+			 	   					"</div>" +
+			 	   				"</div>" +
+				   			"</div>"
+			           	);
+					}else{
+						$("#datahtml").append(
+		   					"<div class='txl_ry' style='height:66px;'>" +
+			 	   				"<div class='txl_ry_img' style='padding-top:6px;'>" +
+			 	   					"<img height='40px' width='40px' style='margin:6px 16px;' src="+sys_ctxStr()+"/oainfo/ydyypt/yhface/pic onerror=\"javascript:this.src='../img/txl/03_09.png'\">" +
+			 	   				"</div>" +
+			 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+			 	   					"<div style='height:32px;width:100%;font-size:16px;font-weight:500;font-family:microsoft yahei;line-height:33px;padding-left:30px;overflow:hidden;'>群通知</div>" +
+			 	   					"<div style='height:32px;width:100%;color:gray;line-height:30px;padding-left:30px;overflow:hidden;' class='listSize'>" + 
+			 	   						str + 
+			 	   					"</div>" +
+			 	   				"</div>" +
+			 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+			 	   					"<div style='height:32px;width:100%;'></div>" +
+			 	   					"<div style='height:32px;width:100%;padding-bottom:6px;'>" +
+			 	   						show +
+			 	   					"</div>" +
+			 	   				"</div>" +
+			   				"</div>"
+		           		);
+					}
+					
+				}
+				//setMessageInnerHTML(json);
+			};
+			 
+			//连接关闭的回调方法
+			websocket.onclose = function(){
+			    
+			};
+			 
+			//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+			window.onbeforeunload = function(){
+			    websocket.close();
+			};
+			 
+			//将消息显示在网页上
+			function setMessageInnerHTML(json){
+				
+			};
+			 
+			//关闭连接
+			function closeWebSocket(){
+				
+			};
+		 
+		//弹出转发窗口
+			function goTrans(sendid,sendname,receiveid,receivename){
+				$("#sendcontent").empty();
+				if((receiveid+"").length==11)
+				{
+					
+					if(filename!=null && filename!=undefined && filename!="")
+					{
+						var sendcontentfile = "<div>" + filename.substring(23) + "&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='downloadFile(\""+url+"\",\""+filename+"\")'>查看</a>" +  "</div>";
+						$("#sendcontent").append(sendcontentfile);
+					}else{
+					
+						$("#sendcontent").append(sendcontent);
+					}
+					$("#sendname").text("发送给："+receivename);
+					
+					$("#sendid").val(sendid);
+					$("#sendname").val(sendname);
+					$("#receiveid").val(receiveid);
+					$("#receivename").val(receivename);
+				}else{
+					if(filename!=null && filename!=undefined&& filename!="")
+					{
+						var sendcontentfile  = "<div>" + filename.substring(23) + "&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='downloadFile(\""+url+"\",\""+filename+"\")'>查看</a>" +  "</div>";
+						$("#sendcontent").append(sendcontentfile);
+					}else{
+						
+						$("#sendcontent").append(sendcontent);
+					}
+					$("#sendname").text("发送给："+receivename);
+					
+					$("#sendid").val(sendid);
+					$("#sendname").val(sendname);
+					$("#receiveid").val(receiveid);
+					$("#receivename").val(receivename);
+				}
+				$("#xzsfbm").css("display", "block");
+				$("#floatdiv").css("display", "block");		
+			}
+		
+
+			 //转发
+			 function transsend()
+			 {
+				 if(filename!=null && filename!=undefined && filename!="")
+				 {
+					sendcontent = "<div>" + filename.substring(23) + "&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='downloadFile(\""+url+"\",\""+filename+"\")'>查看</a>" +  "</div>";
+				 }
+				 var Num=""; 
+				 for(var i=0;i<5;i++) 
+				 { 
+					 Num+=Math.floor(Math.random()*10); 
+				 } 
+				var myDate = new Date();
+				var mouth=myDate.getMonth()+1;
+				if(mouth<10)
+				{
+					mouth="0"+mouth;
+				}
+				var guid = (myDate.getFullYear()+""+mouth+""+myDate.getDate()+""+myDate.getHours()+""+myDate.getMinutes()+""+myDate.getSeconds()+""+myDate.getMilliseconds()+""+Num);
+				var senderId = $("#sendid").val();
+				var senderName = $("#sendname").val();
+				var receiverId = $("#receiveid").val();
+				var receiverName = $("#receivename").val();
+				
+				var message = new Object();
+				message.senderId = senderId;
+				message.senderName = senderName;
+				message.receiverId = receiverId;
+				message.receiverName = receiverName;
+				message.guid=guid;
+				
+				sys_ajaxPost("/jstx/default.do?method=getServerTime",function(json){
+					message.sendTime = json.time;
+					message.sendContent = $("#sendcontent").html();
+					
+			    	websocket.send(JSON.stringify(message));
+			    	
+			    	if((receiverIdfrom+"").length==11)
+			    	{
+			    		sys_goURL("groupChat.html?groupId="+receiverIdfrom+"&groupName="+receivernamefrom+"&backTarget=message");
+			    	}else{
+			    		sys_goURL("chat.html?yhid="+senderId+"&guid="+receiverIdfrom+"&backTarget=message");
+			    	}
+			    	
+					
+				});
+					
+			 }
+			 
+			
+    </script>
+    <style>
+		.txl_bm img{width:24px;height:24px;margin-top:10px;}
+		.dis_sj{display:-webkit-box;}
+		
+		.child_page_title1
+		{
+			float: left;
+		    width: 46%;
+		    height: 65%;
+		    color: white;
+		    font-size: 12px;
+		    text-align: center;
+		    line-height: 26px;
+		    margin-top: 12px;
+		    
+		    margin-left:13%;
+		}
+
+		.child_page_title2
+		{
+			width:100.1%;
+			rules:cols solid #000;
+			border: 1px solid;
+		}
+    </style>
+</head>
+<body onload="iosload();">
+	 <div class="div_body" style="background-color:#fefefe;">
+	 <div id="toolbar">
+		<span class="btn_bak" onclick="goback();"></span>
+		<h1 class="toolbar_title">转发</h1>
+	</div>
+<!-- 		<div id="toolbar" class="blue_top"> -->
+<!-- 			<div class="button_multi" onclick="goback()"> -->
+<!-- 				<img src="img/ztjy/02_06.png" class="img_back_or_xj"></img> -->
+<!-- 			</div> -->
+<!-- 			<div class="child_page_title1">	 -->
+<!-- 				<h1 id="toolbar_text" style="font-size:18px">通讯录</h1> -->
+<!-- 			</div> -->
+			
+<!-- 			<div class="button_multi"> -->
+<!-- 			</div> -->
+<!-- 		</div>	 -->
+		
+<!--   		<div id="search_div" class="search_div"> -->
+<!--   			<div class="search_div_inner"> -->
+<!--   				<div style="display:inline-block;"> -->
+<!--   					<input type="text" id="search"  class="cx_input" name="search" placeholder="请输入名称或拼音首字母"></input> -->
+<!--   				</div> -->
+<!--   				<div class="search_div_img" onclick="search_()"> -->
+<!--   					<img src="img/ztjy/02_11.png" id="c_search_icon" class="cx_img" ></img> -->
+<!--   				</div> -->
+<!--   			</div> -->
+<!--   		</div>		 -->
+
+		<div id="iscr_from" style="background-color:#ezezez;">
+			<div  class="sear">
+<!-- 		  		<div id="cylxrfz" class="font-color-bm head_mc dis_sj" onclick="cylxrfz();"> -->
+<!-- 		  			&nbsp;<img id="cylxr_jt" src="../img/txl/you.png" style="width:24px;height:24px;margin-top:10px;" /><div>常用联系人</div>  -->
+<!-- 		  		</div> -->
+				<div id="lxr_fz">
+					
+				</div>  				
+				
+				<div id="tabslist">
+		   	   		<div id="datahtml"> 	   
+		   	   			
+		   	   		</div>
+		   	   </div>
+			</div>
+		</div>
+			
+			<div  style="display: none;position:absolute;left:50%;top:50%;margin-left:-100px;margin-top:-100px;" id="jzz" width="100%" height="70%" align="center" valign="middle" text-align="center">
+				&nbsp;
+				<font color="#ADADAD">数据更新中···</font>
+			</div>
+			<div  style="display: none;position:absolute;left:35%;top:50%;" id="jzz2" width="100%" height="70%" align="center" valign="middle" text-align="center">
+				&nbsp;
+				<font color="#ADADAD">数据更新中···</font>
+			</div>			
+	</div>
+	
+	
+	<div id="cylxr" class="xzqsyj" style="min-height:120px;">
+		<div class="font-color-blue xzyj">添加至</div>
+		<div id="cylxrHtml">
+			<div class="font-color-rm div-xz" style="font-weight:bold;">
+				<span>常用联系人</span> <input type="radio" name="lxrfz" class="ky" value="cylxr" checked style="margin-top:13px;"/>
+			</div>		
+			<div id="tc_lxr">
+				
+			</div>	
+		</div>
+		<div class="an_jh">
+			<div class="an_yj" onclick="xzlxr();" style="border-right:1px solid #cccccc;">
+				确定
+			</div>
+			<div class="an_yj" onclick="$('#cylxr').css('display', 'none');$('#floatdiv').css('display', 'none');">
+				取消
+			</div>
+		</div>
+	</div>	
+	
+	<div id="floatdiv" class="floatdiv"></div>
+	
+	<div id="xzsfbm" class="xzqsyj" style="min-height:80px;">
+		<div  class="font-color-rm div-xz" style="margin-top:10px;border-bottom:0px;height:auto">
+			<span id="sendname"></span>
+		</div>
+		<div class="font-color-rm div-xz" style="border-bottom:none;height: auto;max-height:230px;overflow: auto;font-size:14px;color:gray"  id="sendcontent"  contenteditable="true">
+			<!-- <span style="font-size:14px;color:gray"  id="sendcontent"></span> -->
+		</div>
+		<div class="an_jh" style="border-top:1px solid #e7e7e7">
+			
+			<div class="an_yj" onclick="$('#xzsfbm').css('display', 'none');$('#floatdiv').css('display', 'none');">
+				取消
+			</div>
+			<div class="an_yj" onclick="$('#xzsfbm').css('display', 'none');$('#floatdiv').css('display', 'none');transsend()" style="border-left:1px solid #e7e7e7;">
+				发送
+			</div>
+		</div>	
+		<input type="hidden" name="senderid" id="sendid"/>
+		<input type="hidden" name="sendername" id="sendname"/>
+		<input type="hidden" name="receiveid" id="receiveid"/>
+		<input type="hidden" name="receivename" id="receivename"/>
+			
+	</div>	
+	<div id="floatdiv" class="floatdiv"></div>
+</body>
+</html>

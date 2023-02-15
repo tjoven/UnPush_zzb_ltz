@@ -1,0 +1,208 @@
+<!doctype html>
+<html>
+  <head>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+    <title>党员信息</title>
+    <link rel="stylesheet" type="text/css" href="../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../css/base.css" />  
+    <script type="text/javascript" src="../gmu/js/gmu.js"></script> 
+	<script type="text/javascript" src="../js/ict.js"></script>
+    <script type="text/javascript" src="../js/local.js"></script>
+    <script type="text/javascript">  	
+		$(function(){
+		   $('#toolbar').toolbar();
+			var lxid = getQueryStringRegExp("lxid");
+			var wd = getQueryStringRegExp("wd");
+			var yhid ;
+			if(lxid == ''){
+				yhid =  getQueryStringRegExp("yhid");
+				
+			}else{
+				yhid = lxid.substring(2);
+			}
+			if(yhid){
+				  sys_ajaxGet("/jcdj/dygl/dfjn/dyxxcx/default.do?method=showDyxx&guid="+yhid,function(json){
+					  bind(json);
+					  $("#jwd").text(json.formData.jd+"，"+json.formData.wd);
+					   if(json.formData && json.formData.pic){//alert(123);
+			               //绑定图片
+				         if(json.formData.pics){
+				    	   var pic,imgStr="";
+				    	   for(var i=0;i<json.formData.pics.length;i++){
+				    		   pic = json.formData.pics[i];
+				    		   lj=json.formData.hyxc_lj+pic.wjlj;//alert(lj);
+					    	   imgStr= imgStr+" <img name='imgname' src='"+getUrl()+lj+"?size="+json.phone_ysdx+"' />&nbsp; <a href='"+getUrl()+lj+"'>原图</a><br/><br/>";
+					    	  
+				    	   }	    	 
+				    	   if(imgStr){
+				    	     
+				    		   $("#imgShow").html(imgStr);
+				    	   }
+				        }
+			          } 
+			          //附件
+			          	if(json.formData){
+					        	var fjhtml = getFj(json.formData);
+					        	$("#_fujian").html(fjhtml);
+	        	        }
+			           
+					     var _height = getListHeight();
+					     $("#sys_innerscoll").height(window.innerHeight-_height);
+			             innerscroll = new iScroll("sys_innerscoll",{click:true});
+			             var imgs = document.getElementsByName("imgname");
+	  		             for(var i=0;i<imgs.length;i++){
+		 				      imgs[i].onload  = function(){
+						       innerscroll.refresh();
+			  		          }	
+				             
+			              }
+			               sys_autoTextarea(innerscroll); 			 			 
+				  });
+			}		
+		
+		   $("#btn_bak").click(function(){
+		  
+		   	if(wd == 'wd'){
+		   		sys_goURL("../oa/system/grzx.html");
+		   	}else{
+		   		 sys_goURL("ryxz.html");
+		   	}
+			  
+		   });			   
+		});
+		
+		
+		/*点击姓名，跳转到党员一栏界面 modify by lxs*/
+		function goToDyyl(){
+			var url = location.href.toString();
+			url = url.substr(0,url.indexOf("djypt"));
+			location.href = url + "djypt/wap_html/dyyl/list.html";
+		}
+    </script> 
+     <style type="text/css">
+        .ui-toolbar-wrap{
+   		   //background-color: #FFB73E;
+   		   border: none !important;
+  		}
+    	.bx{
+		   color:red;
+	    }
+    	
+    </style>         
+  </head>
+  <body>
+    <div id="toolbar">
+	    <span id ="btn_bak" class="btn_bak"></span>
+	    <h1 class="toolbar_title" >党员信息</h1> 
+	</div>
+	<div id="sys_innerscoll">
+    <div>
+	    <form id="frm1">
+        <input type="hidden" name="guid" id="guid"/>
+       
+        <input type="hidden"  name="jd" id="jd"  />
+        <input type="hidden"  name="wd" id="wd"  />
+        <input type="hidden"  name="pic" id="pic" />     
+        <input type="hidden"  name="lj" id="lj"/>
+       <div  class="c_form_show">
+        <div > 
+         <div class="form_cell_label" >姓名：</div>
+          <div class="form_cell_item">
+             <div id="xm" onclick="javascript:goToDyyl();"></div>
+          </div>
+         
+       </div>       
+       <div >
+         <div class="form_cell_label" >性别：</div>
+          <div class="form_cell_item">
+            <div id="sex_mc"></div>
+          </div>
+       </div>       
+       <div >
+         <div class="form_cell_label" >出生日期：</div>
+          <div class="form_cell_item">
+           <div id="birthday"></div>
+          </div>
+       </div>          
+        <div  >
+         <div class="form_cell_label" >民族：</div>
+          <div class="form_cell_item">
+               <span id="mz_mc"></span>
+          </div>
+       </div>      
+          
+        <div  >
+         <div class="form_cell_label" >政治面貌：</div>
+          <div class="form_cell_item">
+               <div id="zzmm_mc"></div>
+          </div>
+       </div>  
+        
+         <div  >
+         <div class="form_cell_label" >身份证号：</div>
+          <div class="form_cell_item">
+               <div id="sfz"></div>
+          </div>
+       </div> 
+          <div  >
+         <div class="form_cell_label" >学历：</div>
+          <div class="form_cell_item">
+               <div id="xl_mc"></div>
+          </div>
+       </div>  
+        <div  >
+         <div class="form_cell_label" >籍贯：</div>
+          <div class="form_cell_item">
+               <div id="jg"></div>
+          </div>
+       </div>  
+        <div  >
+         <div class="form_cell_label" >任职单位：</div>
+          <div class="form_cell_item">
+               <div id="rzdw"></div>
+          </div>
+       </div>  
+        <div  >
+         <div class="form_cell_label" >单位职务：</div>
+          <div class="form_cell_item">
+               <div id="dwzw"></div>
+          </div>
+       </div>
+        <div  >
+         <div class="form_cell_label" >党内职务：</div>
+          <div class="form_cell_item">
+               <div id="dnzw_mc"></div>
+          </div>
+       </div> 
+        <div  >
+         <div class="form_cell_label" >手机号：</div>
+          <div class="form_cell_item">
+               <div id="sj"></div>
+          </div>
+       </div> 
+        <div  >
+         <div class="form_cell_label" >家庭地址：</div>
+          <div class="form_cell_item">
+               <div id="jtdz"></div>
+          </div>
+       </div> 
+        <div  >
+         <div class="form_cell_label" >入党日期：</div>
+          <div class="form_cell_item">
+               <div id="rdrq"></div>
+          </div>
+       </div>
+        <div  >
+         <div class="form_cell_label" >转正日期：</div>
+          <div class="form_cell_item">
+               <div id="zzrq"></div>
+          </div>
+       </div>         
+       </div>              	
+    	  <div id="imgShow" style="text-align:center" > </div> 
+    	 </form>   	
+    	</div>
+	 </div>
+	</body>
+</html>

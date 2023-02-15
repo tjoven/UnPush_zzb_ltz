@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>离退休干部党支部学习参考</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+<link type="text/css" rel="stylesheet" href="../../css/iconfont/iconfont.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+<script type="text/javascript">
+	//var lb_dm=8103;
+	var dm = getQueryStringRegExp("lb_dm"); // 列表类型，所有页面都使用一个列表页
+	var nm = getQueryStringRegExp("nm");
+	$(function() {
+		//生成toolbar
+		$('#toolbar').toolbar();
+		imgList(dm);
+	});	
+   function imgList(lb_dm){
+       sys_ajaxGet("/ltz/publication/wap.do?method=getInfoByLbdm",{lb_dm:dm},function(json){
+            var html_str='';
+            if(json.imglist.length>0){
+			       if(json.imglist.length>0){
+			          html_str=html_str+"<div class='row'>";
+			       }          
+		                 for(var i = 0;i<json.imglist.length;i++){
+							if(i%3==0){
+							   html_str=html_str+'</div> <div class="row">';				 
+							}
+							html_str=html_str+"<div class='item'>";
+							   html_str=html_str+"<div class='item_img'><div ><img class='item_img_small' src='"+getUrl()+json.imglist[i].imgurl+"' onclick=download('"+json.imglist[i].pdfid+"') /></div></div>";
+							   html_str=html_str+"<div class='item_text' onclick=download('"+json.imglist[i].pdfid+"')>"+json.imglist[i].bt+"</div>";
+							html_str=html_str+"</div>";
+						} 
+						if(!(json.imglist.length>0&&json.imglist.length%3==0)){
+						  html_str=html_str+"</div>";
+						}
+						$("#main").append(html_str);//alert(html_str); 
+						$('#main').height(180*Math.ceil(json.imglist.length/3)+30);	
+						var _height = getListHeight();
+			        	$("#sys_innerscoll").height(window.innerHeight-_height);
+			        	var innerscroll = new iScroll("sys_innerscoll",{click:true}); 
+	        }else{
+	          $("#main").append("没有数据！"); 
+	        }  
+        });                      
+   }
+	function download(pdfid){
+	    sys_ajaxGet("/ltz/publication/wap.do?method=getUrlByZid",{pdfid:pdfid},function(json){
+		      if(json.pdfurl==undefined||json.pdfurl==""){
+		         sys_alert("该文件有问题");
+		      }else{
+		         window.location.href=getUrl()+json.pdfurl;
+		      }	       
+	    });
+	}
+	 function go_back(){	 	      
+        sys_goURL("list.html?nm="+nm);     		
+     }	
+		
+</script>
+
+<style type="text/css">
+   .ui-toolbar-wrap{
+	    border: none !important;
+    }
+  	li{
+    	list-style-type:none;
+    }
+  		
+	  .main{
+	    //padding: 10px 0px 0px 0px;
+	    margin: 15px;
+	    text-align: center;
+      }
+      .row{
+	    display:-webkit-box;
+	     //border: 1px solid red;
+      }
+	  .row>div{
+	     width: 33.333%;
+		 //height: 160px;
+		 //border: 1px solid black;
+		}	
+		.item{
+		  display: -webkit-box;
+		  -webkit-box-orient: vertical; 
+		}
+		.item_img{
+		   height:130px;
+		   //border:1px solid black;
+		   display: -webkit-box;
+		   -webkit-box-pack: center;
+		   -webkit-box-align: end; 
+		}
+		.item_img_small{
+		    width:90px;
+			height:120px;
+		}
+		.item_text{	   
+		    //height:32px;
+			display:-webkit-box;
+			-webkit-box-pack:center;
+			-webkit-box-align:center;
+
+			overflow: hidden;		    
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			word-break: break-all;
+			font-size: 14px;
+			margin: 5px 10px;
+			
+			text-overflow:ellipsis;
+			display:-webkit-box; 
+			-webkit-box-orient:vertical;
+			-webkit-line-clamp:2; 
+		}
+</style>
+
+</head>
+<body>
+	<div id="toolbar">
+		<span class="btn_bak" onclick="go_back()"></span>
+		<h1 class="toolbar_title">离退休干部党支部学习参考</h1>
+	
+	</div>
+	
+	<div class="c_tabs div_other_40" id="div_tabs" style="display: none;" ></div>
+	<div id="sys_innerscoll">
+	  <div class="main" id="main">
+	       <!-- 
+	       <div class="row"> 
+		          <div class="item">
+		             <div class="item_img"><div class="item_img_small"></div></div>
+		             <div class="item_text">马克思主义理论马克思主义理论sssssssss</div>
+		          </div>
+		          <div class="item">
+		             <div class="item_img"><div class="item_img_small"></div></div>
+		             <div class="item_text">dddddd</div>
+		          </div>
+		         <div class="item">
+		             <div class="item_img"><div class="item_img_small"></div></div>
+		             <div class="item_text">ddddddd</div>
+		          </div>
+	      </div> 
+	       -->
+	  </div>
+	 </div>
+</body>
+</html>

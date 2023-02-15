@@ -1,0 +1,325 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+    <title>详情</title>
+    <link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link type="text/css" rel="stylesheet" href="../../css/iconfont/iconfont.css" />
+    <script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+    <script type="text/javascript" src="../../js/ict.js"></script>
+    <script type="text/javascript" src="../../js/local.js"></script>
+    <script type="text/javascript">
+        sys_addMeun = false;
+        var guid = null;
+        var clientWidth=window.innerWidth;
+        var innerscroll=null;
+        //去掉前后空格
+        function trim(str)
+        {
+            return str.replace(/(^\s*)|(\s*$)/g, "");
+        }
+
+        $(function(){
+            //生成toolbar
+            $('#toolbar2').toolbar();
+            guid= getQueryStringRegExp("guid");
+
+            sys_ajaxGet("/ltz/lndx/default.do?method=showXxjl",{guid:guid},function(json){
+                bind(json);
+                if(json.formData.content && json.formData.content.length>0){
+                    var content = replaceImgPath(json.formData.content);
+                    $("#content").html(content);
+                }
+                if(json.formData){
+                    var fjhtml = getFj(json.formData);
+                    //$("#_fujian").html(fjhtml);
+                    if(fjhtml==""){
+                        $(".c_fujian").hide();
+                    }else{
+                        $("#_fujian").html(fjhtml);
+                        $(".c_fujian").show();
+                    }
+                }
+
+                $(".c_message").show();
+                $("#btn_msg").show();
+
+                var imgs=document.getElementsByTagName("img");
+                if(imgs.length>0){
+                    var imgArr = [];
+                    for (var i = 0; i < imgs.length; i++) {
+                        imgArr.push(imgs[i].src);
+                    }
+                    var imageArr = [];
+                    var n = 0;
+                    for (var j = 0; j < imgArr.length; j++) {
+                        imageArr.push(new Image());
+                        imageArr[j].src = imgArr[j];
+                        imageArr[j].onload  = function(){
+                            n++; //每加载完成一张图片就累加1
+                            if (n == imageArr.length) {//全部图片加载完成
+                                showImg();
+                                //设置内容内滚动
+                                var _height = getListHeight();//alert(window.innerHeight-_height);
+                                $("#sys_innerscoll").height(window.innerHeight-_height - 50);
+                                innerscroll = new iScroll("sys_innerscoll",{click:true});
+                            }
+                        };
+                    }
+                }else{
+                    var _height = getListHeight();
+                    $("#sys_innerscoll").height(window.innerHeight-_height - 50);
+                    innerscroll = new iScroll("sys_innerscoll",{click:true});
+                }
+                var title_mc="详情";
+                //$(".toolbar_title").text(json.lbmc);
+                LoadMsgList(guid);
+            });
+
+
+        });
+        //加载回复列表
+        function LoadMsgList(themeid){
+            sys_ajaxGet('/ltz/lndx/default.do?method=msgList&page_size=100000',{themeid:themeid},function(json){
+                var msgList = json.msgList;
+                pls = json.pls;
+                $('#pls').html(pls+"");
+                if(msgList.length>0){
+                    bindSsp(msgList);
+                }
+                innerscroll.refresh();
+            });
+        }
+        function bindSsp(list){
+            if(list.length>0){
+                var sspHtml="";
+                for(var i=0;i<list.length;i++){
+                    sspHtml+="<div class='row'>";
+                    sspHtml+=" <div><span class='c_xm'>"+list[i].hfr+"</span><span class='c_time'>"+list[i].cjsj+"</span></div>";
+                    sspHtml+="<div class='c_nr'>"+list[i].content+"</div>";
+                    sspHtml+="<div class='c_hr'></div>";
+                    sspHtml+="</div>";
+                }
+                $('#msgList').html("");
+                $('#msgList').html(sspHtml);
+            }
+        }
+
+        function closeDivpic(){
+            var mask = $("#sys_mask_lyfk");
+            mask.css('display','none');
+            var div=$("#div_lyfk");
+            $(div).css("bottom",'-251px');
+        }
+        function openDiv(){
+            window.event.stopPropagation();
+            var mask = $("#sys_mask_lyfk");
+            if(mask.length==0){
+                var maskHTML = '<div id="sys_mask_lyfk" onclick="closeDivpic();"></div>';
+                $("body").append(maskHTML);
+            }
+            mask.css('display','-webkit-box');
+            var div=$("#div_lyfk");
+            $(div).show();
+
+            $("#div_lyfk").width(window.innerWidth);
+            $(div).css("bottom",'0px');
+        }
+
+        function back() {
+            sys_goURL("xxjl.html");
+        }
+        function submit_msg(){
+            if($.trim($("#hfcontent").val())==""){
+                sys_alert("请输入您要发表的言论。");return;
+            }
+            if (guid != "") {
+                //校验
+                var queryString = "hfcontent="+$("#hfcontent").val();
+                queryString += "&themeid="+guid;
+                sys_ajaxPost("/ltz/lndx/default.do?method=saveJlhf", queryString, function(data) {
+                    if(data.result){
+                        pls = data.pls;
+                        $('#pls').html(pls+"");
+                        sys_alert(data.msg);
+                        closeDivpic();
+                        join_msgStr(data.yhxm,$("#hfcontent").val());
+                        $("#hfcontent").val("");
+                        innerscroll.refresh();
+                    }else{
+                        sys_alert(data.msg);
+                    }
+                });
+            }
+        }
+        function join_msgStr(xm,nr){
+            var str="";
+            str+="<div class='row'>";
+            str+=" <div><span class='c_xm'>"+xm+"</span><span class='c_time'>刚刚</span></div>";
+            str+="<div class='c_nr'>"+nr+"</div>";
+            str+="<div class='c_hr'></div>";
+            str+="</div>";
+            $("#msgList").prepend(str);
+        }
+
+    </script>
+    <style type="text/css">
+        .c_item_value{
+            padding-top: 15px;
+            font-size:.8em;
+        }
+        .c_item_container{
+            min-height: 46px;
+            border-bottom: 1px solid #DDD;
+
+        }
+
+        .ui-toolbar-wrap{
+        //background-color: #FFB73E;
+            border: none !important;
+        }
+        .c_div_nr{
+            margin: 20px;
+        }
+        #hfcontent{
+            width:100%;
+            border: 1px solid #ddd;
+            height:150px;
+            color: #737373;
+            border-radius: 4px;
+        }
+        #sys_mask_lyfk{
+            position: fixed;
+            bottom: 0px;
+            top: 0px;
+            width: 100%;
+            z-index: 98;
+            background: #878787;
+            opacity:0.5;
+            display: -webkit-box;
+            -webkit-box-pack: center;
+            -webkit-box-align: center;
+        }
+        #div_lyfk{
+            position:absolute;
+            width:90%;
+            height:250px;
+            bottom:-250px;
+            background:#ffffff;
+            z-index:99;
+            /*display: none;*/
+            opacity: 0.9;
+            /*color: #f94600;*/
+            font-size: 16px;
+            font-family: "微软雅黑";
+
+            -webkit-transition-property:bottom;
+            -webkit-transition-duration:0.5s;
+        }
+        .div_submit{
+            width: 80%;
+            height: 35px;
+            line-height: 35px;
+            margin: 15px auto 0px auto;
+            -webkit-border-radius: 4px;
+            background-color: #E41213;
+            font-family: 微软雅黑;
+            color: white;
+            font-size: 18px;
+        //font-weight: bold;
+            text-align: center;
+        }
+        .c_xm{
+            color:#7086b5;
+            font-size:16px;
+        }
+        .c_time{
+            font-size: 14px;
+            float:right;
+            color:#999999;
+        }
+        .c_nr{
+            color:#999999;
+            font-size: 16px;
+        }
+        .c_hr{
+            height: 10px;
+            border-bottom: 1px #ddd solid;
+        }
+        .row{
+            margin: 10px;
+        }
+        .c1_message{
+            display: none;
+        }
+
+        .lyFooter {
+            margin-left:20px;
+            color:#bbb;
+            background-color:#efefef;
+            border:1px solid #ddd;
+            height:30px;
+            border-radius:5px;
+            width:68%;
+            font-size:16px;
+        }
+
+        .plsFooter {
+            float:right;
+            background:url('../../img/pls.png')  no-repeat 0 90%;
+            padding-left:25px;
+            margin-right:15px;
+            background-size:20px 20px;
+            background-position:left;
+            color:#999;
+        }
+        .div_footer {
+            backgroud-color:#f40;
+            height:50px;
+            position: fixed;
+            bottom: 0;
+            width:100%;
+            line-height:50px;
+            box-shadow:0px -5px 5px #eae4e4;
+        }
+    </style>
+</head>
+<body>
+<div id="toolbar2">
+    <span class="btn_bak"  onclick="sys_closeDetail();"></span>
+    <h1 class="toolbar_title">学习交流</h1>
+    <!--    <span id="btn_msg"  class="btn_toolbar_font" style="font-size: 16px;color: #FFFFFF;display: none" onclick="openDiv()">留言</span>-->
+</div>
+
+<div id="sys_innerscoll">
+    <div style="margin:0px 8px;">
+        <div style="width:100%;font-size:18px;font-weight:bold;margin-top:15px;text-align:center;text-overflow:ellipsis;-o-text-overflow:ellipsis;overflow:hidden;" id="theme"></div>
+        <div style="width:100%;font-size:12px;color:#BFBFBF;margin-top:15px;padding-left:10px;text-align:left;text-overflow:ellipsis;overflow:hidden;"><span id="fbr"></span><span style="float: right;margin-right: 2%;" id="cjsj"></span></div>
+        <div><hr style="width:96%;"/></div>
+        <div class="c_item_value2" id="content"></div>
+        <div style="height:25px;"></div>
+        <div style="height:5px;"></div>
+        <div id="msgList" class="c_message"></div>
+        <div style="height:25px;"></div>
+    </div>
+
+    <div class='div_lyfk' id="div_lyfk" style="display: none">
+        <div class='c_div_nr'>
+            <textarea id='hfcontent' name='hfcontent' placeholder='请输入您需要发布的言论。'></textarea>
+        </div>
+        <div class='div_submit' onclick='submit_msg()'>发  表</div>
+    </div>
+
+</div>
+<!-- 留言框 -->
+<div    onclick='openDiv()' class="div_footer" id="btn_msg">
+    <input type="text" value="&nbsp;&nbsp;&nbsp;&nbsp;我要发表" class="lyFooter"  onclick='openDiv()' disabled/>
+    <span class="plsFooter" id="pls">0</span>
+</div>
+
+
+
+</body>
+</html>

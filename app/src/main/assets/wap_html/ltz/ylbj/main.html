@@ -1,0 +1,226 @@
+<!doctype html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=1.0,maximum-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../pub.css" />
+    <link rel="stylesheet" type="text/css" href="../../main.css" />
+    <link rel="stylesheet" type="text/css" href="zhfw/zhfw.css" />
+    <script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+    <script type="text/javascript" src="../../js/ict.js"></script>
+    <script type="text/javascript" src="../../js/local.js"></script>
+
+    <script type="text/javascript">
+        var dm = getQueryStringRegExp("dm"); // 列表类型，所有页面都使用一个列表页
+        var nm = getQueryStringRegExp("nm");
+        var innerscroll = null;
+        var width = $(document).width();
+        //var height = $(document).height() - 52 - 240 - 72;
+        var height = $(document).height() - 140 - 240 - 72;
+        var cx_bmid = window.localStorage.getItem("bmid");
+        $(function() {
+            initScroll();
+            $('#toolbar').toolbar();
+            if(nm == ''){
+                nm=0;
+            }
+            $(".c_tabs_text").eq(nm).addClass("c_tabs_active");
+        });
+
+        //设定界面可拖动
+        function initScroll(){
+            $("#div_main").height(window.innerHeight-172);
+            innerscroll = new iScroll("div_main", {
+                click : true
+            });
+        }
+
+        //调到各个功能模块
+        function gourl(id) {
+            var url = null;
+            if (id == "zydj") {//住院登记
+                url = "zygl.html";
+            } else if (id == "sqyl") {//社区医疗
+                url = "sqyl.html";
+            } else if (id == "jypt") {//家医平台
+                url = "jypt.html";
+            } else if (id == "yyjs") {//常用医院
+                url = "cyyy.html";
+            }else if(id=="ghfw"){//挂号服务
+                sys_goURL("../events/demandAndHandle/main.html");
+            }else if(id=="114gh"){//114挂号
+                goZxgh("https://www.114yygh.com/");
+                return;
+            }else if(id=="jkcz"){//健康常在
+                sys_goURL("../../publish/common.html?lb_dm=73650&backUrl=/ltz/ylbj/main.html");
+            }else if(id=="jkjz"){//健康讲座
+                sys_goURL("../../publish/common.html?lb_dm=74320&backUrl=/ltz/ylbj/main.html");
+            }
+            sys_goURL(url);
+        }
+        function goZxgh(param) {
+            if(isAndriod){
+                window.webview.loadurl_embed(param);
+            }else if(isIphone){
+                window.location.href='obj-c://outside//'+param;
+            }else{
+                var iTop = (window.screen.availHeight - 30 - 365) / 2;
+                var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+                window.open(param, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+            }
+            return;
+        }
+
+        function back(){
+            sys_goURL("../../main.html");
+        }
+
+    </script>
+    <style type="text/css">
+        .ui-toolbar-button{
+            border: 1px solid #D2D2D2;
+        }
+
+        table{
+            margin-top:20px;
+        }
+
+        td {
+            height: 75px;
+            text-align: center;
+            font-size: 15px;
+            font-family: "微软雅黑";
+            color: #4B5052;
+            /*border:1px solid #edf0f5;*/
+        }
+
+        .item_smallButton_my_img {
+            margin-left:20px;
+            height: 50px;
+            width: 50px;
+            background-repeat: round;
+            background-size: cover;
+            margin-top: 20px;
+            float:left;
+        }
+
+        .item_smallButton_my_text{
+            float:left;
+            margin-top:20px;
+            height: 50px;
+            line-height:50px;
+            font-size:16px;
+            margin-left:10px;
+            width: 80px;
+        }
+        img{
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+    <title>医疗保健</title>
+</head>
+<body style="background-color:#ffffff;">
+
+<div id="toolbar" >
+    <span id="btn_bak" class="btn_bak" onclick="back();" ></span>
+    <h1 class="toolbar_title" >医疗保健</h1>
+</div>
+<div id="div_main" class="div_main" style="margin:0 auto;">
+
+    <!-- 小图标 start-->
+    <table style="border-spacing:10px;border-collapse:separate;" class="mainbox" width="100%"  >
+
+        <tr class=" border_top_my">
+            <td width="50%" onclick="gourl('zydj')">
+                <!--<div class="" >
+                    <div class="item_smallButton_my">
+                        <div class="item_zygl item_smallButton_my_img"></div>
+                        <div class="item_smallButton_my_text">住院登记</div>
+                    </div>
+                </div>-->
+                <img src="zhfw/img/zydjs.png">
+            </td>
+            <td onclick="gourl('yyjs')">
+                <!--<div class="">
+                    <div class="item_smallButton_my">
+                        <div class="item_yyjs item_smallButton_my_img"></div>
+                        <div class="item_smallButton_my_text"style="line-height: normal;">常用医院就医指南</div>
+                    </div>
+                </div>-->
+                <img src="zhfw/img/cyyys.png">
+            </td>
+        </tr>
+
+        <tr class=" border_top_my">
+            <td onclick="gourl('ghfw')">
+                <!--<div class="" >
+                    <div class="item_smallButton_my">
+                        <div class="item_zxgh item_smallButton_my_img"></div>
+                        <div class="item_smallButton_my_text">挂号服务</div>
+                    </div>
+                </div>-->
+                <img src="zhfw/img/bdyys.png">
+            </td>
+            <td onclick="gourl('114gh')">
+                <!--<div class="">
+                    <div class="item_smallButton_my">
+                        <div class="item_114gh item_smallButton_my_img"></div>
+                        <div class="item_smallButton_my_text">114挂号</div>
+                    </div>
+                </div>-->
+                <img src="zhfw/img/114ghs.png">
+            </td>
+        </tr>
+
+        <tr class=" border_top_my">
+            <td onclick="gourl('sqyl')">
+                <!--<div>
+                    <div class="item_smallButton_my">
+                        <div class="item_sqyy item_smallButton_my_img"></div>
+                        <div class="item_smallButton_my_text">社区医疗</div>
+                    </div>
+                </div>-->
+                <img src="zhfw/img/sqyls.png">
+            </td>
+            <td onclick="gourl('jkcz')">
+                <img src="zhfw/img/jkcz.png">
+            </td>
+            <!--<td onclick="dadianhua('010-51669752')">-->
+                <!--<div class="">
+                    <div class="item_smallButton_my">
+                        <div class="item_zjzx item_smallButton_my_img"></div>
+                        <div class="item_smallButton_my_text" style="line-height: normal;">24小时专家咨询</div>
+                    </div>
+                </div>-->
+                <!--<img src="zhfw/img/zjzxs.png">-->
+            <!--</td>-->
+
+         </tr>
+          <!--  <tr class=" border_top_my">
+            <td onclick="gourl('jkjz')">
+                <img src="zhfw/img/jkjz.png">
+            </td>
+            <td>
+            </td>
+
+        </tr> -->
+
+    </table>	<!-- box-end -->
+
+</div>
+<div id="div_codeShow" class="div_codeShow"></div>
+</body>
+<script>
+    function dadianhua(sj){
+        var v = "tel:"+sj;
+        window.location.href = v;
+        event.stopPropagation();
+    }
+</script>
+</html>

@@ -1,0 +1,342 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+    <title>课程报名</title>
+    <link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/list.css" />
+    <script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+    <script type="text/javascript" src="../../js/ict.js"></script>
+    <script type="text/javascript" src="../../js/local.js"></script>
+    <script type="text/javascript" src="../../js/list.js"></script>
+    <script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+    <script type="text/javascript">
+        //获取完整的日期
+        var m = null;//定义月份的全局变量
+        var date=new Date;
+        var year=date.getFullYear();
+        var month=date.getMonth()+1;
+        month =(month<10 ? "0"+month:month);//获取当前的年和月
+        m=month;
+
+        sys_addMeun = true;
+        var list = {};
+        var server_url =  window.location.protocol + "//" + window.location.host + "/";
+        // slider控件
+        var slider;
+        // slider末位置
+        var lastLoacl;
+        // slider上次滑动位置（初始为0）
+        var slideIndex = getQueryStringRegExp("slideIndex");
+        if (slideIndex == null || slideIndex == '') {
+            slideIndex = "0"
+        }
+        $(function() {
+            //生成toolbar
+            $('#toolbar').toolbar();
+            $("#toolbar h1").text("我的大学");
+
+            // $("#1").val(year);//年(input id换成year 和 month 列表绑定不上)
+            // $("#2").val(month);//月
+
+            $("#div1 ul li").eq(month-1).css("background","white");
+            $("#div1 ul li").eq(month-1).css("color","red");
+
+            // var years = $("#1").val();
+            sys_renderList('table_list', '/ltz/lndx/default.do?method=showClass&bz=all&page_size=1000&&page_goto=', {month:$("#2").val()}, list);
+            // 刷新时选中刷新前选中的tab页
+            $(".c_tabs_text").eq(1).addClass("c_tabs_active");
+            $("#div_all").attr("class","active");
+            // 创建slider
+            slider = new TouchSlider('div_tabs', {
+                auto : false,
+                align : 'left',
+                mousewheel : false,
+                mouse : true,
+                fullsize : false,
+                after : doSlideAfter
+            });
+            // 设定slider展示宽度为页面宽度
+            var clientWidth = document.body.clientWidth;
+            $(".div_tabs").css("width", clientWidth + "px");
+            $(".slideritem").css("width", (clientWidth / 4) + "px");
+            // 取得slider末index
+            lastLoacl = slider.length - 2;
+            // slider滑动到上次滑动位置
+            slider.slide(parseInt(slideIndex), 0);
+        });
+
+
+        // tab左右滑动后记录滑动位置(末屏未填满时滚动填满)
+        function doSlideAfter(newIndex, newSlide) {
+            slideIndex = newIndex;
+            if (lastLoacl <= 0) {
+                slider.slide(0);
+                slideIndex = 0;
+            } else if (newIndex > lastLoacl && lastLoacl > 0) {
+                slider.slide(lastLoacl);
+                slideIndex = lastLoacl;
+            }
+        }
+        function getNm(num){
+            if(num==0){
+                sys_goURL("kcxx.html");
+            }else if (num == 1){
+                sys_goURL("kcap.html");
+            }/* else if (num == 2) {
+                sys_goURL("xxjl.html");
+            }*/ else if (num == 3) {
+                sys_goURL("fczs.html");
+            }else if (num == 4) {
+                sys_goURL("wlkc.html");
+            }
+        }
+
+        function go_back() {
+            sys_goURL("../../main.html");
+        }
+        function getCourse(bz){
+            if (bz=='all'){
+                $("#div_all").attr("class","active");
+                $("#div_my").removeAttr("class","active");
+            } else {
+                $("#div_my").attr("class","active");
+                $("#div_all").removeAttr("class","active");
+            }
+            search(m,bz);
+            $("#div1 ul li").css("background","#d62724");
+            $("#div1 ul li").css("color","white");
+            $("#div1 ul li").eq(m-1).css("background","white");
+            $("#div1 ul li").eq(m-1).css("color","red");
+        }
+        function search(t,bz){
+            sys_ajaxGet("/ltz/lndx/default.do?method=showClass&month="+t+"&bz="+bz+"&page_size=1000&page_goto=",function(json){
+                bind(json,'up');
+                list["table_list"].refresh();
+                list['table_list'].scrollTo(0,0,500,false);
+            });
+            $("#div1 ul li").css("background","#d62724");
+            $("#div1 ul li").css("color","white");
+            $("#div1 ul li").eq(month-1).css("background","white");
+            $("#div1 ul li").eq(month-1).css("color","red");
+        }
+    </script>
+
+    <style type="text/css">
+        .ui-toolbar-wrap {
+            border: none !important;
+        }
+
+        li {
+            list-style-type: none;
+        }
+
+        .c_tabs {
+            height: 40px;
+            width: 100%;
+            background-color: white !important;
+            display: block;
+            border-bottom: #dddddd solid 1px
+        }
+
+        .c_tabs>div {
+            -webkit-box-flex: 1;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            font-size: 15px;
+            font-family: "微软雅黑";
+            /* display:none; */
+            color: #4B5052;
+        }
+
+        .c_tabs_active {
+            color: #FF4854;
+            border-bottom: 2px solid #FF4854;
+            height: 39px !important;
+        }
+
+        .c_tabs_text {
+            display: inline-block;
+        }
+
+        .swipe {
+            /* margin-bottom:20px; */
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            width: 337px;
+        }
+
+        .swipe div {
+            overflow: hidden;
+        }
+        #table_list span{
+            display: inline-block;
+            /*text-align: center;*/
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+            word-break:keep-all;
+        }
+        th{
+            font-size: 19px;
+        }
+        #div1{
+            height: 120px;
+            padding: 15px;
+        }
+        ul{
+            list-style: none;
+            clear: both;
+        }
+        #div1 ul li{
+            width: 18%;
+            height: 45px;
+            background: #d62424;
+            color: #fff;
+            float: left;
+            text-align: center;
+            margin: 5px;
+            padding: 4px;
+            margin-left: 3%;
+        }
+        #div1 div{
+            background: #fff;
+            padding: 5px;
+            margin: 10px 5px 0 5px;
+        }
+        .active{
+            color: #FF4854;
+            border-bottom: 2px solid #FF4854;
+            height: 39px !important;
+        }
+    </style>
+    <script>
+        window.onload = function(){
+            var odiv = document.getElementById('div1');
+            var oli = odiv.getElementsByTagName('li');
+            for(var i = 0; i < oli.length; i++){
+                oli[i].index = i;
+                oli[i].onclick = function(){
+                    for(var i = 0; i < oli.length; i++) {
+                        oli[i].style.background = '#d62724';
+                        oli[i].style.color = '#fff'
+                    }
+                    this.style.background = 'white';
+                    this.style.color = "red";
+                }
+            }
+        };
+        function getM(num){
+            var t = "";
+            if (num<10){
+                t="0"+num;
+            }else {
+                t=num;
+            }
+            var bz="all";
+            $("#div_all").attr("class","active");
+            $("#div_my").removeAttr("class","active");
+            m=t; //把点击的月份值赋给m
+            search(t,bz);
+
+        }
+    </script>
+    <style>
+        #div_tabs{
+            width: 100% !important;
+            left: 0 !important;
+        }
+    </style>
+</head>
+<body>
+<div id="toolbar">
+    <i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+    <h1 class="toolbar_title">我的大学</h1>
+</div>
+
+<div class="c_tabs div_other_40" id="div_tabs" >
+    <div class="slideritem" id="div_list1"
+         style="display: block; width:150px;">
+        <div class="c_tabs_text" onclick="getNm(0)">课程报名</div>
+    </div>
+    <div class="slideritem" id="div_list2"
+         style="display: block; width:150px;">
+        <div class="c_tabs_text" onclick="getNm(1)">课程安排</div>
+    </div>
+    <!--<div class="slideritem" id="div_list3"-->
+         <!--style="display: block; width:150px;">-->
+        <!--<div class="c_tabs_text" onclick="getNm(2)">学习交流</div>-->
+    <!--</div>-->
+    <div class="slideritem" id="div_list4"
+         style="display: block; width:150px;">
+        <div class="c_tabs_text" onclick="getNm(3)">风采展示</div>
+    </div>
+    <div class="slideritem" id="div_list5"
+         style="display: block; width:150px;">
+        <div class="c_tabs_text" onclick="getNm(4)">网络课程</div>
+    </div>
+</div>
+<div class="ui-refresh" id="div_table_list">
+
+    <div id="div_search" class="list_div_search div_other_50" style="display: none;">
+        &nbsp;&nbsp;&nbsp;年：<input type="text" id="1" class="list_search_input" style="width: 29%;margin-left: 10px;" placeholder="按年查询" >
+        月：<input type="text" id="2" class="list_search_input" style="width: 29%;margin-left: 10px;" placeholder="按月查询" >
+    </div>
+    <div id="div1">
+        <ul>
+            <li id="yi" style="display: none;"><span onclick="getM(1)"><b>1</b><p>一月</p></span></li>
+            <li id="er" style="display: none;"><span onclick="getM(2)"><b>2</b><p>二月</p></span></li>
+            <li id="san"><span onclick="getM(3)"><b>3</b><p>三月</p></span></li>
+            <li id="si"><span onclick="getM(4)"><b>4</b><p>四月</p></span></li>
+            <li id="wu"><span onclick="getM(5)"><b>5</b><p>五月</p></span></li>
+            <li id="liu"><span onclick="getM(6)"><b>6</b><p>六月</p></span></li>
+            <li id="qi" style="display: none;"><span onclick="getM(7)"><b>7</b><p>七月</p></span></li>
+            <li id="ba" style="display: none;"><span onclick="getM(8)"><b>8</b><p>八月</p></span></li>
+            <li id="jiu"><span onclick="getM(9)"><b>9</b><p>九月</p></span></li>
+            <li id="shi"><span onclick="getM(10)"><b>10</b><p>十月</p></span></li>
+            <li id="sy"><span onclick="getM(11)"><b>11</b><p>十一月</p></span></li>
+            <li id="se"><span onclick="getM(12)"><b>12</b><p>十二月</p></span></li>
+        </ul>
+    </div>
+    <hr/>
+    <div style="width: 100%;text-align: center;border-bottom: 2px solid lightgrey;" id="lb" >
+        <div style="display:inline-block;width: 48%;height: 39px;" id="div_all" onclick="getCourse('all')">
+            全部课程
+        </div>
+        <div style="display:inline-block;width: 48%;height: 39px;" id="div_my" onclick="getCourse('my')">
+            我的课程
+        </div>
+    </div>
+    <div class="ui-refresh" id="div_table_list">
+        <!--<div class="ui-refresh-up" id="ui-refresh-up"></div>-->
+        <ul class="data-list" id="table_list" style="list-style-type:none">
+            <li style="display: none;" >
+                <div style="display: none;">{guid}</div>
+                <!-- 点击行的参数 -->
+                <div class="list_row_con" style="height:70px;min-height:65px;background-color: #ffffff;" >
+
+                    <div class="list_row_col1" style="width:15px;"></div>
+                    <div class="list_row_col2" style="width:100%;">
+                        <div class="list_row_col2_1 overflow" style="padding-top: 10px;">
+                            <span style="width:30%;">{kcmc}</span>
+                            <span style="width:65%;">{skdd}</span>
+                        </div>
+                        <div class="list_row_col2_2 overflow" style="top:2px;">
+                            <div style="width:30%;display:inline-block;text-align:left;">{sksj}</div>
+                            <div style="width:20%;display:inline-block;text-align:left;margin-left: 10px;">{weekday}</div>
+                            <div style="width:40%;display:inline-block;text-align:left;margin-left: 10px;">{hh}</div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <div class="ui-refresh-down"></div>
+    </div>
+</div>
+</body>
+</html>

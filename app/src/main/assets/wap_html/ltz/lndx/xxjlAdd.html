@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+    <title>交流新建</title>
+    <link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/list.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/mobiscoller.css" />
+    <script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+    <script type="text/javascript" src="../../js/ict.js"></script>
+    <script type="text/javascript" src="../../js/local.js"></script>
+    <link href="../../bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <script type="text/javascript">
+
+        var innerscroll = null;
+        $(function() {
+            var guid = getQueryStringRegExp("guid");
+            //生成toolbar
+            $('#toolbar').toolbar();
+            //获取交流信息
+            sys_ajaxGet("/ltz/lndx/default.do?method=showXxjl&r=" + Math.random(), {guid: guid}, function (json) {
+                bind(json);
+
+            });
+            var _height = getListHeight();
+            $("#sys_innerscoll").height(window.innerHeight - _height);
+        });
+
+        function checkForm() {
+            if (trim($("#theme").val())=='') {
+                sys_alert('请输入标题');
+                return false;
+            }
+            if (trim($("#content").val())=='') {
+                sys_alert('请输入内容');
+                return false;
+            }
+
+            return true;
+        }
+        //去掉前后空格
+        function trim(str)
+        {
+            return str.replace(/(^\s*)|(\s*$)/g, "");
+        }
+
+        function save() {
+            //校验
+            if(!checkForm()) return;
+
+            var queryString = $("#form_xxjl_add").serialize();
+            sys_ajaxPost("/ltz/lndx/default.do?method=saveXxjl", queryString, function(data) {
+                if (data.result) {
+                    sys_alert("提交成功");
+                    setTimeout(function() {
+                        //sys_goURL(from+".html?guid="+guid );
+                        sys_goURL("xxjl.html");
+                    }, 1000);
+                } else {
+                    sys_alert_xgmm(data.msg);
+                }
+            });
+        }
+
+        function back() {
+            sys_goURL("xxjl.html");
+        }
+    </script>
+    <style type="text/css">
+
+        .ui-toolbar-wrap{
+            border:0px;
+        }
+        .c_form_show>div {
+            border-bottom: 0px;
+        }
+
+        td{
+            height:40px;
+            line-height:40px;
+        }
+        .c_form_title{
+            text-align:right;
+            font-size:18px;
+            font-weight:bold;
+            padding-right:15px;
+        }
+    </style>
+</head>
+<body>
+<div id="toolbar">
+    <span id="btn_bak" class="btn_bak" onclick="back();"></span>
+    <h1 class="toolbar_title">学习交流</h1>
+    <span class="btn_toolbar_font" style="color:#ffffff;" onclick="save()">发表</span>
+</div>
+<div id="sys_innerscoll">
+
+    <form id="form_xxjl_add">
+        <input type="hidden" name="guid" id="guid" />
+
+        <div class="c_form_show" style="padding:20px;">
+
+            <table style="width:100%;">
+                <tr >
+                    <td width="15%" class="c_form_title" style="text-align:left">标题</td>
+                </tr>
+                <tr>
+                    <td >
+                        <input type="text" maxlength="200" class="form-control" name="theme" id="theme" placeholder="标题" />
+                    </td>
+                </tr>
+                <tr>
+
+                    <td class="c_form_title" style="text-align:left">学习交流内容</td>
+                </tr>
+                <tr>
+                    <td >
+						<textarea class="form-control" name="content" id="content" rows="15"
+                                  placeholder="请输入内容"></textarea>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

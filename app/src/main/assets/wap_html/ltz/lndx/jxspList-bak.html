@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>教学视频</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript">
+	sys_addMeun = true;
+	var list = {};
+	var lb_dm="74150";
+	$(function() {		
+		$('#toolbar').toolbar();
+		sys_ajaxGet("/publish/wap.do?method=showTabByLBdm","lb_dm="+lb_dm,function(json2){		   
+		 	if(json2.btlmc){
+		 	  $(".toolbar_title").text(json2.btlmc);
+		 	}
+    });
+		sys_renderList('table_list', '/publish/wap.do?method=waplist&page_size=10&&page_goto=', {lb_dm:lb_dm}, list);	
+	});	
+	function callback_trclick_table_list(param) {
+		 var url = "/publish/jxspShow.html?guid=" + param + "&src=list&lb_dm=" + lb_dm ;
+		   sys_showDetail(url);
+	}
+	function go_back() {
+		sys_goURL("wlkc.html");
+	}
+</script>
+
+<style type="text/css">
+.ui-toolbar-wrap {
+	border: none !important;
+}
+
+li {
+	list-style-type: none;
+}
+.list_row_con{
+	height: 80px; min-height: 80px; background-color: #ffffff;
+}
+.list_row_col2{
+	height: 100%;
+	padding: 9px 3px 0px 12px;
+}
+.list_row_col2_1{
+	height: 50%;
+	margin-bottom: 0px;
+}
+.list_row_col2_2 {
+	width: 95%;
+	top: 8px;
+}
+
+
+</style>
+
+</head>
+<body>
+	<div id="toolbar">
+		<i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+		<h1 class="toolbar_title">教学视频</h1>
+	</div>
+
+	<div class="ui-refresh" id="div_table_list">
+		<ul class="data-list" id="table_list" style="list-style-type: none">
+			<li style="display: none;">
+				<div style='display: none;'>{guid}</div>
+
+				<div class="list_row_con" >
+				
+					<div class="list_row_col2">
+						<div class="list_row_col2_1 ">{zt}</div>
+						<div class="list_row_col2_2">
+							<span style="float: right;">{cjsj}&nbsp;&nbsp;</span>
+						</div>
+					</div>
+				</div>
+			</li>
+		</ul>
+		<div class="ui-refresh-down"></div>
+	</div>
+</body>
+</html>

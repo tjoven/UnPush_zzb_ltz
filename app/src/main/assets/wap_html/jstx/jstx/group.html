@@ -1,0 +1,322 @@
+<!doctype html>
+<html>
+<head>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+<title>群组</title>
+<link rel="stylesheet" type="text/css" href="css/oa.css?v=3" />
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>   
+<script type="text/javascript" src="js/touch.js"></script>   
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="js/jstxflag.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="js/custom.js"></script>
+<script type="text/javascript" src="js/datadumper.js"></script>
+<style type="text/css">
+	body{
+		background-color: #F7F7F7;
+		font-family: microsoft weiruanyahei;
+	}
+   	li{list-style-type:none;}
+   	
+   	 	.badge{
+   		display: inline-block;
+   		min-width: 10px;
+   		font-size: 12px;
+   		font-weight: bold;
+   		line-height: 1;
+   		color: #fff;
+   		text-align: center;
+   		white-space: nowrap;
+   		vertical-align: middle;
+   		border-radius:10px;
+   		float:right;
+   		padding: 3px 6px;
+   		background-color:red;
+   		margin-top: 24px;
+   		margin-right:50px;
+   		text-indent:0px !important;
+   	}
+.table_tabs {
+	width:100%;
+	background-color: white !important;
+	border-bottom: #dddddd solid 1px
+}
+
+.table_tabs td {
+	-webkit-box-flex: 1;
+	height: 39px;
+	line-height: 39px;
+	text-align: center;
+ 
+}
+
+
+.table_tabs_text {
+ font-size: 16px;
+	padding-bottom:9px;
+	display:inline;
+	color: #4B5052;
+}
+.table_tabs_active {
+color: #FF4854;
+	border-bottom: 2px solid #FF4854;
+}
+
+.ui-toolbar-button{
+	border:none;
+}
+ 
+.ui-toolbar-wrap { //
+	background-color: #D58900;
+	border: none !important;
+}
+</style>
+<script type="text/javascript">
+	var iscr_from = null;
+	var currId = window.localStorage.getItem("yhid");
+	var currId_ = getQueryStringRegExp("currId");
+	if(currId_) currId = currId_;
+	var yhid=window.localStorage.getItem("yhid");
+	var sjid = getSjid();
+	$(function(){
+		if(yhid!=null && yhid!="" && yhid!=undefined && yhid!="null")
+		{
+			recordCount(yhid);
+		}
+		
+		
+		//生成toolbar
+	  	$('#toolbar').toolbar({
+            fixed: true
+        });
+	  	$("#iscr_from").height(window.innerHeight - 150);
+	  	iscr_from = new iScroll("iscr_from",{checkDOMChanges:true,useTransition:true});
+	  	 
+	});
+	
+	//返回上一步
+	function goback(){
+		var guid = getQueryStringRegExp("guid");
+// 		sys_goURL("../../desk/desk.html?guid="+guid);
+		sys_goURL("../../main.html?guid="+guid);
+	}
+	
+	function jumper(ob){
+		if(0 == ob){
+			sys_goURL("message.html");
+		}else if(1 == ob){
+			sys_goURL("group.html");
+		}
+	}
+	
+	function gourl(lb_dm) {
+		$("#div_"+lb_dm).addClass("table_tabs_active");
+		if("xx"==lb_dm){
+			sys_goURL("message.html?lb_dm=" + lb_dm);
+		}else if("lxr"==lb_dm){
+			sys_goURL("lxr.html?lb_dm=" + lb_dm);
+		}else  if("qz"==lb_dm){
+			sys_goURL("group.html?lb_dm=" + lb_dm);
+		}
+	}
+	
+	window.onload = init;
+	function init(){
+		sys_ajaxPost("/jstx/default.do?method=loadGroup&userId="+currId,function(json){
+			$("#group_list > li").remove();
+           	if(json.length > 0){
+           		for(var i = 0;i < json.length; i++){
+           			var showGroupKindCount = json[i].kindcount2 == 0 ? "" : json[i].kindcount2;
+           				
+         			var v_html =	"<div class='txl_ry' " +
+         					"style='text-indent:50px;line-height:60px;height:60px;font-size:16px;font-family:\"microsoft weiruanyahei\"'>"+
+							
+         					
+             				"<div onclick='goChat(this)' id='"+json[i].group_id+"' style='width:100%'>"+
+             				
+             				"<div>"+
+             				" <img height='40px' width='40px' style='margin:6px 16px;float:left' src='./image/group.png'/>"+
+             				"</div>"+
+             				"&nbsp;&nbsp;"+
+             				"<span style ='margin-left:-10px' id='span_"+json[i].group_id+"'>"+json[i].group_name + "</span><span>&nbsp;(" + json[i].users_of_group.split(",").length + ")</span>" ;
+             			if(showGroupKindCount>0){
+             				v_html += "<span class='badge' >" + showGroupKindCount + 	"</span>" ;
+             			}	
+             			v_html +=	"</div>"+
+						"</div>";
+						$("#datahtml").append( v_html );
+           		}
+           	}else{
+           		$("#datahtml").append(
+       				"<div style='text-align:center;margin-top:200px;'>没有群组信息!</div>"
+       			);
+           	}
+		});
+	}
+	
+	 function getSjid(){
+			var sjid = getQueryStringRegExp("sjid");
+			if(sjid=='undefined' || sjid=='' || sjid==null){
+				sjid=0;
+			}
+			return sjid;
+	    }
+	
+	//跳转聊天页面
+	function goChat(ob){
+		var groupId = ob.id;
+		
+		//var groupName = ob.innerHTML.substring(0,ob.innerHTML.indexOf("("));
+		var groupName = $("#span_"+groupId+"").text()
+		sys_ajaxPost("/jstx/default.do?method=updateReadStatus&senderId="+groupId+"&receiverId="+currId+"&groupMessageSenderId=random",function(json){
+			
+		});
+		sys_goURL("groupChat.html?groupId="+groupId+"&groupName="+groupName);
+	}
+	
+	//新增群组
+	function addGroup(){
+		sys_goURL("addGroup.html");
+	}
+	
+	 function changeDiv(flag)
+	 {
+		 if(flag=='xx')
+		 {
+			 //$("#xxlb").css("color","#0973c5");
+			// $("#lxrlb").css("color","#FFF");
+			 //$("#qzlb").css("color","#FFF");
+			 sys_goURL("message.html");
+			 
+		 }else if(flag=='lxr')
+		 {
+			 //$("#xxlb").css("color","#FFF");
+			 //$("#lxrlb").css("color","#0973c5");
+			 //$("#qzlb").css("color","#FFF");
+			 sys_goURL("lxr.html");
+		 }else if(flag=='qz')
+		 {
+			 //$("#xxlb").css("color","#FFF");
+			// $("#lxrlb").css("color","#FFF");
+			 //$("#qzlb").css("color","#0973c5"); 
+			 sys_goURL("group.html");
+		 }
+	 }
+	 
+	 function search_(){
+ 		//alert($("#search").val());
+ 		sys_goURL("searchgroup.html?sjid="+sjid+"&py="+$("#search").val()+"&from=group");
+ 	}
+	 
+	 function exchange(ob){
+		 sys_goURL("branchExchange/main.html?currId="+currId);
+	 }
+	
+	 function wawb(ob){
+		 sys_goURL("branchExchange/wawb.html");
+	 }
+</script> 
+<style type="text/css">
+.child_page_title1
+{
+	float: left;
+    width: 46%;
+    height: 65%;
+    color: white;
+    font-size: 12px;
+    text-align: center;
+    line-height: 26px;
+    margin-top: 12px;
+   
+    margin-left:13%;
+}
+
+
+.child_page_title2
+{
+	border-radius:6px;
+	width:100.1%;
+	border: 1px solid;
+}
+table{  
+        border-collapse: collapse;  
+        border: 0px solid #999;  
+    }  
+table td {  
+        border-top: 0;  
+        border-right: 1px solid #FFF;  
+        border-bottom:0;  
+        border-left: 0;  
+    }  
+      
+table tr.lastrow td {  
+    border-bottom: 0;  
+}  
+      
+table tr td.lastCol {  
+    border-right: 0;  
+}  
+      
+</style>    
+</head>
+<body>
+	<div class="div_body">
+ 
+
+		<div id="toolbar">
+		<span class="btn_bak" onclick="goback();"></span>
+		<div id="toolbar_text" class="child_page_title1"></div>
+		<h1 class="toolbar_title">群组</h1>
+		<span class="btn_toolbar_font" id="btn_add" onclick="addGroup()" style="color:#ffffff;">建群</span>  
+		
+		</div>	
+		 <table class="table_tabs">
+			<tr><td style="width:30%;"> <div class="table_tabs_text " id="div_xx" onclick="gourl('xx')">消息</div> </td>
+				<td style="width:40%;"> <div class="table_tabs_text " id="div_lxr" onclick="gourl('lxr')">联系人</div> </td>
+				<td style="width:30%;"> <div class="table_tabs_text table_tabs_active" id="div_qz" onclick="gourl('qz')">群组</div> </td>
+			</tr></table>
+<!-- 		<div id="search_div" class="search_div"> -->
+<!--   			<div class="search_div_inner"> -->
+<!--   				<div style="display:inline-block;"> -->
+<!--   					<input type="text" id="search"  class="cx_input" name="search" placeholder="请输入名称或拼音首字母"></input> -->
+<!--   				</div> -->
+<!--   				<div class="search_div_img" onclick="search_()"> -->
+<!--   					<img src="img/ztjy/02_11.png" id="c_search_icon" class="cx_img" ></img> -->
+<!--   				</div> -->
+<!--   			</div> -->
+<!--   		</div>		 -->
+		<div class="font-color-bm" id="iscr_from" style="background-color:#ezezez;">
+			<div  class="sear">
+				<div id="tabslist">
+		   	   		<div id="datahtml">	 
+		   	   		    <div class="txl_ry" style="text-indent:50px;line-height:60px;height:60px;font-size:16px;font-family:&quot;microsoft weiruanyahei&quot;">
+		   	   				<div onclick="wawb(this)" id="20190315001" style="width:100%">
+		   	   					<div> 
+		   	   						<img height="40px" width="40px" style="margin:6px 16px;float:left" src="image/wawb.png">
+		   	   					</div>&nbsp;&nbsp;
+		   	   					<span style="margin-left:-10px" id="span_20190315001">我爱我部</span>
+		   	   				</div>
+		   	   			</div>  
+		   	   			<div class="txl_ry" style="text-indent:50px;line-height:60px;height:60px;font-size:16px;font-family:&quot;microsoft weiruanyahei&quot;">
+		   	   				<div onclick="exchange(this)" id="20180521002" style="width:100%">
+		   	   					<div> 
+		   	   						<img height="40px" width="40px" style="margin:6px 16px;float:left" src="image/Twitter.png">
+		   	   					</div>&nbsp;&nbsp;
+		   	   					<span style="margin-left:-10px" id="span_20180521002">我爱我文</span>
+		   	   				</div>
+		   	   			</div>
+		   	   			
+		   	   		</div>
+		   	   </div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

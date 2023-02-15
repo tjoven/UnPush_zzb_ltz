@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>我的事项</title>
+<link rel="stylesheet" type="text/css" href="../../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+
+<script type="text/javascript" src="../../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../../js/ict.js"></script>
+<script type="text/javascript" src="../../../js/local.js"></script>
+<script type="text/javascript" src="../../../js/list.js"></script>
+<script type="text/javascript" src="../../../js/touchslider.dev.js"></script>
+<script type="text/javascript">
+	sys_addMeun = true;
+	var list = {};
+	var nm = getQueryStringRegExp("nm");
+	$(function() {
+		//生成toolbar
+		$('#toolbar').toolbar();
+		//$("#toolbar h1").text(rwlxmc);
+		//获取列表
+		sys_renderList('table_list', '/ltz/dailyManagement/demandAndHandle/default.do?method=wapList&page_size=15&page_goto=', {}, list);
+		// sys_renderList('table_list', '/ltz/ylfw/ylzj/default.do?method=wapKsList&page_size=15&page_goto=', {}, list);
+		sys_ajaxGet("/ltz/lndx/default.do?method=isLtz",function (json) {
+			if (!json.result){
+			    $("#bdyygh").hide();
+			}
+        });
+		//跳转新增页
+		$("#btn_add").click(function() {
+			sys_goURL("zjyy.html");
+		});
+		// 刷新时选中刷新前选中的tab页
+		if (nm == '') {
+			nm = 1;
+		}
+		$(".c_tabs_text").eq(nm).addClass("c_tabs_active");
+	});
+	function getNm(lb_dm) {
+        if("zxgh"==lb_dm){
+            sys_goURL("main.html?lx=" + lb_dm);
+        }else if("ylbx"==lb_dm || "sqyl"==lb_dm){
+            sys_goURL("../../ylbj/ylbx.html?lx=" + lb_dm);
+        }else if("71330"==lb_dm){
+            sys_goURL("../../ylbj/ylbj.html?lb_dm=" + lb_dm);
+        }else if("71320"==lb_dm){
+            sys_goURL("../../ylbj/jypt.html?lb_dm=" + lb_dm);
+        }
+	}
+    function goZxgh(param) {
+        if(isAndriod){
+            window.webview.loadurl_embed(param);
+        }else if(isIphone){
+            window.location.href='obj-c://outside//'+param;
+        }else{
+            var iTop = (window.screen.availHeight - 30 - 365) / 2;
+            var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+            window.open(param, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+        }
+        return;
+    }
+
+	function callback_trclick_table_list(param) {
+		sys_goURL("detail.html?guid=" + param);
+
+	}
+	function go_back() {
+		sys_goURL("../../ylbj/main.html");
+	}
+    function search(){
+        var zjxm = $("#zjxm").val();
+        sys_ajaxGet("/ltz/dailyManagement/demandAndHandle/default.do?method=wapList&zjxm="+zjxm+"&page_size=15&page_goto=",function(json){
+            bind(json,'up');
+            list["table_list"].refresh();
+            list['table_list'].scrollTo(0,0,500,false);
+        });
+    }
+</script>
+
+<style type="text/css">
+.ui-toolbar-wrap {
+	border: none !important;
+}
+
+li {
+	list-style-type: none;
+}
+
+.add {
+	width: 50px;
+	height: 50px;
+	background: url("../../../img/jiahao.png") no-repeat;
+	background-position: center center;
+	background-size: 28px 28px;
+	border: 0px !important;
+}
+</style>
+
+</head>
+<body>
+	<div id="toolbar">
+		<i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+		<h1 class="toolbar_title">预约挂号</h1>
+		<!--<span class="add" id="btn_add"></span>-->
+		 <span class="btn_toolbar_font" id="btn_add" style="color:#ffffff;">我要预约</span>
+	</div>
+	<div class="c_tabs div_other_40" id="div_tabs" style="display: none;">
+		<div id='div_list0'>
+			<div class='c_tabs_text' onclick=getNm('71330')>常用医院</div>
+		</div>
+		<div id='div_list1'>
+			<div class='c_tabs_text' onclick=getNm('zxgh')>挂号服务</div>
+		</div>
+		<div id='div_list2'>
+			<div class='c_tabs_text' onclick=getNm('sqyl')>社区医疗</div>
+		</div>
+		<div id='div_list3' style="display: none;">
+			<div class='c_tabs_text' onclick=getNm('71320')>家医平台</div>
+		</div>
+	</div>
+	<!--<div id="div_search" class="list_div_search div_other_50">
+		<input type="text" id="zjxm" class="list_search_input" style="width: 93%;margin-left: 3%;" placeholder="输入专家姓名查询" >
+		<div class="list_search_img" id="btn_search" onclick="search()"></div>
+	</div>-->
+	<div class="ui-refresh" id="div_table_list">
+		<ul class="data-list" id="table_list" style="list-style-type:none">
+			<li style="display: none;">
+				<div style="display: none;">{guid}</div> <!-- 点击行的参数 -->
+				<div class="list_row_con"
+					style="height:75px;background-color: #ffffff;">
+					<div class="list_row_col1" style="width:20px;"></div>
+					<div class="list_row_col2" style="margin-top:14px;">
+						<div class="list_row_col2_1 overflow">
+                            <span class="list_title"><b>专家：{expert_name}</b></span>
+                            <span class="list_title" style="margin-left: 20%;">{department}</span>
+						</div>
+						<div class="list_row_col2_1 overflow" style="font-size: 14px;margin-top: 10px;">
+							<span class="list_title">{blzt}</span>
+							<span class="list_title" style="float:right;">就诊时间：{jzrqgzry}&nbsp;&nbsp;{sxwgzry}</span>
+						</div>
+					</div>
+					<div class="list_row_col3" style="width:50px;"></div>
+				</div>
+			</li>
+		</ul>
+		<div class="ui-refresh-down"></div>
+	</div>
+</body>
+<!--<div id="bdyygh" style="height:60px;position:fixed;bottom:50px;left:0px;width:100%;text-align: center" class="div_other_50">
+	<img id="btn_add" alt="" src="../../../img/bdyygh.png" style="width: 50%;">
+</div>-->
+<script>
+    function dadianhua(sj){
+        var v = "tel:"+sj;
+        window.location.href = v;
+        event.stopPropagation();
+    }
+</script>
+</html>

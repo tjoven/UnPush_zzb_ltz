@@ -1,0 +1,384 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+<title>设置</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+
+<link rel="stylesheet" type="text/css" href="../css/oa.css" />
+<link rel="stylesheet" href="../../css/iconfont/iconfont.css">
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+
+<script type="text/javascript">
+		sys_addMeun = true;		
+        var yh_id =  getQueryStringRegExp("yhid");      
+	    var yhid_me=window.localStorage.getItem("yhid");
+	    var dlrxm=window.localStorage.getItem("dlrxm");
+   		var iscr_show = null;  
+   		var click_count=0; 	    	   
+		$(function(){
+			//生成toolbar
+		  	$('#toolbar_addrt').toolbar();
+		  	width=window.innerWidth;
+		  	//设置内滚动
+			var _height = getListHeight();					
+		    $("#iscr_show").height(window.innerHeight - _height);  	
+		    iscr_show = new iScroll("iscr_show",{click:true}); 
+		    
+		    sys_ajaxGet("/getwoinfo.do?method=mySettingWap&wo_yhid="+yhid_me,function(json){					
+		    	$("#wo_info").find("font").eq(0).html(json.dw_mc);
+		    	$("#sj_info").find("font").eq(0).html(json.sjhm);
+		    	$("#jf_info").find("font").eq(0).html(json.jfxx);
+		    	if(json.bmlist.length>1){
+		    		$("#a_qh").show();
+		    	}else{
+		    		$("#a_qh").hide();
+		    	}
+			});
+			sys_ajaxGet("/org2/default.do?method=showTx",function(json){					
+				if(json.formData.imgurl){
+					$("#yhpic").attr("src",json.formData.imgurl+"?size=200*");
+				}else{
+					$("#yhpic").attr("src","../image/wo_user.png");
+				}
+			});
+			
+		});		
+	
+        function guanyu(){
+            if(isAndriod){
+                var version = window.webview.getVersion();
+                sys_alert_xgmm("当前版本:"+version);
+            } else if(isIphone){
+                window.location.href='obj-c://softwareVersion';
+            }
+	    }
+        function guanyu1(version){
+        	sys_alert_xgmm("当前版本:"+version+"<br>技术支持:<br>联通系统集成有限公司");
+        }
+         
+	    function tuichu(){
+	    	if(isAndriod){
+				window.webview.logout();
+			}
+	    /*
+			if(isAndriod){
+				window.webview.exit();
+			} else if(isIphone){
+				window.location.href='obj-c://exitIphone';
+			}else{
+			*/
+				window.location.href="../../login.html"
+			//}
+		}
+
+		function go_back(){
+			sys_goURL("../../main.html");
+		}
+		function jifenbang(){
+			sys_goURL("../../jf/jfb.html");
+		}
+		function dangfeijiaona(){
+			window.localStorage.setItem("returnentryval","oa/system/grzx");
+			sys_goURL("../../dyyl/list.html?yhid="+yhid_me);
+		}
+		function dyxx(){
+			sys_goURL("../../dzz/show.html?yhid="+yhid_me+"&wd=wd");
+		}
+		function changePic(){
+		window.event.stopPropagation();
+		var mask = $("#sys_mask_pic");
+		if(mask.length==0){
+			var maskHTML = '<div id="sys_mask_pic" onclick="closeDivpic();"></div>';
+			$("body").append(maskHTML);
+		}
+		mask.css('display','-webkit-box');
+		var div=$("#div_pic");
+		$(div).show();
+		var yhxx=new Array();
+		yhxx.push("<ul>");
+		yhxx.push("<li onclick=\"paizhaoPic()\">拍照</li>");
+		yhxx.push("<li onclick=\"choosePic()\">从相册选择</li>");
+		yhxx.push("<li onclick=\"tuijianPic()\">推荐头像</li>");
+		yhxx.push("</ul>");
+		$(div).html(yhxx.join(''));
+		$("#div_pic").width(window.innerWidth);
+		$(div).css("bottom",'50px');
+		//$(div).animate({ bottom: '48px' }, 500,'', function() {
+		//	$(div).css("bottom",'48px');
+        //});
+    //}
+	}
+	function tuijianPic(){
+	  sys_goURL("tuijianTX.html");    
+	}
+	function closeDivpic(){
+		var mask = $("#sys_mask_pic"); 
+		mask.css('display','none');	
+		var div=$("#div_pic");
+		div.hide();
+		//$(div).css("bottom",'-151px');
+	}
+	//头像
+	function paizhaoPic(){//拍照
+		if(isAndriod){
+			window.webview.camera('','dytx_fj','','1',width);
+		}else if(isIphone)
+		{
+			window.location.href=encodeURI('obj-c:imTypeCamera"zip":"yhpic","mk_mc":"grtx_fj","filename":"","wjlj":"pic","attachment":"0","callback":"loadpic"');
+		}
+	}
+	function choosePic(){//相册选择
+		if(isAndriod){
+			window.webview.gallery('','dytx_fj','','1',width);
+		}else if(isIphone)
+		{
+			window.location.href=encodeURI('obj-c:imPhotoLibrary"zip":"yhpic","mk_mc":"grtx_fj","filename":"","wjlj":"pic","attachment":"0","callback":"loadpic"');
+		}
+	}
+	function loadpic(zid,filepath){
+			closeDivpic();
+			if(zid == 'null' ){
+			   sys_alert('上传失败，请重新拍照。');	
+			   zid='';			 				  
+			   return;
+			}
+			
+			var picpath=getUrl()+filepath;
+			if(filepath.indexOf("&")>-1){
+				picpath=picpath.substring(0,picpath.indexOf("&"));
+			}
+			picpath=picpath+"?t="+Math.random()+"&size=180*200";
+			$("#yhpic").attr("src",picpath);
+			sys_ajaxPost("/org2/default.do?method=changeTx&picid="+zid,'',function(data){
+				 if(data.result == true) {					  	
+					 sys_alert("保存头像成功");	
+					/*  $("#btn_save").hide(); 						 */  							 	
+					 }else{
+					   sys_alert(data.msg); 
+				     }
+		       });
+		}
+		  function go_back(){	 	      
+    		   sys_goURL("../../main.html");     		
+    	}
+    	function goHelp(){
+    	  sys_alert('正在建设中');
+    	}
+    	function record_click(){
+    	  click_count++;
+    	  if(click_count==10){
+    	    $(".click_ten_show").show();
+    	    iscr_show.refresh();
+    	  }
+    	}
+    	function showhelp() {
+    		/* var url= "/oa/system/showhelp.html?backUrl=grzx&lx=sybz";
+    		sys_showDetail(url); */
+    		window.location.href=sys_ctx+"/ltz/help/help.pdf";
+    		//sys_goURL(sys_ctx+"/ltz/help/help.pdf");      		
+    	}
+    	function getAllowance(){
+	       if(isAndriod){
+	           window.webview.sendSMS("","10010","1501");
+	           //sys_alert_xgmm("您已提交查询，请及时查看短信！");
+	       /*
+	    	  //校验手机号
+	    	   var dlmc=window.webview.getUsername();
+	    	   if(isValidatorPhone(dlmc)){
+	    	      window.webview.sendSMS(dlmc,"10010","1501");
+	    	      //sys_alert_xgmm("您已提交查询，请及时查看短信！");
+	    	   }else{
+	    	      sys_alert_xgmm("该用户登陆名称不是手机号！");
+	    	   }
+	    	   */
+    	   }
+    	}
+    	function isValidatorPhone(num)
+	   {
+	       var reg = /^1[0-9]{10}$/;
+           var flag = reg.test(num); //true	    
+	       return flag; 
+      }
+    </script>
+    <style type="text/css">
+		.ui-toolbar-wrap{
+	    		border: none !important;
+    		}
+   
+		.grzx_border{
+			height: 10px;
+			//border-top:1px solid #c4c4c4;
+			//background-color: #f2f2f2;
+		}
+		.grzx_wo{
+			height: 160px;
+			width: 100%;
+			background-image:url("../image/wo_back.png"); 
+			background-repeat: no-repeat;
+			background-size:100% 100%; 
+			background-position: center center;
+			border: none !important;
+		}
+		.grxz_wo_div{
+			display: -webkit-box;
+			-webkit-box-pack: center;
+		    -webkit-box-align: center;
+		    font-size: 17px;
+			color: #555555;
+			font-family:微软雅黑;
+		}
+		.grzx_wo_img{
+			height: 60px;
+			width: 60px;
+			margin-top: 0px;
+			border-radius: 50%;
+		}
+		#sys_mask_pic{
+			position: fixed;
+			bottom: 0px;
+			top: 0px;
+			width: 100%;
+			z-index: 98;
+			background: #878787;
+			opacity:0.5;
+			display: -webkit-box;
+			-webkit-box-pack: center;
+			-webkit-box-align: center;
+		}
+		#div_pic{
+		position:absolute;
+		width:90%;
+		height:150px;
+		bottom:-150px;
+		background:#ffffff;
+		z-index:99;
+		/*display: none;*/
+		opacity: 0.9;
+		/*color: #f94600;*/
+		font-size: 16px;
+		font-family: "微软雅黑";
+		border-radius: 4px;
+		-webkit-transition-property:bottom;
+		-webkit-transition-duration:0.5s;
+	} 
+	#div_pic li{
+		border-top: 1px #EDEDED solid;
+		text-align: left;
+		padding-left: 70px;
+		height:47px;
+		line-height:48px;
+	}
+	.icon_font{
+	 font-size: 26px;
+	 color: #fea200
+	}
+    </style>
+</head>
+<body style="background-color: #ececec">
+	<div id="toolbar_addrt">
+	     <span class="btn_bak"  onclick="go_back();"></span>
+		<h1 class="toolbar_title"><span onclick="record_click();">设置</span></h1>
+	</div>
+	<div id="iscr_show"> 
+		<div>
+			<div class="grzx_wo">
+				<div class="grxz_wo_div">
+					<div style="width: 60px;height: 60px;margin-top: 30px;border-radius:50%">
+					<img src="../image/wo_user.png" class="grzx_wo_img" id="yhpic" onclick="changePic()"/>
+					</div>
+				</div>
+				<div class="grxz_wo_div" id="wo_info"><font></font></div>
+				<div class="grxz_wo_div" id="sj_info"><font></font></div>
+				<!-- <div class="grxz_wo_div" id="jf_info"><font></font></div> -->
+			</div>
+			
+			<div class="grzx_border"></div>
+			   <a onclick="showhelp();" style="text-decoration:none;" id="a_orgInfo">
+					<div class="div_addr_row" style="border-bottom: 1px solid #ececec">
+						<div class="div_add_bs_head" ><i class="icon iconfont icon-bangzhu icon_font" ></i></div>
+						<div class="div_add_bs_grzx">
+							<font style="font-family:微软雅黑;color:#666666;font-size: 18px;">使用帮助</font>
+						</div>
+						<div class="div_add_info_img_grzx"><img src="../image/jt.png" width="30px" height="30px" /></div>
+					</div>
+				</a>
+				<a onclick="getAllowance();" style="text-decoration:none;">
+					<div class="div_addr_row" style="border-bottom: 1px solid #ececec">
+						<div class="div_add_bs_head" ><i class="icon iconfont  icon-yue2 icon_font" ></i></div>
+						<div class="div_add_bs_grzx">
+							<font style="font-family:微软雅黑;color:#666666;font-size: 18px;">套餐余量</font>
+						</div>
+						<div class="div_add_info_img_grzx"><img src="../image/jt.png" width="30px" height="30px" /></div>
+					</div>
+				</a>	
+				<a href="modiDlmm.html" style="text-decoration:none;">
+					<div class="div_addr_row" style="border-bottom: 1px solid #ececec">
+						<div class="div_add_bs_head" ><i class="icon iconfont icon-mima-copy icon_font" ></i></div>
+						<div class="div_add_bs_grzx">
+							<font style="font-family:微软雅黑;color:#666666;font-size: 18px;">修改密码</font>
+						</div>
+						<div class="div_add_info_img_grzx"><img src="../image/jt.png" width="30px" height="30px" /></div>
+					</div>
+				</a>
+			
+				<a style="text-decoration:none;display: none" class="click_ten_show">
+					<div class="div_addr_row" onClick="guanyu()">
+						<div class="div_add_bs_head"><i class="icon iconfont icon-iconfontabout icon_font"></i></div>
+						<div class="div_add_bs_grzx">
+							<font style="font-family:微软雅黑;color:#666666;font-size: 18px;">关于</font></div>
+						<div class="div_add_info_img_grzx"><img src="../image/jt.png" width="30px" height="30px" /></div>
+					</div>
+				</a>
+			
+			<!-- <a onclick="dyxx()" style="text-decoration:none;">
+				<div class="div_addr_row" >
+					<div class="div_add_bs_head"><img src="../image/dyjfb.png"/></div>
+					<div class="div_add_bs_grzx">
+						<font style="font-family:微软雅黑;color:#666666;font-size: 18px;">个人信息</font></div>
+					<div class="div_add_info_img_grzx"><img src="../image/jt.png" width="30px" height="30px" /></div>
+				</div>
+			</a> -->
+			<!-- <a style="text-decoration:none;">
+				<div class="div_addr_row" onClick="jifenbang()">
+					<div class="div_add_bs_head"><img src="../image/dyjfb.png"/></div>
+					<div class="div_add_bs_grzx">
+						<font style="font-family:微软雅黑;color:#666666;font-size: 18px;">积分榜</font></div>
+					<div class="div_add_info_img_grzx"><img src="../image/jt.png" width="30px" height="30px" /></div>
+				</div>
+			</a> -->
+			<!-- 
+			<a onClick="dangfeijiaona();" style="text-decoration:none;">
+				<div class="div_addr_row" >
+					<div class="div_add_bs_head"><img src="../image/dyjfb.png"/></div>
+					<div class="div_add_bs_grzx">
+						<font style="font-family:微软雅黑;color:#666666;font-size: 18px;">我的一览</font></div>
+					<div class="div_add_info_img_grzx"><img src="../image/jt.png" width="30px" height="30px" /></div>
+				</div>
+			</a> -->
+			
+			
+			
+			<div class="grzx_border"></div>
+			
+			<a style="text-decoration:none;display: none" class="click_ten_show">
+				<div class="div_addr_row" onClick="tuichu();" >
+					<div class="div_add_bs_head"><i class="icon iconfont icon-tuichu icon_font" style="color: #ff5e58"></i></div>
+					<div class="div_add_bs_grzx">
+						<font style="font-family:微软雅黑;color:#666666;font-size: 18px;">退出</font></div>
+					<div class="div_add_info_img_grzx"><img src="../image/jt.png" width="30px" height="30px" /></div>
+				</div>
+			</a>
+		</div>
+		<div class='div_pic' id="div_pic" style="display: none">
+	  	&nbsp;
+	  	</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+<title>更正信息</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+
+
+<script type="text/javascript">
+
+	$(function() {
+
+		//生成toolbar
+		$('#toolbar').toolbar();
+	
+		
+	});
+	function submit_msg() {
+		if ($.trim($("#gznr").val()) == "") {
+			sys_alert("请输入需要更正的信息");return;
+		}
+		sys_ajaxPost("/ltz/wapPerson/default.do?method=saveXxgg", {
+			gznr : $("#gznr").val()
+		},
+			function(msg) {
+				if (msg.result == true) {
+					sys_alert("提交成功");
+					$(".div_submit").hide();
+					
+				} else {
+					sys_alert(msg.msg);
+				}
+			});
+	}
+	
+</script>
+<style type="text/css">
+body {
+	font-family: "微软雅黑";
+}
+.ui-toolbar-wrap { //
+	background-color: #FFB73E;
+	border: none !important;
+}
+#div_lyfk {
+	width: 100%;
+	height: 250px;	
+	background: #ffffff;
+	/*display: none;*/
+	opacity: 0.9;
+	/*color: #f94600;*/
+	font-size: 16px;
+	font-family: "微软雅黑";
+	-webkit-transition-property: bottom;
+	-webkit-transition-duration: 0.5s;
+}
+
+.c_div_nr {
+	margin: 20px;
+}
+
+#gznr {
+	width: 100%;
+	border: 1px solid #ddd;
+	height: 150px;
+	color: #737373;
+	border-radius: 4px;
+}
+
+.div_submit {
+	width: 80%;
+	height: 35px;
+	line-height: 35px;
+	margin: 15px auto 0px auto;
+	-webkit-border-radius: 4px;
+	background-color: #E41213;
+	font-family: 微软雅黑;
+	color: white;
+	font-size: 18px; //
+	font-weight: bold;
+	text-align: center;
+}
+</style>
+</head>
+<body>
+	<div id="toolbar">
+		<span id="btn_bak" class="btn_bak" onclick="sys_goURL('personInfo.html');"></span>
+		<h1 class="toolbar_title">更正信息</h1>
+		<!-- <span class="btn_toolbar_font" id="btn_save">提交</span> -->
+	</div>
+	<div id="sys_innerscoll">
+		<div>	
+		    <form>
+				<div class='div_lyfk' id="div_lyfk" >
+					<div class='c_div_nr'>
+						<textarea id='gznr' name='gznr' placeholder='请输入需要更正的信息'></textarea>
+					</div>
+					<div class='div_submit' onclick='submit_msg()'>提 交</div>
+				</div>
+			</form>
+	   </div>
+	</div>	
+</body>
+</html>

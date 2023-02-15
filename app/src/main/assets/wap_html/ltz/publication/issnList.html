@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>晚枫苑</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript">
+	var list = {};
+	var lb_dm = getQueryStringRegExp("lb_dm");
+	sys_addMeun = true;
+	$(function() {
+		$('#toolbar').toolbar();
+		if (lb_dm == "01") {
+			$("#title_h1").html("晚枫苑");
+			document.getElementById("myImg").src = "img/wfyt.png";
+		} else if (lb_dm == "02") {
+			$("#title_h1").html("学习参考");
+			document.getElementById("myImg").src = "img/xxckt.png";
+		}
+		sys_renderList('table_list', '/ltz/wfy/default.do?method=wapIssnlist&page_size=20&page_goto=', {lb_dm:lb_dm}, list);
+	});
+
+	function callback_trclick_table_list(param) {
+        var paramarr = param.split(",");
+        if (paramarr[1]){
+            download(paramarr[1]);
+        }else {
+            sys_goURL("wfyList2.html?issn=" + paramarr[0] +"&lb_dm="+lb_dm+"&title="+paramarr[2]+"&time="+paramarr[3]);
+        }
+	}
+    function download(pdfid){
+        sys_ajaxGet("/ltz/publication/wap.do?method=getUrlByZid",{pdfid:pdfid},function(json){
+            if(json.pdfurl==undefined||json.pdfurl==""){
+                sys_alert("该文件有问题");
+            }else{
+                window.location.href=getUrl()+json.pdfurl;
+            }
+        });
+    }
+
+</script>
+
+<style type="text/css">
+	.ui-toolbar-wrap {
+		border: none !important;
+	}
+	.data-list li {
+		border-bottom: 0px solid #e7e7e7;
+	}
+	.list_tr{
+		padding: 5px;
+	}
+	.list_td{
+		text-align: center;
+		height: 160px;
+	}
+	.list_td1{
+		text-align: center;
+	}
+</style>
+</head>
+<body>
+	<div id="toolbar">
+		<span class="btn_bak" onclick="sys_goURL('list.html');"></span>
+		<h1 class="toolbar_title" id="title_h1"></h1>
+	</div>
+	<div class="div_other_50" style="width: 100%; height: 50px;">
+		<img id="myImg" src="" width="100%;">
+	</div>
+	<div class="ui-refresh" id="div_table_list" style="background: white !important;">
+
+		<ul class="data-list" id="table_list">
+			<li style="display: none;">
+				<div style="display: none;">{guid},{pdfid},{name},{cjsj}</div>
+				<div class="list_tr">
+					<div class="list_td">
+						<img src="{imgurl}" height="160px"/>
+					</div>
+					<div class="list_td1">
+						<div class="overflow">{name}</div>
+					</div>
+				</div>
+			</li>
+		</ul>
+		<div class="ui-refresh-down"></div>
+	</div>
+
+</body>
+</html>

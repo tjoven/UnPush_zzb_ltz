@@ -1,0 +1,493 @@
+<!doctype html>
+<html>
+<head>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+<META HTTP-EQUIV="pragma" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate"> 
+<META HTTP-EQUIV="expires" CONTENT="0">
+	
+<title>搜索</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="css/oa.css" />
+    <script type="text/javascript" src="../../gmu/js/gmu.js"></script>   
+    <script type="text/javascript" src="js/touch.js"></script>   
+	<script type="text/javascript" src="../../js/ict.js"></script>
+    <script type="text/javascript" src="../../js/local.js"></script>
+    <script type="text/javascript" src="js/custom.js"></script>
+    <script type="text/javascript" src="js/datadumper.js"></script>
+
+<script type="text/javascript">
+		sys_expendRow['table_list']=false;
+		
+    	var sjid = getQueryStringRegExp("sjid");
+    	var py = getQueryStringRegExp("py");
+    	var groupId = getQueryStringRegExp("groupId");
+    	var groupName = getQueryStringRegExp("groupName");
+    	var members = getQueryStringRegExp("members");
+    	var currId = window.localStorage.getItem("yhid");
+    	var currUsername = getQueryStringRegExp("currUsername");
+    	//alert("py is " + py);
+	   	var addr_list = {};
+	   	//sys_expendRow['table_list']=false;
+	    if(sys_pageData["table_list"]){
+	     	sys_pageData["table_list"] = null;
+	    }
+
+    	$(function(){
+    		//列表数据
+    		sys_renderList2('table_list','',{},addr_list);
+    		
+    		//生成toolbar
+		  	$('#toolbar').toolbar({
+	            fixed: true
+	        });	
+	        
+    		if(py == ""){
+				$("#search").focus();
+			}else{
+				$("#search").val(py);
+				$("#search").focus();
+				if(isAndriod){
+					loadList(py);
+				}else if(isIphone){
+					window.location.href='obj-c://getAccessByNameOrPy'+encodeURI(py);
+				}
+			}
+		  	//搜索事件
+			$("#search").bind("keyup",function(){
+				var py = $("#search").val();
+        		if(py != ""){
+                    if(isIphone){
+                        window.location.href='obj-c://getAccessByNameOrPy'+encodeURI(py);
+                    }else if(isAndriod){
+                    	loadList(py);
+                    }
+        		}else{
+        			clearList('table_list');
+        		}
+			});
+   		});
+    	
+    	function clearList(tableid){
+    		var _dataList = $("#"+tableid).children();
+    		_dataList.each(function(index){
+   	     		if(index!=0){
+   	     			$(this).remove();
+   	     		}
+    	    });
+    		$("#"+tableid).append('<li><div style="font-size: 16px;background: white;height: 80px;display: -webkit-box;-webkit-box-pack: center;-webkit-box-align: center">没有数据！</div></li>');
+    	}
+    	
+    	function query(){
+    		var py = $("#search").val();
+       		if(py != ""){
+                   if(isIphone){
+                       window.location.href='obj-c://getAccessByNameOrPy'+encodeURI(py);
+                   }else if(isAndriod){
+                   	loadList(py);
+                   }
+       		}
+    	}
+    	
+    	function search_(){
+    		var py = $("#search").val();
+    		loadList(py);
+    	}   
+    	
+    	function loadList(py){
+    			//alert("loadList py is " + py);
+                if(isIphone){
+                    window.location.href='obj-c://getAccessByNameOrPy'+encodeURI(py);
+                }else {
+                    var json = window.webview.searchAddress(py);//,null,flag
+                    eval("var jsonValue = "+json);
+                    bind(jsonValue,'up');
+                    var arr = jsonValue.gridData.table_list.data;
+                    for(var i=0;i<arr.length;i++)
+                    {
+                    	ifInvite2(arr[i].guid);
+                    }
+                    addr_list["table_list"].refresh();
+                }
+              
+    	}
+		
+    	function loadSearchList(json){
+    		bind(json,'up');
+    	}
+	
+    	function callback_trclick_table_list(param){
+    		//alert(param);
+    		var py = $("#search").val();
+    		//sys_goURL("show.html?guid="+param+"&from=search&sjid="+sjid+"&py="+py);
+    	}
+    	
+    	function goback(){
+    		sys_goURL("addUsersOfGroup.html?groupId=" + groupId + "&groupName="
+    				+ groupName + "&members="+members + "&currUsername=" + currUsername);
+    	}
+    	
+    	function sys_renderList2(tableid,url,params,_refresh){
+    		var refreshDown = $("#div_"+tableid).find(".ui-refresh-down");
+    		if(refreshDown.length>0){
+    			refreshDown.hide();
+    		}
+    		if(!tableid){
+    			alert("请设置tableid");
+    			return false;
+    		}
+    		var refreshDIV = "div_"+tableid;
+    		var height = getListHeight();
+    		var removeStyle = (typeof(_refresh.removeStyle)!='undefined')?_refresh.removeStyle:true;
+    		//alert((window.innerHeight-parseInt(height))+"==="+height+"==="+window.innerHeight);
+    	    $('#'+refreshDIV).css('height',window.innerHeight-parseInt(height)-60).refresh({
+    			
+    	            load:function(dir,type){
+    	               	var me = this;
+    	               	var page_goto = sys_getPageNum(tableid,dir);
+    	               	if(!page_goto){
+    	               		me.afterDataLoading(dir);  
+    	               		me.disable('down',false);
+    	               		return ;
+    	               	}
+    	               $.get('search.html',function(response){//do_document.html
+    	               	  _refresh[tableid] = me._options.iScroll;
+    	               	  me.afterDataLoading(dir);  
+    	               });
+    	           	},
+    	           	
+    	           	ready:function(){
+    	           		this.trigger("load");
+    	           	},
+    	           	statechange:function(event,elem,state,dir){}
+    	      });
+    	      
+    	}
+    	
+    	function sys_ctxStr(){
+	           var count = 0;
+	           var end = 0;
+	           for(var i=0;i<sys_ctx.length;i++) {
+	               var c = sys_ctx.charAt(i);
+	               if(c == '/') {
+	                   count ++;
+	                   if(count == 3) {
+	                       end = i;
+	                   }            
+	               } 
+	           }
+	           var hostUrl=sys_ctx.substring(0, end);
+			   return hostUrl;			
+		}  
+    	
+    	//选中添加群组成员
+    	function select(ob){
+    		var id = ob.id;
+    		if($("#input"+id).is(":checked")){
+    			$("#input"+id).prop("checked",false);
+    			var yxzry = $("#xzry").val();
+    			var str = yxzry.split(",");
+    			str.remove(id);
+    			$("#xzry").val(str);
+    		}else{
+    			$("#input"+id).prop("checked",true);
+    			var xz = $("#input"+id).val();
+    			var yxzry = $("#xzry").val();
+    			$("#xzry").val(yxzry+","+xz);
+    		}
+    	}
+    	
+    	function select1(){
+    		
+    		event.stopPropagation();
+    		var id = $("guiddiv").text();
+    		//var id = ob.id;
+    		if($("#input"+id).is(":checked")){
+    			$("#input"+id).prop("checked",false);
+    			var yxzry = $("#xzry").val();
+    			var str = yxzry.split(",");
+    			str.remove(id);
+    			$("#xzry").val(str);
+    		}else{
+    			$("#input"+id).prop("checked",true);
+    			var xz = $("#input"+id).val();
+    			var yxzry = $("#xzry").val();
+    			$("#xzry").val(yxzry+","+xz);
+    		}
+    	}
+    	
+    	Array.prototype.indexOf = function(val) {
+    		for (var i = 0; i < this.length; i++) {
+    		if (this[i] == val) return i;
+    		}
+    		return -1;
+    		};
+    		
+    	Array.prototype.remove = function(val) {
+    		var index = this.indexOf(val);
+    		if (index > -1) {
+    		this.splice(index, 1);
+    		}
+    		};
+    		
+  
+    	//提交添加群组成员
+		function inviteUser(){
+			
+			var addMembers = "";
+			var addMemberName = "";
+			$("input[name='member']:checked").each(function(){
+				
+				addMembers += ("," + $(this).val());
+				addMemberName += (",&nbsp;" + $(this).parent().siblings()[1].innerHTML);
+				
+			});
+			addMemberName = addMemberName.replace(/[\n]/ig,'').replace(/\s+/g,"");
+			//获取组成员列表id和姓名
+			sys_ajaxPost("/jstx/default.do?method=ifInvite2&groupId=" + groupId,function(json){
+				
+				//处理用户id
+				var array1 = addMembers.split(',');
+				var array2 = json.data.split(',');
+				
+				//临时数组存放
+				var tempArray1 = [];//临时数组1
+				var tempArray2 = [];//临时数组2
+
+				for(var i=0;i<array2.length;i++){
+					tempArray1[array2[i]]=true;//将数array2 中的元素值作为tempArray1 中的键，值为true；
+				}
+
+				for(var i=0;i<array1.length;i++){
+					if(!tempArray1[array1[i]]){
+						tempArray2.push(array1[i]);//过滤array1 中与array2 相同的元素；
+					}
+				}
+				if(tempArray2==""||tempArray2==null)
+				{
+					alert("请选择邀请的人员");
+				}else{
+					sys_confirm("确定邀请选中的人员加入该群吗？",function(result){
+						if(result == false){
+							return false;
+						}else{
+// 					if (window.confirm("确定邀请选中的人员加入该群吗？")==false){
+// 						return false;	
+// 					}else{
+						//处理用户姓名
+						addMemberName =addMemberName.replace(/\s+/g,""); 
+						var arrayxm1 = addMemberName.split(',');
+						var arrayxm2 = json.yhxm.split(',');
+						
+						//临时数组存放
+						var tempArrayxm1 = [];//临时数组1
+						var tempArrayxm2 = [];//临时数组2
+
+						for(var i=0;i<arrayxm2.length;i++){
+							tempArrayxm1[arrayxm2[i]]=true;//将数array2 中的元素值作为tempArray1 中的键，值为true；
+						}
+
+						for(var i=0;i<arrayxm1.length;i++){
+							if(!tempArrayxm1[arrayxm1[i]]){
+								tempArrayxm2.push(arrayxm1[i]);//过滤array1 中与array2 相同的元素；
+							}
+						}
+						
+						var message = new Object();
+						
+						//message.inviteMemberId = addMembers;
+						//message.inviteMemberName = addMemberName;
+						message.inviteMemberId = ""+tempArray2;
+						message.inviteMemberName = ","+tempArrayxm2;
+						message.inviterId = currId;
+						message.inviterName = currUsername;
+						message.inviteGroupName = groupName;
+						message.inviteGroupId = groupId;
+						//Dumper.alert(message);
+			       		websocket.send(JSON.stringify(message));
+			       		
+			       		alert("邀请已发送");
+			       		sys_goURL("member.html?groupId=" + groupId + "&groupName=" + groupName + "&currUsername=" + currUsername);
+						
+					}
+						});
+				}
+				
+			});
+			
+		}
+	
+		//websocket对象
+		var websocket = null;
+		//判断当前浏览器是否支持WebSocket
+		if("WebSocket" in window){
+		    websocket = new WebSocket(sys_ctx.replace("http","ws")+"/websocket/"+("mobile" + currId));
+		}else{
+		    alert("Not support websocket");
+		}
+		
+		//连接发生错误的回调方法
+		websocket.onerror = function(){
+		    
+		};
+		 
+		//连接成功建立的回调方法
+		websocket.onopen = function(event){
+			
+		};
+		 
+		//接收到消息的回调方法
+		websocket.onmessage = function(event){
+			var json = JSON.parse(event.data);
+		};
+		 
+		//连接关闭的回调方法
+		websocket.onclose = function(){
+		    
+		};
+		 
+		//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+		window.onbeforeunload = function(){
+		    websocket.close();
+		};
+		 
+		//将消息显示在网页上
+		function setMessageInnerHTML(json){
+			
+		};
+		 
+		//关闭连接
+		function closeWebSocket(){
+			
+		};
+    	
+/* 		function showDiv(guid){
+			//alert(guid);
+			$("#cylxr").css("display", "block");
+			//document.getElementById("cylxr").style.display="block";
+			window.event.stopPropagation();
+		}
+		
+		function clickTel(){
+			//取消列表行事件触发
+			window.event.stopPropagation();
+		}    */ 	
+
+	function ifInvite2(yhid){//alert(id);
+			
+			sys_ajaxPost("/jstx/default.do?method=ifInvite2&membersId=" + yhid + "&groupId=" + groupId,function(json){
+				
+				if(json.flag)
+    			{
+					document.getElementById("input"+yhid).disabled = true;
+    				document.getElementById("input"+yhid).checked = true;
+    				
+    			}
+				
+				//根据已经选中的人员设置选中状态
+				var yxzry = $("#xzry").val();
+				var yxzrystr = yxzry.split(",");
+				
+				for(var k =0;k<yxzrystr.length;k++)
+				{
+					
+					if(yhid==yxzrystr[k])
+					{
+						
+						document.getElementById("input"+yhid).checked = true;
+					}
+				}
+    		});
+			
+			
+		}
+    </script>
+    
+    <style type="text/css">
+.child_page_title1
+{
+	float: left;
+    width: 40%;
+    height: 65%;
+    color: white;
+    font-size: 14px;
+    text-align: center;
+    line-height: 25px;
+    margin-top: 15px;
+  	margin-left:15%;
+}
+
+
+.child_page_title2
+{
+	border-radius:6px;
+	width:100%;
+}
+</style>  
+</head>
+<body>
+<div class="div_body desk_table">	
+	
+	<div id="toolbar" class="blue_top">
+			<div class="button_multi" >
+				<img src="img/ztjy/02_06.png" class="img_back_or_xj" onclick="goback()"></img>
+			</div>
+			<div class="child_page_title1">	
+				<h1 id="toolbar_text" style="font-size:18px">搜索详情</h1>
+			</div>
+			
+			<div class="button_multi" style="width:28%" >
+  				<span onclick="groupDetails()">
+		    		<img src="./image/right.png" style="width:20px;height:20px;margin-top: 13px;margin-left: 75%;" id="showSave" onclick="inviteUser()">
+		   		</span>
+  			</div>
+		
+		</div>	
+	<div id="search_div" class="search_div">
+		<div class="search_div_inner">
+			<div style="display:inline-block;">
+				<input type="text" id="search" class="cx_input" name="search" placeholder="请输入姓名、号码或拼音首字母"></input>
+			</div>
+			<div class="search_div_img" onclick="search_()">
+				<img src="img/ztjy/02_11.png" id="c_search_icon" class="cx_img" ></img>
+			</div>
+		</div>
+	</div>	
+	
+	
+	<!--  列表模板 -->
+	<div class="ui-refresh" id="div_table_list">
+		<ul class="data-list" id="table_list">
+			<li style="display: none;">
+				<div id ="guiddiv" style="display: none;">{guid}</div>
+				<div class="txl_ry" onclick='select(this)' id="{guid}">
+					<div class='txl_ry_rm' style='padding-left:30px;line-height:50px;width:20px'>
+						<input name='member' type='checkbox' onclick='select1()' id='input{guid}'  value='{guid}'>
+					</div>
+					<div class="txl_ry_img" style="text-align:center;">
+						<img id="tximg" src="../img/txl/03_09.png"  onerror="../img/txl/03_09.png" class="txl_img"></img>
+					</div>
+					<div class="txl_ry_rm">
+						{mc}
+					</div>
+					<div class="txl_ry_cz">
+<!--  						<img onclick="showDiv({guid}')" src="../img/txl/03_12.png" class="txl_img_cz "></img>
+						<img src="../img/txl/04_15.png" class="txl_img_cz "></img>
+						<img onclick="clickTel()" href="tel:{{mobile}}" src="../img/txl/04_17.png" class="txl_img_cz"></img> -->
+					</div>
+				</div> 					
+				
+			</li>
+		</ul>
+		<div class="ui-refresh-down"></div>
+	</div>
+</div>	
+
+</body>
+</html>

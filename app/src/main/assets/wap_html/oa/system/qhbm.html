@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=0.5, maximum-scale=2.0">
+<title>切换部门</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript">  
+		sys_addMeun = true;
+   		var yhid_me=window.localStorage.getItem("yhid");    	
+   		var checked_i;
+		$(function(){
+			//生成toolbar
+		  	$('#toolbar_mm').toolbar();			
+	  		sys_ajaxGet("/getwoinfo.do?method=mySettingWap&wo_yhid="+yhid_me,function(json){					
+		    	console.log(json);
+		    	if(json.bmlist){
+		    		var bmlist = json.bmlist;
+		    		var htmlstr = "";
+		    		for(var i =0;i<bmlist.length;i++){
+		    			var checked = "";
+			    		if(bmlist[i].bmid == json.bmid){
+			    			checked_i = i;
+			    			checked = "checked";
+		    			}
+		    			htmlstr+="<div style=\"height:60px\" onclick='changeRadio("+i+")'>";
+		    			htmlstr+="<div class=\"form_cell_label overflow\" style=\"padding-left: 15px;font-family:微软雅黑;font-size:18px;width: 100%\">";
+		    			htmlstr+="<input type=\"radio\" name=\"bmoptions\" id='bm_"+i+"' value='"+bmlist[i].bmid+"'"+ checked+">"+bmlist[i].mc+"</div>";
+		    			htmlstr+="</div>";
+		    			htmlstr+="";
+		    			htmlstr+="";
+		    		}
+		    		$("#radio_div").html(htmlstr);
+		    	}
+			});	
+			
+			 //保存成功后的业务处理
+			$("#btn_save").click(function(){
+				var change_bmid = $("input[type='radio']:checked").val();
+				window.localStorage.setItem("bmid", change_bmid);
+				 sys_ajaxPost("/getwoinfo.do?method=saveQhbm&change_bmid="+change_bmid+"&wo_yhid="+yhid_me,function(msg){
+					sys_alert(msg.msg);
+					setTimeout(function() {
+						sys_goURL("grzx.html");
+					}, 1000);
+					
+					
+				});	
+			});			
+		});		
+		function changeRadio(i){
+			$("#bm_"+checked_i).removeAttr("checked");
+			checked_i = i;
+			$("#bm_"+i).attr("checked","checked");
+		}
+		function goback(){
+			sys_goURL("grzx.html");
+		}
+    </script>
+    <style type="text/css">
+    	.ui-toolbar-wrap {
+			//background-color: #ff0000;
+			border: none !important;
+		}
+    </style>
+</head>
+<body>
+	<div id="toolbar_mm">
+		<span class="btn_bak" onclick="goback();"></span>
+		<h1 class="toolbar_title">切换部门</h1>
+		<span class="btn_toolbar_font" style="color: #ffffff;font-size: 16px;" id="btn_save">确认</span>
+	</div>
+
+	<div>
+		<!--<form id="frm_mm">  -->
+			<div class="c_form_show" id="radio_div">
+				<!-- <div style="height:60px">
+					<div class="form_cell_label overflow" style="padding-left: 15px;font-family:微软雅黑;font-size:18px;width: 100%">
+					<input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked> 部门 1</div>
+				</div>
+				<div style="height:60px">
+					<div class="form_cell_label overflow" style="padding-left: 15px;font-family:微软雅黑;font-size:18px;width: 100%"><input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">部门 2</div>
+				</div> -->
+			</div>
+		<!-- </form> -->
+	</div>
+</body>
+</html>

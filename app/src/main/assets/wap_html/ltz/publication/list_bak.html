@@ -1,0 +1,265 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>局内刊物</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+<link type="text/css" rel="stylesheet" href="../../css/iconfont/iconfont.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+<script type="text/javascript">
+	sys_addMeun = true;
+	//var lb_dm=8103;
+	var dm = getQueryStringRegExp("lb_dm"); // 列表类型，所有页面都使用一个列表页
+	var nm = getQueryStringRegExp("nm");
+	var _list = {};
+
+    // slider控件
+  	var slider;
+	// slider末位置				 
+	var lastLoacl;	
+	// slider上次滑动位置（初始为0）
+	var slideIndex = getQueryStringRegExp("slideIndex");
+	if(slideIndex==null || slideIndex==''){
+		slideIndex="0"
+	}
+	$(function() {
+		//生成toolbar
+		$('#toolbar').toolbar();
+		createTabs();
+	});
+
+	function createTabs() {
+	    	// 取得下级模块展示
+				sys_ajaxGet("/ltz/publication/wap.do?method=createTab",function(json2){
+					if(json2.tab.length>1){					  
+						var div =document.getElementById("div_tabs");
+					    var tab ="";
+					   // alert(json2.tab[0].mc);
+					 	// 取得第一个tab页类别代码t_dm2（为了默认展示第一个tab页的内容list）
+					    if(dm == ''){
+					    	dm=String(json2.tab[0].dm);
+					    }		  
+					    if(nm == ''){			    	
+					    	nm=0;
+					    }	    
+					 	// 生成tab页
+						for(var i = 0;i<json2.tab.length;i++){
+							tab+="<div class='slideritem' id='div_list"+i+"' style='display: block; width:150px;' >";
+							tab+="<div class='c_tabs_text' onclick=getNm('"+json2.tab[i].dm+"',"+i+")>"+json2.tab[i].mc+"</div>";
+						 	tab+="</div>";
+						}
+					 	div.innerHTML=tab;
+						imgList(dm);
+						// 刷新时选中刷新前选中的tab页
+						$(".c_tabs_text").eq(nm).addClass("c_tabs_active");
+						
+						// 创建slider
+						slider = new TouchSlider('div_tabs',{auto:false, align:'left', mousewheel:false, mouse:true, fullsize:false,after:doSlideAfter});
+						
+						var tabsCount = json2.tab.length;
+						// 设定slider展示宽度为页面宽度
+						var clientWidth=document.body.clientWidth;	
+						$(".swipe").css("width",clientWidth+"px");
+						if(tabsCount>3){
+							tabsCount=3;
+						}
+						// 设定每个tab宽度保证一屏显示3个tab
+						$(".slideritem").css("width",(clientWidth/tabsCount)+"px");
+						// 取得slider末index
+						lastLoacl = slider.length - tabsCount;
+						// slider滑动到上次滑动位置
+						slider.slide(parseInt(slideIndex),0);
+					}else if(json2.tab.length==1){
+					   $("#div_tabs").hide();
+					   //$('#table_list').html('<div style="font-size: 16px;background: white;height: 80px;display: -webkit-box;-webkit-box-pack: center;-webkit-box-align: center">没有数据！</div>');
+					   // $(".ui-refresh-down").hide();
+					   imgList(dm);
+					}else{
+					   $("#div_tabs").hide();
+					   $('#table_list').html('<div style="font-size: 16px;background: white;height: 80px;display: -webkit-box;-webkit-box-pack: center;-webkit-box-align: center">没有数据！</div>');
+					   $(".ui-refresh-down").hide();
+					}
+				});
+
+
+	}
+   function imgList(lb_dm){
+       sys_ajaxGet("/ltz/publication/wap.do?method=getInfoByLbdm",{lb_dm:lb_dm},function(json){
+            var html_str='';
+	       if(json.imglist.length>0){
+	          html_str=html_str+"<div class='row'>";
+	       }          
+                 for(var i = 0;i<json.imglist.length;i++){
+					if(i%3==0){
+					   html_str=html_str+'</div> <div class="row">';				 
+					}
+					html_str=html_str+"<div class='item'>";
+					   html_str=html_str+"<div class='item_img'><div ><img class='item_img_small' src='"+getUrl()+json.imglist[i].imgurl+"' onclick=download('"+json.imglist[i].pdfid+"') /></div></div>";
+					   html_str=html_str+"<div class='item_text' onclick=download('"+json.imglist[i].pdfid+"')>"+json.imglist[i].bt+"</div>";
+					html_str=html_str+"</div>";
+				} 
+				if(!(json.imglist.length>0&&json.imglist.length%3==0)){
+				  html_str=html_str+"</div>";
+				}
+				$("#main").append(html_str); 
+				var _height = getListHeight();
+	        	$("#sys_innerscoll").height(window.innerHeight-_height);
+	        	var innerscroll = new iScroll("sys_innerscoll",{click:true});   
+        });                      
+   }
+	function download(pdfid){
+	    sys_ajaxGet("/ltz/publication/wap.do?method=getUrlByZid",{pdfid:pdfid},function(json){
+		      if(json.pdfurl==undefined||json.pdfurl==""){
+		         sys_alert("该文件有问题");
+		      }else{
+		         window.location.href=getUrl()+json.pdfurl;
+		      }	       
+	    });
+	}
+		
+			// tab左右滑动后记录滑动位置(末屏未填满时滚动填满)
+		function doSlideAfter(newIndex, newSlide) {
+			
+			slideIndex = newIndex;
+		    if (lastLoacl <= 0) {
+		        slider.slide(0);
+		        slideIndex = 0;
+		    } else if (newIndex > lastLoacl && lastLoacl > 0) {
+		        slider.slide(lastLoacl);
+		        slideIndex = lastLoacl;
+		    }
+		}
+		
+		// 点击tab页刷新画面显示相应tab页内容一览list
+		function getNm(dm,nm){
+			sys_goURL("list.html?lb_dm="+dm+"&nm="+nm+"&slideIndex="+slideIndex);			
+		}
+		
+</script>
+
+<style type="text/css">
+   .ui-toolbar-wrap{
+	    		border: none !important;
+    		}
+   
+  	li{
+    	list-style-type:none;
+    }
+     .c_tabs{
+			height: 40px;
+			width: 100%;
+			background-color: white !important;
+			display:block;
+			border-bottom: #dddddd solid 1px
+		}
+		.c_tabs>div{
+			-webkit-box-flex:1;
+			height:40px;
+			line-height:40px;
+			text-align: center;
+			font-size: 15px;
+			font-family: "微软雅黑";
+			/* display:none; */
+			color: #4B5052;
+		}
+		.c_tabs_active{
+			/*height: 37px !important;
+			border-bottom: 3px solid #FD6C00;
+			color: #FD6C00;*/
+			color: #FF4854;
+			border-bottom: 2px solid #FF4854;
+			height: 38px !important;
+		}
+		.c_tabs_text{
+			display: inline-block;
+		}
+		
+			
+	  .main{
+	    //padding: 10px 0px 0px 0px;
+	    margin: 15px;
+      }
+      .row{
+	    display:-webkit-box;
+	     //border: 1px solid red;
+      }
+	  .row>div{
+	     width: 33.333%;
+		 //height: 160px;
+		 //border: 1px solid black;
+		}	
+		.item{
+		  display: -webkit-box;
+		  -webkit-box-orient: vertical; 
+		}
+		.item_img{
+		   height:130px;
+		   //border:1px solid black;
+		   display: -webkit-box;
+		   -webkit-box-pack: center;
+		   -webkit-box-align: end; 
+		}
+		.item_img_small{
+		    width:90px;
+			height:120px;
+		}
+		.item_text{	   
+		    //height:32px;
+			display:-webkit-box;
+			-webkit-box-pack:center;
+			-webkit-box-align:center;
+
+			overflow: hidden;		    
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			word-break: break-all;
+			font-size: 14px;
+			margin: 5px 10px;
+			
+			overflow:hidden; 
+			text-overflow:ellipsis;
+			display:-webkit-box; 
+			-webkit-box-orient:vertical;
+			-webkit-line-clamp:2; 
+		}
+</style>
+
+</head>
+<body>
+	<div id="toolbar">
+		<span class="btn_bak" onclick="sys_goURL('../../main.html');"></span>
+		<h1 class="toolbar_title">我的书架</h1>
+	
+	</div>
+	
+	<div class="c_tabs div_other_40" id="div_tabs" style="display: none;" ></div>
+	<div id="sys_innerscoll">
+	  <div class="main" id="main">
+	       <!-- 
+	       <div class="row"> 
+		          <div class="item">
+		             <div class="item_img"><div class="item_img_small"></div></div>
+		             <div class="item_text">马克思主义理论马克思主义理论sssssssss</div>
+		          </div>
+		          <div class="item">
+		             <div class="item_img"><div class="item_img_small"></div></div>
+		             <div class="item_text">dddddd</div>
+		          </div>
+		         <div class="item">
+		             <div class="item_img"><div class="item_img_small"></div></div>
+		             <div class="item_text">ddddddd</div>
+		          </div>
+	      </div> 
+	       -->
+	  </div>
+	 </div>
+</body>
+</html>

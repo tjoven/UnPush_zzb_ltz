@@ -1,0 +1,189 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>在线学习</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript">
+	var innerscroll = null;
+	var nm = getQueryStringRegExp("nm");
+	$(function() {
+		//生成toolbar
+		$('#toolbar').toolbar();
+		if (nm == '') {
+			nm = 1;
+		}
+		$(".c_tabs_text").eq(1).addClass("c_tabs_active");
+		var _height = window.innerHeight - getListHeight();
+		$("#innerscroller").height(_height);
+		 innerscroll = new iScroll("innerscroller",{click:true});
+	});
+
+	function goUrl(mk,param) {
+		if (mk == "hqwg" || mk == "qs"|| mk == "rmrb"|| mk == "ckxx") {
+			var url = "";
+			if (mk == "qs") {
+				url = "http://www.qstheory.cn/qs/mulu.htm";
+			}
+			if (mk == "hqwg") {
+				url = "http://www.qstheory.cn/hqwg/";
+			}
+			if (mk == "rmrb") {
+				//url = "http://rmrbimg2.people.cn/html/items/wap-peonet/#/index/category/17/normal/paper";
+				url = "http://paper.people.com.cn/";
+			}
+			if (mk == "ckxx") {
+				url = "http://m.cankaoxiaoxi.com/";
+			}
+			if (isAndriod) {
+			    if(param=='0'){
+				  window.webview.loadurl_embed(url);
+				}else if(param=='1'){
+				  window.webview.loadurl_new(url);
+				}else{
+				  window.webview.loadurl_new(url);
+				}
+			//内嵌用window. webview. loadurl_embed(url);              	
+			} else if (isIphone) {
+				window.location.href = 'obj-c://outside//' + url;
+			} else {
+				var iTop = (window.screen.availHeight - 30 - 365) / 2;
+				var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+				window.open(url, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+			}
+			return;
+		}
+
+		if (mk == "xxck") {
+			//sys_goURL("jnkw.html?lb_dm=01&nm=" + nm);
+			sys_goURL("issnList.html?lb_dm=02&nm=" + nm);
+		}
+		if (mk == "wfy") {
+			sys_goURL("issnList.html?lb_dm=01&nm=" + nm);
+		}
+
+	}
+	// 点击tab页刷新画面显示相应tab页内容一览list
+	/* function getNm(dm){
+		   if(dm=="xxzl"){//学习专栏
+			    sys_goURL(getBaseURL()+"ltz/elearning/list.html");		
+			}else if(dm=="wdsj"){//我的书架
+			 	sys_goURL(getBaseURL()+"ltz/publication/list.html");
+			}else if(dm=="xxtj"){//我的书架
+			 	sys_goURL(getBaseURL()+"ltz/lgsy/list.html?lb_dm=71680");
+			}else if(dm=="yqlj"){
+			    sys_goURL(getBaseURL()+"ltz/link/list.html");
+			}				
+		}	 */
+		function getNm(dm){
+			if(dm=="wdsj"){
+				sys_goURL(getBaseURL()+"ltz/publication/list.html");
+			}
+		}
+</script>
+
+<style type="text/css">
+.ui-toolbar-wrap {
+	border: none !important;
+}
+
+.main {
+	padding-top:15px;
+	padding-left:20px;
+	padding-right:20px;
+	display: -webkit-box;
+	-webkit-box-orient:vertical;
+}
+
+.row{
+ width: 100%;
+ height: 85px;
+
+}
+
+.item { 
+	margin-bottom: 20px;
+	height: 70px;
+	background-repeat: round;
+	background-size: 100% 100%;	
+	
+}
+
+.item_qs {
+	background-image: url("img/qs.png");
+}
+
+.item_hqwg {
+	background-image: url("img/hqwg.png");
+}
+
+.item_xxck {
+	background-image: url("img/xxck.png");
+}
+
+.item_rmrb {
+	background-image: url("img/rmrb.png");
+}
+.item_ckxx {
+	background-image: url("img/ckxx.png");
+}
+.item_wfy {
+	background-image: url("img/wfy.png");
+}
+</style>
+
+</head>
+<body>
+	<div id="toolbar">
+		<span class="btn_bak" onclick="sys_goURL('../elearning/main.html');"></span>
+		<h1 class="toolbar_title">我的书架</h1>
+		<span class='c_tabs_text' onclick=getNm('wdsj')></span>
+	</div>
+	<!-- 学习专栏和我的书架 -->
+	<!-- <div class="c_tabs div_other_40" id="div_tabs">
+		<div id='div_list0'>
+			<div class='c_tabs_text' onclick=getNm('xxzl')>学习专栏</div>
+		</div>
+		<div id='div_list1'>
+			<span class='c_tabs_text' onclick=getNm('wdsj')></span>
+		</div>
+		<div id='div_list2'>
+			<div class='c_tabs_text' onclick=getNm('xxtj')>信息推荐</div>
+		</div>
+		<div id='div_list3'>
+			<div class='c_tabs_text' onclick=getNm('yqlj')>友情链接</div>
+		</div>
+	</div> -->
+
+	<div id="innerscroller">
+		<div class="main" id="main">
+
+			<div class="row">
+                <div class="item item_rmrb" onclick="goUrl('rmrb','0')"></div>
+            </div>
+            <div class="row">
+				<div class="item item_qs" onclick="goUrl('qs','0')"></div>
+		    </div>
+		     <div class="row">
+				<div class="item item_hqwg" onclick="goUrl('hqwg','0')"></div>
+			 </div>
+		    <div class="row">
+			  <div class="item item_ckxx" onclick="goUrl('ckxx','0')"></div>
+			</div>	
+			  <div class="row">			
+			    <div class="item item_xxck" onclick="goUrl('xxck','0')"></div>
+			</div>
+			  <div class="row">
+			    <div class="item item_wfy" onclick="goUrl('wfy','0')"></div>
+			</div>
+			      
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>我的事项</title>
+<link rel="stylesheet" type="text/css" href="../../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/base.css" />
+<script type="text/javascript" src="../../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../../js/ict.js"></script>
+<script type="text/javascript" src="../../../js/local.js"></script>
+<link href="../../../bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
+<script type="text/javascript">
+var guid = null;
+var innerscroll = null;
+	$(function() {
+		$('#toolbar').toolbar();
+		 guid = getQueryStringRegExp("guid");
+		 
+		sys_ajaxGet("/ltz/dailyManagement/demandAndHandle/default.do?method=wapShow&guid=" + guid, function(json) {
+			bind(json);
+			console.log(json.formData.blsj);
+			if(!json.formData.blsj){
+				//blsj为空，隐藏信息
+				$('#report').hide();
+			}
+		});
+		
+		$("#btn_bak").click(function() {
+			sys_goURL("main.html");
+		});
+		//暂时没做
+		$("#btn_upate").click(function(){
+			sys_goURL("add.html?guid="+guid+"&from=detail");
+		});
+		//暂时没做
+		$("#btn_delete").click(function() {
+			sys_confirm("确认删除吗？",function(flag){
+				if(flag){
+					deleteReport();
+				}else{
+					return ;
+				}
+			});
+		});
+		
+		var _height = getListHeight();
+		$("#sys_innerscoll").height(window.innerHeight - _height);
+		innerscroll = new iScroll("sys_innerscoll", {
+			click : true
+		});
+	});
+	//暂时没做
+	function deleteReport(){
+		   sys_ajaxPost("/hmdj/report/default.do?method=wapdelete&guid="+jhid,"",function(data){
+				 if(data.result == true) {		
+					 sys_alert("删除成功");
+						setTimeout(function() {
+							sys_goURL(from+".html");
+						}, 1000);
+					 }else{
+					   sys_alert(data.msg); 
+				     }
+		       });
+	}
+ 
+</script>
+	<style type="text/css">
+
+		.ui-toolbar-wrap {
+			border: 0px;
+		}
+
+		td, td span {
+			font-size: 16px;
+			vertical-align: middle;
+		}
+		tr{
+			height: 55px;
+			border-bottom: 1px solid #e7e7e7;
+		}
+		.c_form_title{
+			width: 40%;
+			padding-left: 25px;
+		}
+		th{
+			padding-left: 10px;
+			text-align: left;
+			font-size: 18px;
+			vertical-align: bottom;
+		}
+		th span{
+			border-bottom: 3px solid #d62724;
+			width: 30%;
+			display: inline-block;
+			text-align: center;
+		}
+	</style>
+</head>
+<body style="background-color: white!important;">
+	<div id="toolbar">
+		<span id="btn_bak" class="btn_bak"></span>
+		<h1 class="toolbar_title">挂号服务</h1>
+<!-- 		<span class="btn_toolbar_font" style="color: #ffffff;font-size: 20px;" id="btn_upate">修改</span>
+ -->	</div>
+	
+	<div id="sys_innerscoll">
+	<!-- 表单区域 -->
+		<div class="c_form_show" style="padding:10px 0 10px 0;">
+			<table style="width:100%;">
+				<!--<tr>
+					<td class="c_form_title">医院</td>
+					<td><span name="hospital" id="hospital" style="width: 30%;"></span></td>
+				</tr>-->
+				<tr>
+					<td class="c_form_title">科室</td>
+					<td><span name="department" id="department" style="width: 30%;"></span></td>
+				</tr>
+				<tr>
+					<td class="c_form_title">专家</td>
+					<td><span name="expert_name" id="expert_name" style="width: 30%;"></span></td>
+				</tr>
+				<tr>
+					<td class="c_form_title">简要病情</td>
+					<td><span name="nr" id="nr" style="width: 30%;"></span></td>
+				</tr>
+				<tr>
+					<td class="c_form_title">预约就诊时间</td>
+					<td><span name="jzrq" id="jzrq" style="width: 30%;"></span><span name="sxw" id="sxw" style="margin-left: 8px;"></span></td>
+				</tr>
+				<tr>
+					<td class="c_form_title">备选日期</td>
+					<td><span name="bxrq" id="bxrq" style="width: 30%;"></span></td>
+				</tr>
+				<tr>
+					<td class="c_form_title">备注</td>
+					<td><span name="bz" id="bz" style="width: 30%;"></span></td>
+				</tr>
+				<tr>
+					<th colspan="2"><span>反馈信息</span></th>
+				</tr>
+				<tr>
+					<td class="c_form_title">就诊时间</td>
+					<td>
+						<span name="jzrqgzry" id="jzrqgzry" style="width: 30%;"></span>
+						<span name="sxwgzry" id="sxwgzry" style="margin-left: 8px;"></span>
+					</td>
+				</tr>
+				</tr>
+				<tr>
+					<td class="c_form_title">办理状态</td>
+					<td><span name="blzt" id="blzt" style="width: 30%;"></span></td>
+				</tr>
+				<tr>
+					<td class="c_form_title">办理人</td>
+					<td><span name="blr" id="blr" style="width: 30%;"></span></td>
+				</tr>
+				<tr>
+					<td class="c_form_title">办理说明</td>
+					<td><span name="blsm" id="blsm" style="width: 30%;"></span></td>
+				</tr>
+				<tr>
+					<td class="c_form_title">办理时间</td>
+					<td><span name="blsj" id="blsj" style="width: 30%;"></span></td>
+				</tr>
+			</table>
+	    </div>		    	    		
+	</div>
+
+</body>
+</html>

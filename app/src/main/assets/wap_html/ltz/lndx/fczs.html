@@ -1,0 +1,201 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+    <title>风采展示</title>
+    <link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/list.css" />
+    <script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+    <script type="text/javascript" src="../../js/ict.js"></script>
+    <script type="text/javascript" src="../../js/local.js"></script>
+    <script type="text/javascript" src="../../js/list.js"></script>
+    <script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+    <script type="text/javascript">
+        sys_addMeun = true;
+        var list = {};
+        var server_url =  window.location.protocol + "//" + window.location.host + "/";
+        // slider控件
+        var slider;
+        // slider末位置
+        var lastLoacl;
+        // slider上次滑动位置（初始为0）
+        var slideIndex = getQueryStringRegExp("slideIndex");
+        if (slideIndex == null || slideIndex == '') {
+            slideIndex = "0"
+        }
+        $(function() {
+            //生成toolbar
+            $('#toolbar').toolbar();
+            $("#toolbar h1").text("我的大学");
+
+            sys_renderList('table_list', '/ltz/lndx/default.do?method=getKcListApp&page_size=10&&page_goto=', {server_url:server_url}, list);
+            // 刷新时选中刷新前选中的tab页
+            $(".c_tabs_text").eq(2).addClass("c_tabs_active");
+            // 创建slider
+            slider = new TouchSlider('div_tabs', {
+                auto : false,
+                align : 'left',
+                mousewheel : false,
+                mouse : true,
+                fullsize : false,
+                after : doSlideAfter
+            });
+            // 设定slider展示宽度为页面宽度
+            var clientWidth = document.body.clientWidth;
+            $(".div_tabs").css("width", clientWidth + "px");
+            $(".slideritem").css("width", (clientWidth / 4) + "px");
+            // 取得slider末index
+            lastLoacl = slider.length - 2;
+            // slider滑动到上次滑动位置
+            slider.slide(parseInt(slideIndex), 0);
+        });
+
+        // tab左右滑动后记录滑动位置(末屏未填满时滚动填满)
+        function doSlideAfter(newIndex, newSlide) {
+            slideIndex = newIndex;
+            if (lastLoacl <= 0) {
+                slider.slide(0);
+                slideIndex = 0;
+            } else if (newIndex > lastLoacl && lastLoacl > 0) {
+                slider.slide(lastLoacl);
+                slideIndex = lastLoacl;
+            }
+        }
+        function getNm(num){
+            if(num==0){
+                sys_goURL("kcxx.html");
+            }else if (num == 1){
+                sys_goURL("kcap.html");
+            }/* else if (num == 2) {
+                sys_goURL("xxjl.html");
+            }*/ else if (num == 3) {
+                sys_goURL("fczs.html");
+            }else if (num == 4){
+                sys_goURL("wlkc.html");
+            }
+        }
+
+        function go_back() {
+            sys_goURL("../../main.html");
+        }
+        //风采展示
+        function fczs(num){
+            var mkmc = "";
+            var lb_dm = "";
+            if (num==1){
+                mkmc="教学剪影";
+                lb_dm="71720";
+            } else if (num==2){
+                mkmc="学员风采";
+                lb_dm="71721";
+            } else {
+                sys_goURL("sheying.html");
+                return;
+            }
+            sys_goURL("../../publish/common.html?mkmc="+mkmc+"&lb_dm="+lb_dm+"&backUrl=ltz/lndx/fczs.html");
+            // sys_goURL("fczsShow.html?mkmc="+mkmc+"&lb_dm="+lb_dm+"&nm"+mkmc);
+        }
+    </script>
+
+    <style type="text/css">
+        .ui-toolbar-wrap {
+            border: none !important;
+        }
+
+        li {
+            list-style-type: none;
+        }
+
+        .c_tabs {
+            height: 40px;
+            width: 100%;
+            background-color: white !important;
+            display: block;
+            border-bottom: #dddddd solid 1px
+        }
+
+        .c_tabs>div {
+            -webkit-box-flex: 1;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            font-size: 15px;
+            font-family: "微软雅黑";
+            /* display:none; */
+            color: #4B5052;
+        }
+
+        .c_tabs_active {
+            color: #FF4854;
+            border-bottom: 2px solid #FF4854;
+            height: 39px !important;
+        }
+
+        .c_tabs_text {
+            display: inline-block;
+        }
+
+        /*.swipe {*/
+            /*!* margin-bottom:20px; *!*/
+            /*overflow: hidden;*/
+            /*position: relative;*/
+            /*width: 100%;*/
+            /*width: 337px;*/
+        /*}*/
+
+        .swipe div {
+            overflow: hidden;
+        }
+        #table_list span{
+            display: inline-block;
+            text-align: center;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+            word-break:keep-all;
+        }
+        th{
+            font-size: 19px;
+        }
+        #div_tabs{
+            width: 100% !important;
+            left: 0 !important;
+        }
+    </style>
+
+</head>
+<body style="background-color: white;">
+<div id="toolbar">
+    <i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+    <h1 class="toolbar_title">我的大学</h1>
+</div>
+<div class="c_tabs div_other_40" id="div_tabs" >
+     <div class="slideritem" id="div_list1"
+         style="display: inline-block; width:150px;">
+        <div class="c_tabs_text" onclick="getNm(0)">课程报名</div>
+    </div>
+    <div class="slideritem" id="div_list2"
+         style="display: inline-block; width:150px;">
+        <div class="c_tabs_text" onclick="getNm(1)">课程安排</div>
+    </div>
+    <div class="slideritem" id="div_list4"
+         style="display: block; width:150px;">
+        <div class="c_tabs_text" onclick="getNm(3)">风采展示</div>
+    </div>
+    <div class="slideritem" id="div_list5"
+         style="display: block; width:150px;">
+        <div class="c_tabs_text" onclick="getNm(4)">网络课程</div>
+    </div>
+</div>
+<div>
+    <ul>
+        <li onclick="fczs(1)"><div><img style="width: 90%;height: 120px;padding: 5px 5% 5px 5%;" src="../../image/jxjy.png" /></div></li>
+        <li onclick="fczs(2)"><div><img style="width: 90%;height: 120px;padding: 5px 5% 5px 5%;" src="../../image/xyfc.png" /></div></li>
+        <li onclick="fczs(3)"><div><img style="width: 90%;height: 120px;padding: 5px 5% 5px 5%;" src="../../image/zpzs.png" /></div></li>
+    </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,564 @@
+<!doctype html>
+<html>
+  <head>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+    <title>详情</title>
+    <link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="show.css" />
+    <script type="text/javascript" src="../../gmu/js/gmu.js"></script> 
+	<script type="text/javascript" src="../../js/ict.js"></script>
+    <script type="text/javascript" src="../../js/local.js"></script>
+    <script type="text/javascript" src="voicespeak.js"></script>
+    <script type="text/javascript">
+       sys_addMeun = false;
+		var guid = getQueryStringRegExp("guid");
+		var lb_dm = getQueryStringRegExp("lb_dm");
+		var tzlb = getQueryStringRegExp("dm");
+		var src = getQueryStringRegExp("src");
+		var innerscroll=null;
+		var sign_up_flag="";//后台发布是否需要报名
+		var ride_flag="";//后台发布是否需要乘车
+		var is_already_sign_up="";//是否已经报名
+		var close_up="";//报名关闭状态
+		$(function(){
+			//生成toolbar
+		  	$('#toolbar2').toolbar();
+		  	//追忆与思念
+		  	if(tzlb&&tzlb==3){
+		  	   $(".ui-toolbar-wrap").css("background","#303030");
+		  	   $(".ui-toolbar").css("background","#303030");
+		  	   $("#speakButton").hide();		  	
+		  	}
+			sys_ajaxGet("/tzsf/wap.do?method=tzShow",{lb_dm:lb_dm,guid:guid},function(json){
+			    
+	        	bind(json);
+	            	
+	        	if(json.formData.ggnr && json.formData.ggnr.length>0){
+	        		var nr = replaceImgPath(json.formData.ggnr);
+	        		$("#ggnr").html(nr);
+	        	}
+	        	if(json.formData){
+		        	var fjhtml = getFj(json.formData);
+		        	if(fjhtml==""){
+		        	  $(".c_fujian").hide();
+		        	}else{
+		        	  $("#_fujian").html(fjhtml);
+		        	  $(".c_fujian").show();
+		        	}      	
+	        	}
+	            //追忆与思念
+	            if(json.formData.lb2_dm=='3'){
+	               $("#btn_msg").show();
+	               $("#leave_msg_list").show();
+	               
+	               LoadMsgList(guid);
+	            }else{
+	               $("#btn_msg").hide();
+	               $("#leave_msg_list").hide();
+	            }
+	            
+	        	var imgs=document.getElementsByTagName("img");
+		        if(imgs.length>0){
+		        	handleImage(imgs);
+		        }
+		       
+		        
+		       //控制显示报名及乘车信息 
+		        sign_up_flag=json.formData.sign_up_flag;//报名控制
+		        ride_flag=json.formData.ride_flag;//乘车控制
+		        is_already_sign_up=json.is_already_sign_up;  //判断是否已经报名
+		        close_up=json.formData.close_up;
+		       // alert(is_already_sign_up+"==="+json.formData.close_up+"===="+sign_up_flag);
+		        if(!is_already_sign_up&&close_up=='1'&&sign_up_flag=='1'){//报名已结束(未报名情况下)
+		           $("#btn_close_sign_up").show();
+		        }else{
+		            show_sign_up_info(sign_up_flag,ride_flag,is_already_sign_up,json.formData.is_sign_up,json.formData.is_ride); 		      
+		        }
+		      
+		    	 //调查问卷
+		    	//alert(json.show_questionnaire);alert(json.formData.id_questionnaire);
+		    	if(json.show_questionnaire&&json.show_questionnaire==true&&json.formData.id_questionnaire){
+		    	    $("#btn_questionnaire").show();//onclick="go_questionnaire()"
+		    	    $("#btn_questionnaire").attr("onclick","go_questionnaire('"+json.formData.id_questionnaire+"','"+json.submit_questionnaire+"')");
+		    	} else{
+		    	    $("#btn_questionnaire").hide(); 
+		    	}      
+		        _innerscoll();//重置高度
+		        msgNOreadnum();
+		        
+	        });
+	       /*
+	       $('input[type=radio][name=is_sign_up]').change(function() {
+		        if (this.value == '1'&&ride_flag=='1') {
+		            $(".div_ride_info").show();
+		        }
+		        else{
+		           $(".div_ride_info").hide();
+		        }
+		    });
+		    */
+		     $('input[type=radio][name=is_ride]').change(function() {
+		        if (this.value == '1') {
+		            $(".div_place").show();
+		        }
+		        else{
+		           $(".div_place").hide();
+		        }
+		    });
+	        init_dialog();
+	        
+		});
+	
+	//未关闭报名条件下、控制页面显示
+	 function show_sign_up_info(sign_up_flag,ride_flag,is_already_sign_up,is_sign_up,is_ride){	 
+	     if(sign_up_flag&&sign_up_flag=='1'){//
+	         if(!is_already_sign_up){//未报名
+	             $(".btn_sign_up").show();
+			    //乘车安排
+			     if(ride_flag&&ride_flag=='1'){
+			        $(".div_ride_info").show(); 
+			     }else{
+			       $(".div_ride_info").hide(); 
+			     }
+	         }else{//已报名
+	             $("#msgnr").removeAttr("placeholder");
+	               
+	             if(is_sign_up&&is_sign_up=='1'){                 
+	                 $("#btn_show_sign_up").show();  
+	                 $("#div_already_info").text("您已选择报名参加！");          	               
+	             }else{
+	                 $("#div_already_info").text("您已选择不参加！");  
+	             }
+	              $("#div_already_info").show();//已报名信息显示
+	              $("#btn_sign_up_submit").hide();//报名按钮提交
+	            //安排乘车条件下
+	            if(ride_flag&&ride_flag=='1'){
+		               $(".div_ride_info").show();
+		               //已选择乘车    
+		              if(is_ride&&is_ride=='1'){	                 
+		                 $(".div_place").show();
+		              }else{
+		                 $(".div_place").hide();	                
+		              }	               
+	            }else{
+	               $(".div_ride_info").hide(); 
+	            }     
+	         }   
+		 }	  	  
+	 }
+	 
+      function handleImage(imgs){
+            var imgArr = [];
+		for (var i = 0; i < imgs.length; i++) {
+		    imgArr.push(imgs[i].src);
+		}
+		var imageArr = [];
+		var n = 0;
+		for (var j = 0; j < imgArr.length; j++) {
+		    imageArr.push(new Image());
+		    imageArr[j].src = imgArr[j];
+		    imageArr[j].onload  = function(){
+				n++; //每加载完成一张图片就累加1
+				if (n == imageArr.length) {//全部图片加载完成
+				  showImg();
+		        	//设置内容内滚动
+		        	_innerscoll();
+				}
+		  	};
+		}	           
+      }
+			    //重置页面高度
+		function _innerscoll(){
+			if(innerscroll){
+			   innerscroll.refresh(); 
+			}else{
+				var _height = getListHeight();
+		    	$("#sys_innerscoll").height(window.innerHeight-_height);
+		        innerscroll = new iScroll("sys_innerscoll",{click:true});
+		    	sys_autoTextarea(innerscroll); 		   
+			}		    
+		}    
+		function showImg(){            
+		       var imgs = document.getElementsByTagName("img");
+		       var w=window.innerWidth-10;
+					for(var i=0; i<imgs.length; i++)
+					{
+					  var img = imgs[i];
+					  if(img.width>w){
+						  img.width=w;
+					  }
+					}
+           }
+    function closeDivpic(){
+		var mask = $("#sys_mask_sign_up"); 
+		mask.css('display','none');	
+		var div=$("#div_sign_up");
+		//$(div).css("bottom",'-321px');
+		$(div).hide();
+	}   
+      function openDiv(){
+		window.event.stopPropagation();
+		var mask = $("#sys_mask_sign_up");
+		if(mask.length==0){
+			var maskHTML = '<div id="sys_mask_sign_up" onclick="closeDivpic();"></div>';
+			$("body").append(maskHTML);
+		}
+		mask.css('display','-webkit-box');
+		var div=$("#div_sign_up");
+		$(div).show();
+		$("#div_sign_up").width(window.innerWidth);
+		$(div).css("bottom",'0px');
+	}
+	function submit_msg_no(){	    
+         if (guid != "") {
+				   sys_ajaxPost("/tzsf/wap.do?method=signUp",{guid:guid,is_sign_up:'0'},function(msg) {
+							  if(msg.result==true){
+							     sys_alert(msg.msg);						     						     
+							      setTimeout(function() {
+                                      window.location.reload();
+                                   }, 1000);
+							  }else{
+							     sys_alert(msg.msg);
+							  }
+				   });
+			} 	    
+	}
+	function submit_msg_yes(){	         
+		       if (guid != "") {
+					   sys_ajaxPost("/tzsf/wap.do?method=signUp",
+					     {guid:guid,is_sign_up:'1',is_ride:$("input[name='is_ride']:checked").val(),place:$("#place").val(),msgnr:$("#msgnr").val(),ride_flag:ride_flag},
+								function(msg) {
+								  if(msg.result==true){
+								     sys_alert(msg.msg);						     
+								     //window.location.reload();
+								     setTimeout(function() {
+                                         window.location.reload();
+                                     }, 1000);
+								  }else{
+								     sys_alert(msg.msg);
+								  }
+					   });
+				} 	  	     
+	}
+	function go_back(){
+	   if(src=="list"){
+	     sys_goURL("list.html?guid=" + guid + "&src=list&lb_dm=" + lb_dm);
+	   }else{
+	     sys_goURL("../../main.html");
+	   }
+	   
+	}
+	
+	  function leave_closeDivpic(){
+		var mask = $("#sys_mask_lyfk"); 
+		mask.css('display','none');	
+		var div=$("#div_lyfk");
+		$(div).hide();
+		//$(div).css("bottom",'-251px');
+	}   
+      function leave_openDiv(){
+		window.event.stopPropagation();
+		var mask = $("#sys_mask_lyfk");
+		if(mask.length==0){
+			var maskHTML = '<div id="sys_mask_lyfk" onclick="leave_closeDivpic();"></div>';
+			$("body").append(maskHTML);
+		}
+		mask.css('display','-webkit-box');
+		var div=$("#div_lyfk");
+		$(div).show();
+		
+		$("#div_lyfk").width(window.innerWidth);
+		$(div).css("bottom",'0px');
+	}
+	function leave_submit_msg(){
+		   if($.trim($("#leave_msgnr").val())==""){
+		      sys_alert("请输入留言");return;
+		   }
+		   if (guid != "") {
+				   sys_ajaxPost("/msg/default.do?method=save",{ywid:guid,mk_dm_mc:"gwcs",msgnr:$("#leave_msgnr").val()},
+							function(msg) {
+							  if(msg.result==true){
+							     sys_alert("发表成功");						     
+							     leave_closeDivpic();
+							     join_msgStr(msg.yhxm,$("#leave_msgnr").val());
+							     $("#leave_msgnr").val("");
+							     $("#leave_no_msg").hide();
+							     _innerscoll();	
+							  }else{
+							     sys_alert(msg.msg);
+							  }
+				   });
+			}
+	}
+	
+	function join_msgStr(xm,nr){
+	         var str="";
+	         str+="<div class='row'>";			
+                    str+="<div class='c_nr'>"+nr+"</div>";				
+		            str+=" <div style='height:20px;'><span style='float:right'><span class='c_xm'>"+xm+"</span>&nbsp;&nbsp;<span class='c_time'>刚刚</span></span></div>";  		                        				      
+					str+="<div class='c_hr'></div>";
+             str+="</div>";	
+             $("#msgList").prepend(str);
+	}
+	function LoadMsgList(ywid){
+   	     sys_ajaxGet('/msg/default.do?method=msgList',{ywid:ywid},function(json){
+				 var msgList = json.msgList;
+				  if(msgList.length==0){
+				      $('#leave_no_msg').show();
+				  }else{
+				     $('#leave_no_msg').hide();
+				  }
+			     if(msgList.length>0){
+			       bindSsp(msgList);
+			     }
+			     _innerscoll();		    	 	
+		});
+	} 
+	function bindSsp(list){			 
+					if(list.length>0){					  
+						  var sspHtml="";
+						  for(var i=0;i<list.length;i++){											  
+					         sspHtml+="<div class='row'>";	
+					             sspHtml+="<div class='c_nr'>"+list[i].msgnr+"</div>";				
+		                         sspHtml+=" <div style='height:20px;'><span style='float:right'><span class='c_xm'>"+list[i].lyr+"</span>&nbsp;<span class='c_time'>("+list[i].lysj+")</span></span></div>";   
+		                        				      
+					              sspHtml+="<div class='c_hr'></div>";
+					         sspHtml+="</div>";						  
+						  }
+						   $('#msgList').html("");
+						   $('#msgList').html(sspHtml);
+					}	
+			}
+			
+	function send_candle(){
+	       if (guid != "") {
+	               var candle_img="<img src='img/candle.png' class='send_candle'>";
+				   sys_ajaxPost("/msg/default.do?method=save",{ywid:guid,mk_dm_mc:"gwcs",msgnr:candle_img},
+							function(msg) {
+							  if(msg.result==true){
+							     sys_alert("发表成功");						     
+							     join_msgStr(msg.yhxm,candle_img);
+							      $("#leave_no_msg").hide();
+							     _innerscoll();	
+							  }else{
+							     sys_alert(msg.msg);
+							  }
+				   });
+			}
+	}
+	
+	function go_questionnaire(id_questionnaire,submit_questionnaire){
+	  if(id_questionnaire){
+	   if(submit_questionnaire=='true'){
+	        sys_goURL("../dcwj/wstpy.html?src_notice=1&id_questionnaire="+id_questionnaire+"&id_notice="+guid+"&tzlb="+tzlb+"&lb_dm="+lb_dm);
+	   }else{	     
+	        sys_goURL("../dcwj/wstp.html?src_notice=1&id_questionnaire="+id_questionnaire+"&id_notice="+guid+"&tzlb="+tzlb+"&lb_dm="+lb_dm);
+	   }
+	  } 
+	}
+
+   function init_dialog(){
+              //报名不参加
+	          $('#dialog_search_no').dialog({
+	                autoOpen: false,
+	                closeBtn: false,
+	                buttons: {
+	                    '确定': function(){
+	                        submit_msg_no();
+	                        this.close();
+	                    },
+	                    '取消': function(){
+	                        this.close();
+	                    }
+	                }
+	            }).dialog('this')._options['_wrap'].addClass('login-dialog');
+	           
+	            $('#btn_no_sign_up').click(function(){
+	                $('#dialog_search_no').dialog('open');
+	            });
+	            
+	           //提交 参加报名信息
+	            $('#dialog_search_yes').dialog({
+	                autoOpen: false,
+	                closeBtn: false,
+	                buttons: {
+	                    '确定': function(){
+	                        submit_msg_yes();
+	                        this.close();
+	                    },
+	                    '取消': function(){
+	                        this.close();
+	                    }
+	                }
+	            }).dialog('this')._options['_wrap'].addClass('login-dialog');
+	           
+	            $('#btn_sign_up_submit').click(function(){
+			    
+			         var is_ride_val=$("input[name='is_ride']:checked").val();
+			         var place_val=$("#place").val();
+			         //有乘车安排条件下，一定要选择是否乘车
+				      if(ride_flag==1&&is_ride_val==''){
+				        sys_alert("请选择是否乘车");return;
+				      }
+				      //有乘车安排条件下，并且自己选择乘车的条件下，选择乘车地点
+				       if(ride_flag==1&&is_ride_val==1&&place_val==''){
+				        sys_alert("请选择乘车地点");return;
+				      }	 
+				       $('#dialog_search_yes').dialog('open');   
+	            });
+	            
+	            
+	           //有报名活动返回时给与提示
+	          $('#dialog_tips').dialog({
+	                autoOpen: false,
+	                closeBtn: false,
+	                buttons: {
+	                    '确定': function(){
+	                        this.close();
+	                    }
+	                }
+	            }).dialog('this')._options['_wrap'].addClass('login-dialog');
+	           
+	           
+   }
+   function goBack(){
+       sys_closeDetail();
+       /*
+	   if(!is_already_sign_up&&close_up!='1'&&sign_up_flag=='1'){
+	      $('#dialog_tips').dialog('open');return;
+	   }else{
+	      sys_closeDetail();
+	   } 
+	   */
+   }
+    </script>
+
+    <style type="text/css">
+#speakButton {
+	height: 40px;
+	width:  40px;
+	position:fixed;
+	opacity:0.5;
+	top:45%;
+	right:10px;
+	z-index:99999;
+	background:url('../img/start_speak.png') no-repeat;
+	background-size:40px 40px;
+}
+#div_already_info{
+ text-align: center;
+ font-weight: bold;
+}
+    	
+    </style>
+  </head>
+  <body>
+    <div id="toolbar2">
+	    <span class="btn_bak" onclick="goBack()"></span>
+	    <h1 class="toolbar_title">详 情</h1>
+	</div>
+<div id="speakButton" speak_status="朗读" ></div>
+	<div id="sys_innerscoll">
+		<div style="margin:0px 8px;">
+			<div class="c_zt" id="zt"></div>
+			<div class="c_info">&nbsp;<span id="yhid"></span>&nbsp;&nbsp;&nbsp;&nbsp;<span id="cjsj"></span></div>
+			<div><hr style="width:96%;"/></div>
+			<div class="c_item_value2" id="ggnr"></div>
+			<div style="height:25px;"></div>
+			<div class="c_item_container c_fujian"><div class="c_item_value" style="font-weight:bold;font-size:.7em;color:#666;"><br>相关附件：</div></div>
+			<div class="c_item_container"><div class="c_item_value" id="_fujian"></div></div>
+			 <div class="div_submit btn_sign_up" id="btn_yes_sign_up"  style="display: none"  onclick="openDiv()">报名参加</div>	
+			 <div class="div_submit btn_sign_up" id="btn_no_sign_up"  style="display: none" >不参加</div>	
+			 <div class="div_submit" id="btn_close_sign_up" style="display: none">报名已结束</div>	
+			 <div id="div_already_info" style="display: none"></div>		
+			 <div class="div_submit" id="btn_show_sign_up" style="display: none"  onclick="openDiv()">查看报名信息</div>
+			  <div class="div_submit" id="btn_questionnaire"  style="display: none">参与调查问卷</div>
+			<div style="height:15px;"></div>
+			<!-- 追忆与思念信息 -->
+			 <div id="leave_msg_list" style="display: none">
+			     <div class="c_leave_title_hr"></div>
+				     <div style="border-bottom: 1px solid #CCC;">
+					     <div id="leave_msg_title">
+					         <div class="leave_msg_title_star"></div>
+					         <div class="leave_msg_title_lable">追忆与思念</div>
+					     </div>
+				     </div>
+			      <div id="leave_no_msg">暂无信息！</div>
+			     <div id="msgList" class="c_message"></div>
+			  </div>
+			
+			<div style="height:25px;"></div>
+		 </div>	 
+		 <!-- 报名信息 -->
+		<div class='div_sign_up' id="div_sign_up" style="display: none">
+		   <form id="frm1">
+		         <div class="c_form_show">
+		             <!--  
+		             <div>
+						<div class="form_cell_label">
+							是否报名：
+						</div>
+						<div class="form_cell_item">
+							 <input  type="radio"  name="is_sign_up" value="1" checked="checked" class="radio_size"/><label class="c_left">是 &nbsp;&nbsp;&nbsp; </label> 
+	               	         <input type="radio"  name="is_sign_up" value="0"  class="radio_size"/><label class="c_left">否</label>  
+						</div>
+					</div>
+					 -->
+					<div class="div_ride_info"> 
+						<div class="form_cell_label">
+							是否乘车：
+						</div>
+						<div class="form_cell_item">
+						    
+							 <input type="radio" name="is_ride" value="1" checked="checked" class="radio_size"/><label class="c_left">是 &nbsp;&nbsp;&nbsp; </label> 
+	               	         <input type="radio" name="is_ride" value="0" class="radio_size"/><label class="c_left">否</label> 
+	               	        
+						</div>
+					</div>
+					<div class="div_ride_info div_place">
+						<div class="form_cell_label">
+							乘车地点：
+						</div>
+						<div class="form_cell_item">
+							 <select id="place" name="place"></select>
+						</div>
+					</div>
+					<div >
+						<div class="form_cell_label">
+							留&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;言：
+						</div>
+						<div class="form_cell_item">
+							<textarea id="msgnr" name="msgnr" rows="3" cols="100" placeholder=若无其他需要，请忽略留言，直接点击“提交报名”按钮></textarea>
+						</div>
+					</div>
+		         </div>
+		          <div class="div_submit btn_sign_up" id="btn_sign_up_submit" onclick="submit_msg('1')">提交报名</div>
+		          
+		   </form>
+		</div>
+		<!-- 留言框 -->
+	    <div class="div_footer div_other_50" id="btn_msg"  style="display: none">
+		    <div class="div_footer_left"> <input type="text" placeholder='我要留言' class="lyFooter"  onclick='leave_openDiv()'/></div>
+		    <div class="div_footer_right"><img src="img/btn_candle.png" width="40px" height="30px" onclick="send_candle()"/></div>
+	    </div>
+	    
+		<div class='div_lyfk' id="div_lyfk" style="display: none">	
+			<div class='c_div_nr'>
+			   <textarea id='leave_msgnr' name='leave_msgnr' placeholder='请输入要留言的内容'></textarea>
+			</div>
+			<div class='div_submit' onclick='leave_submit_msg()'>发  表</div>
+		</div>
+		
+<div id="dialog_search_no">
+    <div>您确认不参与报名吗？</div>
+</div>
+<div id="dialog_search_yes">
+    <div>您确认参与报名并提交信息吗？</div>
+</div>
+<div id="dialog_tips">
+    <div>请您选择“报名参加”或“不参加”提交信息后再返回，感谢您的参与！</div>
+</div>
+  </body>
+</html>

@@ -1,0 +1,231 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>推荐头像</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript">
+    var innerscroll=null;
+   
+	$(function() {
+		//生成toolbar
+		$('#toolbar').toolbar();
+	    loadImgList();
+	});
+	function loadImgList(){
+	    sys_ajaxGet("/ltz/grtx/wap.do?method=waplist",function(json){
+            var html_str='';
+            if(json.imglist.length>0){
+			           var list=json.imglist;
+						var sspHtml = "";				       
+						for (var i = 0; i < list.length; i++) {							       	         
+					          sspHtml +=" <div class='content'>";
+				              sspHtml +=" <div class='img' onclick=showImg('"+list[i].picid + "') style=\"background-image: url('"+getUrl()+list[i].imgurl+"');\"></div>	";               
+				              sspHtml +=" </div> ";				              					       
+						}						
+						$('#box').html("");
+						$('#box').html(sspHtml);
+						$('#box').height((window.innerWidth/4)*Math.ceil(list.length/4)+2);	
+						
+						var _height = window.innerHeight - getListHeight();
+						$("#innerscroller").height(_height);
+						  innerscroll = new iScroll("innerscroller", {
+							hScrollbar : false,
+							vScrollbar : false,
+							click : true
+						});	
+						//	
+		         }   			
+	        
+        });  
+	}
+   function showImg(picid){
+       sys_ajaxGet("/ltz/grtx/wap.do?method=getUrlByZid",{picid:picid},function(json){
+		      if(json.imgurl==undefined||json.imgurl==""){
+		         sys_alert("该图片文件有问题");
+		      }else{
+		         var _width=window.innerWidth;
+		        showOpenImg(picid,getUrl()+json.imgurl+"?size="+_width+"*");
+		      }	       
+	    });
+    
+   }
+  function showOpenImg(picid,url){
+		//window.event.stopPropagation();
+		var mask = $("#sys_mask_pic");
+		if(mask.length==0){
+			var maskHTML = '<div id="sys_mask_pic" onclick="closeDivpic();"></div>';
+			$("body").append(maskHTML);
+		}
+		mask.css('display','-webkit-box');
+		var div=$("#div_pic");
+		$(div).show();
+		var yhxx=new Array();
+		yhxx.push("<div id='div_pic_temp' style=\"background-image:url('"+url+"');\"></div>");
+		yhxx.push("<div id='div_pic_temp_text'><div id='btn_tx' onclick=setPhoto('"+picid+"')> 设为头像</div></div>");
+		//
+		$(div).html(yhxx.join(''))
+	    var _width1=window.innerWidth;
+		$("#div_pic_temp").width(_width1);
+		$("#div_pic_temp").height(_width1);
+		$("#div_pic").width(_width1);
+		$("#div_pic").height(_width1+60);
+		//$("#div_pic").height("200px");
+       var _heigh=(window.innerHeight-$("#div_pic").height())/2;
+		$(div).css("bottom",_heigh);
+	
+	}
+	function setPhoto(picid){
+	     sys_ajaxPost("/ltz/grtx/wap.do?method=setPhoto",{picid:picid},function(json){
+	         if(json.result==true){
+	            sys_alert('设置成功');
+	            setTimeout(function() {
+					 sys_goURL('grzx.html');
+					}, 1000);	           
+	         }else{
+	           sys_alert_xgmm(json.msg);
+	         }
+	     });	
+	}
+	function closeDivpic(){
+		var mask = $("#sys_mask_pic"); 
+		mask.css('display','none');	
+		var div=$("#div_pic");
+		div.hide();
+		//$(div).css("bottom",'-151px');
+	}
+</script>
+
+<style type="text/css">
+.ui-toolbar-wrap {
+	border: none !important;
+}
+
+.box {
+   // background: lightblue;
+    width: 100%;
+}
+.content {
+    width: 25%;
+   // height: 100%;
+    float: left;
+    background: inherit;
+    position: relative;
+   
+}
+.content:before {
+    content: "";
+    padding-top: 100%;
+    vertical-align: middle; /* 这是关键，否则图片下方会超出一条缝 */
+    display: block;
+}
+.diff {
+   // background: lightpink;
+}
+.content .img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+ 
+    /* 下面没有用，只是看着好看 */
+    font-size: 12px;
+   // color: darkgray;
+    text-align: center;
+    //padding-top: 30px;
+  
+    background-image: url("tx/1.png");
+    background-repeat: no-repeat;
+    background-size:98% 98%; 
+    background-position: center center;
+
+}
+       #sys_mask_pic{
+			position: fixed;
+			bottom: 0px;
+			top: 0px;
+			width: 100%;
+			z-index: 98;
+			background: #878787;
+			opacity:0.5;
+			display: -webkit-box;
+			-webkit-box-pack: center;
+			-webkit-box-align: center;
+		}
+	#div_pic{
+		position:absolute;
+		width:90%;
+		height:150px;
+		bottom:-150px;
+		background:#ffffff;
+		z-index:99;
+		/*display: none;*/
+		opacity: 0.9;
+		/*color: #f94600;*/
+		font-size: 16px;
+		font-family: "微软雅黑";
+		border-radius: 0px;
+		-webkit-transition-property:bottom;
+		-webkit-transition-duration:0.5s;
+		
+		
+	}
+	#div_pic_temp{
+	   //background-image: url('tx/1.png');
+	   background-repeat: no-repeat;
+	   background-size:100% 100%;
+	 //  width: 100%;height: 100%;
+	  // padding-bottom: 100%;
+	} 
+	#div_pic_temp_text{
+		width: 100%;
+		height:60px; 
+		display: -webkit-box;
+		-webkit-box-pack: center;
+	    -webkit-box-align: center;
+		
+	} 
+	#btn_tx{
+	     width: 80%;
+	     height: 30px;
+		 background-color: red;		
+	     border-radius:5px;	    
+	     color:#FFF;
+	     line-height: 30px;
+	     text-align: center;
+	}
+</style>
+
+</head>
+<body>
+	<div id="toolbar">
+		<span class="btn_bak" onclick="sys_goURL('grzx.html');"></span>
+		<h1 class="toolbar_title">推荐头像</h1>
+	</div>
+	
+
+	<div id="innerscroller">        
+			<div class="box" id="box">
+			  <!-- 
+			    <div class="content"><div class="img" onclick="showImg('tx/1.png');"></div></div>
+			    <div class="content"><div class="img"  onclick="showImg('tx/1.png');"></div></div>
+			    <div class="content"><div class="img"></div></div>
+			    <div class="content"><div class="img"></div></div>
+			    <div class="content"><div class="img"></div></div>
+			    <div class="content"><div class="img"></div></div>
+			    <div class="content"><div class="img"></div></div>
+			   -->  
+           </div>	
+	</div>
+	<div class='div_pic' id="div_pic" style="display: none">
+	  
+	  	</div>
+</body>
+</html>

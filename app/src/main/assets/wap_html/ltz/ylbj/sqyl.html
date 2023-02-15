@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+<script type="text/javascript">
+	sys_addMeun = true;
+	var lb_dm=getQueryStringRegExp("lb_dm");
+    var _list = {};
+	$(function() {
+		$('#toolbar').toolbar();
+		
+		sys_ajaxGet("/ltz/yyjsAndsqyl/default.do?method=waplist&page_size=1000&page_goto=", {type : "1"}, function(json) {
+            var html = "<div class='content_text' >近年来，北京市社区医疗得到长足发展，医疗设备配备和科室建设得到加强，康复护理能力显著提升，中医学科得到全面发展，为老同志就医看医又提供了一个便捷的渠道。老干部局在调研基础上，向大家推荐我部老同志集中居住点的社区卫生服务站，供您参考。</div><hr style='height: 5px;'/>";
+            var jsonT = json.list;
+            if (jsonT.length === 0) {
+                html += "<li><div class='list_row_con' style='height:70px;min-height:70px;background-color: #ffffff;'>";
+                html += "<div class='list_row_col2' style='padding-top:12px;margin-left:18px;'>";
+                html += "<div class='list_row_col2_1 overflow' style='text-align: center;'>没有数据！</div></div></div></li>";
+                $("#table_list").html(html);
+            } else {
+                for(var i=0;i<jsonT.length;i++){
+                    html += "<li class='liclass'><div class='mc'><img src='sqylimg/Site.png'><span>"+ jsonT[i].mc + "</span></div>";                                              
+                	html += "<hr style='width:80%;'/><div class='address'><img src='sqylimg/Pin.png'><span>"+ jsonT[i].address + "</span></div>";
+                	html += "<hr style='width:80%;'/><div class='address'><img src='sqylimg/Phone.png'><span onclick=dadianhua('" + jsonT[i].phone + "')>" + jsonT[i].phone + "</span></div><hr/></li>";
+                }
+                $("#table_list").html(html);
+            }
+            var _height = getListHeight();
+    		$("#sys_innerscoll").height(window.innerHeight - _height);
+    		var innerscroll = new iScroll("sys_innerscoll", {
+    			click : true
+    		}); 
+        });
+	});
+	function go_back() {
+		sys_goURL("main.html");
+	}
+	function showDetail() {
+		var url= "/ltz/bjfw/show.html?&backUrl=food&lx=dcsc";
+		sys_showDetail(url);
+	}
+	function dadianhua(sj){
+		if(!sj || sj=="undefined" || sj=="null"){
+			sj = "";
+		}
+		var v = "tel:"+sj;
+		window.location.href = v;
+		event.stopPropagation(); 
+	}
+
+</script>
+<style>
+.ui-toolbar-wrap {
+	border: 0px;
+}
+#sys_innerscoll{font-size: 14px;}
+
+.content_text {
+    padding: 3%;
+    text-indent: 29px;
+    line-height: 27px;
+    padding-top: 17px;
+    letter-spacing: 1px;
+}
+.mc{
+	padding: 12px;
+	
+}
+.address{
+    padding:11px 11px 11px 40px;
+}
+img{
+	width: 12px;
+    
+}
+hr{ 
+	-webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
+    background: #f7f1f1;
+    border: none;
+    height: 1px;
+    }
+.liclass>div> span{
+    	padding-left:12px;
+    }
+
+</style>
+</head>
+<body>
+	<div id="toolbar">
+		<i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+		<h1 class="toolbar_title">社区医疗</h1>
+	</div>
+	<div id="sys_innerscoll">
+		
+		<ul id="table_list" style="list-style-type:none">
+		</ul>
+	</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

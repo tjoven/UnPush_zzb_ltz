@@ -1,0 +1,275 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>通知公告</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript">
+	sys_addMeun = false;
+	var lb_dm=getQueryStringRegExp("lb_dm");
+	var dm = getQueryStringRegExp("dm");
+	var mc = getQueryStringRegExp("mc");
+	//var lb_dm=8103
+	var nm = getQueryStringRegExp("nm");
+	var _list = {};
+	var qx_send=false;
+
+	$(function() {
+		//生成toolbar
+		$('#toolbar').toolbar();
+		$("#cx_zt").width($(document).width()-20);
+		$("#cx_zt").val("");
+		
+		if(nm == ''){			    	
+			nm=0;
+		}	
+		$(".c_tabs_text").eq(nm).addClass("c_tabs_active");
+		if(lb_dm==''||lb_dm==undefined){
+		  lb_dm=8103;
+		}
+		if(mc!=''&&mc!=undefined){
+		  $(".toolbar_title").text(mc);
+		}
+		sys_renderList('table_list', '/tzsf/wap.do?method=tzSignList&p_flag=1&page_size=10&&page_goto=', {lb_dm:lb_dm,dm:dm}, _list);		
+		
+	});
+	function callback_trclick_table_list(param) {
+		/*
+			var _target = event.target;
+			if($("#is_sign_in_"+param).val()=="1"){//需要签收的判断
+			     if ($("#sign_in_"+param).val() == ''|| $("#sign_in_"+param).val() == '0') {
+				   sys_alert("该通知未签收，请先签收！");
+				   return;
+			  }
+			}
+		
+			if (!$(_target).hasClass("c_nonexec")) {
+				sys_goURL("show.html?guid=" + param + "&src=list&lb_dm=" + lb_dm + "&nm=" + nm+"&operate=sign");
+			}
+	  */	
+	   $("#red_dot_"+param).hide();
+		var url = "/ltz/notice/show.html?guid=" + param + "&src=list&lb_dm=" + lb_dm + "&nm=" + nm+"&operate=sign&dm="+dm;
+		//sys_goURL("show.html?guid=" + param + "&src=list&lb_dm=" + lb_dm + "&nm=" + nm+"&operate=sign");
+	     sys_showDetail(url);
+     }
+   		
+   		function search(){
+   			cx_zt = $("#cx_zt").val();
+   			sys_ajaxGet("/tzsf/wap.do?method=tzSignList&p_flag=1&page_size=10&page_goto=",{cx_zt:cx_zt,lb_dm:lb_dm,dm:dm},function(json){
+   				bind(json,'up');
+   				
+   				if(json.gridData.table_list.data.length==0){
+				  $(".ui-refresh-down").hide();
+			    }else{
+				  $(".ui-refresh-down").show();
+			    }
+   				
+   				_list["table_list"].refresh();
+   				_list['table_list'].scrollTo(0,0,500,false); 
+   			});
+   			//$("#zt").val("");
+   		}
+   		/*
+   		function qianshou(guid,is_sign_in){
+   		        //是否需要签收 is_sign_in
+	        if(is_sign_in!='1'){//不需要签收的
+	            return;
+	        }else if(is_sign_in=='1'&&$("#sign_in_"+guid).val()==1){
+	           //需要签收，但已经签收的
+	            return;
+	        }else{
+		    	sys_ajaxGet('/tzsf/wap.do?method=signIn&guid='+guid,function(json){
+			    	 //alert(response.msg);
+					if(json.result==true){
+					    $("#sign_"+guid).val("已签收");
+					    $("#sign_in_"+guid).val("1");
+						sys_alert(json.msg);
+					}else{
+						sys_alert(json.msg);
+					}
+			   });
+		   }
+	    }*/
+	
+		// 点击tab页刷新画面显示相应tab页内容一览list
+		function getNm(dm){
+			if(dm=="tzjs"){
+			    sys_goURL("list.html?nm=0&lb_dm="+lb_dm);		
+			}else if(dm=="ptgg"){
+			 	sys_goURL("../publish/ptgg.html?nm=1&lb_dm=64941");
+			}
+		}
+		function showHis(param,mc){
+		  sys_goURL("list_his.html?lb_dm="+lb_dm+"&dm="+param+"&mc="+escape(mc));		
+		}
+		
+</script>
+
+<style type="text/css">
+   .ui-toolbar-wrap{
+	    		border: none !important;
+    		}
+   
+  	li{
+    	list-style-type:none;
+    }
+     .ui-toolbar-wrap{
+       background-color: #303030;
+     }
+		
+		
+		.add {
+			width: 50px;
+			height: 50px;
+			line-height: 50px;
+			color: #ffffff;
+			font-size: 16px;
+			/* background: url("../img/jiahao.png") no-repeat; */
+			background-position: center center;
+			background-size: 28px 28px;
+			border: 0px !important;
+		}
+		.list_row_col3 {
+			width: 76px;
+			color: #ff6600;
+			font-size: 12px;
+			font-weight: bold;
+			display: -webkit-box;
+			-webkit-box-pack: end;
+			-webkit-box-align: center;
+			padding-right: 5px;
+			background: none;
+		}
+		.c_nonexec{
+		  -webkit-appearance: none;
+		  padding:3px; 
+		  background-color:#ffffff;
+		  border: 1px;
+		  border-color:#808080; 
+		  border-style: solid;
+		  border-radius:1px;
+		}
+		.red_dot{
+		  display: -webkit-box;
+	      -webkit-box-align: center;
+	      -webkit-box-pack: center;
+		  width: 12px;
+		  height: 65px;
+		  line-height: 65px;
+		}
+	.span_noreadnum{
+	     width: 12px;
+		 height: 65px;
+		background: url("../../img/noread_black.png") no-repeat;
+		background-size: 7px 7px;	
+		background-position:5px 20px;
+		display: none;
+	}
+	
+	.div_btn{
+	   position:fixed;
+	   bottom:50px;
+	   width:100%;
+	   height: 50px;
+	   display:-webkit-box;
+	   -webkit-box-orient: horizontal; 
+	   background-color: #ece9e9;
+	}
+	.div_btn>div{ 
+       display:-webkit-box;
+	   -webkit-box-flex: 1;
+	   -webkit-box-align: center;
+	   -webkit-box-pack: center;
+	}		
+	.div_bottom_btn{
+	  width:120px;
+	  height: 30px;
+	  /*
+		 border-radius:15px;
+		 background-color: #a5a5a5;    
+		 text-align: center;
+		 line-height: 30px;
+		 color: white;
+		 font-weight: bold;
+	  */
+	  background-repeat: round;
+	  background-size: cover;
+	}
+	#xtxry{
+	   background-image: url("img/xtxry.png");
+	}
+	#lsry{
+	   background-image: url("img/lsry.png");
+	}
+	.bg_candles{
+	  width:100%;
+	  height:100px; 
+	  background-image: url('img/candles.png');
+	  background-size: 100% 100%;
+	  background-repeat: no-repeat;
+	  background-position: center center;
+	}
+
+</style>
+
+</head>
+<body>
+
+	<div id="toolbar">
+		<span class="btn_bak" onclick="sys_goURL('block.html');"></span>
+		<h1 class="toolbar_title">通知公告</h1>
+	</div>
+	
+	    <div id="div_search" class="list_div_search div_other_50" >			
+			<input type="text" id="cx_zt" class="list_search_input" placeholder="请输入主题" >		
+			<div class="list_search_img" id="btn_search" onclick="search()"></div>			
+		</div>
+		
+		
+    <div class="ui-refresh" id="div_table_list">
+    
+		<!--<div class="ui-refresh-up" id="ui-refresh-up"></div>-->
+		<ul class="data-list" id="table_list" style="list-style-type:none">
+			<li style="display: none;" >
+				<div style="display: none;">{guid}</div>
+				
+				<!-- 点击行的参数 -->
+				<div class="list_row_con" style="height:65px;background-color: #ffffff;" >
+				    <div class="red_dot" >
+				        <div class="span_noreadnum" id="red_dot_{guid}" style="display:{display_val};"></div>
+				    </div>
+					<div class="list_row_col2" style="margin-top:13px;margin-right: 10px;">
+						<div class="list_row_col2_1 overflow">{zt}</div>
+						<div class="list_row_col2_2" style="top:0px;clear:none;width: 100%;float: left;">
+						   <!--   <span style="display:inline;float: left;">{gglb}</span>-->		
+							<span style="display:inline;float: right;margin-right: 5px;">{fbrq}</span>				
+						</div>
+					</div>
+				</div>
+			</li>
+		</ul>		
+		<div class="ui-refresh-down"></div>
+
+
+	</div>
+	<div class="bg_candles">
+	    <div class="div_other_50"></div>
+	    <div class="div_other_50"></div>
+	</div>
+	 <!-- 
+		<div class="div_btn div_other_50">
+	          <div><div id="xtxry" class="div_bottom_btn" onclick="showHis('2','新退休人员')"></div></div>
+		      <div><div id="lsry" class="div_bottom_btn" onclick="showHis('3','追忆与思念')"></div></div>
+		</div>
+	 -->
+</body>
+</html>

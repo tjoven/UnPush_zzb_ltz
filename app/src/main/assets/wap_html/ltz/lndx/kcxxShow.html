@@ -1,0 +1,298 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+    <title>课程详情</title>
+    <link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link type="text/css" rel="stylesheet" href="../../css/iconfont/iconfont.css" />
+    <script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+    <script type="text/javascript" src="../../js/ict.js"></script>
+    <script type="text/javascript" src="../../js/local.js"></script>
+    <script type="text/javascript">
+        var guid = getQueryStringRegExp("guid");
+        var clientWidth=window.innerWidth;
+        var innerscroll=null;
+        $(function(){
+            //生成toolbar
+            $('#toolbar').toolbar();
+
+            sys_ajaxGet("/ltz/lndx/default.do?method=show",{guid:guid},function(json){
+                bind(json);
+                innerscorll();
+                var title_mc="课程详情";
+                //$(".toolbar_title").text(json.lbmc);
+                LoadBmList(guid);
+                if (json.formData.sfyybm=='1'&&json.result){
+                    sys_ajaxGet("/ltz/lndx/default.do?method=ifBm",{guids:guid},function(json) {
+                        if (!json.result) {
+                            if (json.msg!="gzry") {
+                                $("#bmBtn").hide();
+                                $("#qxBtn").show();
+                                innerscorll();
+                            }
+                        }else {
+                            $("#qxBtn").hide();
+                            $("#bmBtn").show();
+                            innerscorll();
+                        }
+                    })
+                }
+            });
+            //加载报名列表
+            function LoadBmList(kcid){
+                sys_ajaxGet('/ltz/lndx/default.do?method=getBmListApp&page_size=10000',{kcid:kcid},function(json){
+                    //bind(json);
+                    var msgList = json.msgList;
+                    if(msgList.length>0){
+                        bindBmList(msgList);
+                        
+                    }
+
+                });
+            }
+           
+            function innerscorll(){
+    			if(innerscroll){
+    			   innerscroll.refresh(); 
+    			}else{
+    				var _height = getListHeight();
+    		    	$("#sys_innerscoll").height(window.innerHeight-_height);
+    		        innerscroll = new iScroll("sys_innerscoll",{click:true});
+    		    		   
+    			}		    
+    		}    
+            
+
+            //绑定报名列表
+            function bindBmList(list){
+                if(list.length>0){
+                    var sspHtml="";
+                    for(var i=0;i<list.length;i++){
+                        /* sspHtml+="<li onclick=bmxq('"+list[i].bmrid+"')><div class='list_row_con' style='min-height:40px;background-color: #ffffff;' >"; */
+                        sspHtml+="<li><div class='list_row_con' style='min-height:40px;background-color: #ffffff;' >";
+                        sspHtml+="<div class='list_row_col1' style='width:15px;'></div><div class='list_row_col2' style='width:100%;'>";
+                        sspHtml+="<div class='list_row_col2_1' style='margin-top: 10px;'><span style='display: inline-block;margin-left: 8%;width: 13%;'>"+list[i].xh+"</span>";
+                        sspHtml+="<span class='overflow' style='display: inline-block;width: 25%;'>"+list[i].xm+"</span><span style='display: inline-block;'>"+list[i].cjsj1+"</span>";
+                        sspHtml+="</div></div></div></li>";
+                    }
+                    $('#table_list').html("");
+                    $('#table_list').html(sspHtml);
+                    innerscorll();
+                }
+            }
+
+            $('#dialog_search').dialog({
+                autoOpen: false,
+                closeBtn: false,
+                buttons: {
+                    '确定': function(){
+                        kcbm();
+                        this.close();
+                    },
+                    '取消': function(){
+                        this.close();
+                    }
+                }
+            }).dialog('this')._options['_wrap'].addClass('login-dialog');
+
+            $('#bmBtn').click(function(){
+                $('#dialog_search').dialog('open');
+            });
+
+            $('#dialog_search1').dialog({
+                autoOpen: false,
+                closeBtn: false,
+                buttons: {
+                    '确定': function(){
+                        qxbm();
+                        this.close();
+                    },
+                    '取消': function(){
+                        this.close();
+                    }
+                }
+            }).dialog('this')._options['_wrap'].addClass('login-dialog');
+
+            $('#qxBtn').click(function(){
+                $('#dialog_search1').dialog('open');
+            });
+        });
+
+        function bmxq(bmrid) {
+            sys_goURL("bmxq.html?bmrid="+bmrid+"&guid="+guid);
+        }
+        function go_back(){
+            sys_goURL("kcxx.html");
+        }
+        //取消报名
+        function qxbm(){
+            sys_ajaxGet("/ltz/lndx/default.do?method=qxKcbm",{guids:guid},function(json) {
+                if (json.result) {
+                    $("#bmBtn").show();
+                    $("#qxBtn").hide();
+                    sys_alert(json.msg);
+                    window.location.reload();
+                }
+            })
+        }
+        //课程报名
+        function kcbm() {
+            sys_ajaxGet("/ltz/lndx/default.do?method=saveKcbm", {guids: guid}, function (json) {
+                if (json.result) {
+                    $("#bmBtn").hide();
+                    $("#qxBtn").show();
+                    sys_alert(json.msg);
+                    window.location.reload();
+                }
+            });
+        }
+
+    </script>
+
+    <style type="text/css">
+        .c_item_value{
+            padding-top: 15px;
+            font-size:.8em;
+        }
+        .c_item_container{
+            min-height: 46px;
+            border-bottom: 1px solid #DDD;
+
+        }
+
+        .ui-toolbar-wrap{
+        //background-color: #FFB73E;
+            border: none !important;
+        }
+        td{
+            padding: 5px;
+        }
+        .c_div_nr{
+             margin: 20px;
+        }
+        .c_div_nr1{
+            margin: 20px;
+        }
+        #btn span{
+            border-radius: 7px;
+            color: white;
+            width: 100%;
+            height: 35px;
+            display: inline-block;
+            text-align: center;
+            font-size: 18px;
+            line-height: 35px;
+        }
+        #form_show td{
+            vertical-align: middle;
+        }
+        .form_cell_label{
+            color:#000000;
+            width: 30%;
+            padding-left: 30px;
+        }
+
+
+    </style>
+</head>
+<body>
+<div id="toolbar">
+    <span class="btn_bak"  onclick="go_back();"></span>
+    <h1 class="toolbar_title">课程详情</h1>
+</div>
+
+<div id="sys_innerscoll">
+    <form id="form_show">
+        <input type="hidden" name="guid" id="guid" />
+        <div class="c_form_show">
+            <div style="margin-top:10px;">
+                <div class="form_cell_label" ><span>课程名称</span></div>
+                <div class="form_cell_item">
+                    <span name="kcmc" id="kcmc" style="width: 30%;color: #adadad;"></span>
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <div class="form_cell_label" ><span>任课老师</span></div>
+                <div class="form_cell_item">
+                    <span name="rkls" id="rkls" style="width: 30%;color: #adadad;"></span>
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <div class="form_cell_label" ><span>课程简介</span></div>
+            </div>
+            <div style="margin-top:10px;">
+                <div class="form_cell_item">
+                    <span name="kcjj" id="kcjj" style="width: 93%;color: #adadad;display: inline-block;padding: 0 20px 0 15px;"></span>
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <div class="form_cell_label" ><span>老师简介</span></div>
+            </div>
+            <div style="margin-top:10px;">
+                <div class="form_cell_item">
+                    <span name="lsjj" id="lsjj" style="width: 93%;color: #adadad;display: inline-block;padding: 0 20px 0 15px;"></span>
+                </div>
+            </div>
+           <!-- <div style="margin-top:10px;">
+                <div class="form_cell_label" ><span>开课时间</span></div>
+                <div class="form_cell_item">
+                    <span name="kksj" id="kksj" style="width: 30%;color: #adadad;"></span>
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <div class="form_cell_label" ><span>结课时间</span></div>
+                <div class="form_cell_item">
+                    <span name="jksj" id="jksj" style="width: 30%;color: #adadad;"></span>
+                </div>
+            </div>-->
+            <div style="margin-top:10px;">
+                <div class="form_cell_label" ><span>上课地点</span></div>
+                <div class="form_cell_item">
+                    <span name="skdd" id="skdd" style="width: 30%;color: #adadad;"></span>
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <div class="form_cell_label" ><span>上课频次</span></div>
+                <div class="form_cell_item">
+                    <span name="skpc" id="skpc" style="width: 30%;color: #adadad;"></span>
+                </div>
+            </div>
+        </div>
+
+        <!--课程报名-->
+        <div id="btn" style="width: 80%;padding: 10px 10% 10px 10%;"><!--onclick="kcbm('{guid}')"-->
+            <span id="bmBtn" style="background: rgb(214, 167, 36);display:none;">立即报名</span>
+            <span id="qxBtn" style="background: rgb(214,39,36);display:none;">取消报名</span>
+        </div>
+
+        <!--回复列表-->
+        <p style="font-size: 20px;margin: 10px 0 0 20px;">报名情况</p>
+        <div style="margin-top: 10px;">
+            <table style="margin-left: 2%;width: 96%;">
+                <tbody>
+                <tr style="border-bottom: 1px solid #b0aea6;">
+                    <td style="text-align: center;">序号</td>
+                    <td>姓名</td>
+                    <td>报名时间</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class='ui-refresh' id='div_table_list'>
+            <ul class='data-list' id='table_list' style='list-style-type:none'>
+            </ul>
+        </div>
+        <div style="height: 20px;"></div>
+
+    </form>
+</div>
+<div id="dialog_search">
+    <div>您确认报名此课程吗？</div>
+</div>
+<div id="dialog_search1">
+    <div>您确认取消报名吗？</div>
+</div>
+</body>
+</html>

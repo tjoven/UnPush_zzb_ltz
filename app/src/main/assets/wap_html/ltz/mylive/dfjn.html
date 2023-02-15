@@ -1,0 +1,268 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport"
+		  content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+	<title>党费交纳</title>
+	<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+	<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+	<script type="text/javascript" src="../../js/ict.js"></script>
+	<script type="text/javascript" src="../../js/local.js"></script>
+	<script type="text/javascript" src="../../js/list.js"></script>
+	<script type="text/javascript" src="../../js/Mdate/Mdate.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../js/Mdate/mdate.css" />
+
+
+	<script type="text/javascript">
+
+        var nm = getQueryStringRegExp("nm");
+        var _list = {};
+        var guid = null;//全局变量
+        var jnbz = null;//党费交纳标准
+        var date=new Date;
+        var month=date.getMonth()+1;
+        month =(month<10 ? "0"+month:month);
+        $(function() {
+            //生成toolbar
+            $('#toolbar').toolbar();
+            $(".c_tabs_text").eq(1).addClass("c_tabs_active");
+            new Mdate("cx_year", {
+                beginYear : "2010",
+                beginMonth : "1",
+                format : "yyyy"
+            })
+
+            sys_renderList('table_list', '/ltz/dfjn/default.do?method=waplist&page_size=15&&page_goto=', {}, _list);
+            sys_ajaxGet("/ltz/lndx/default.do?method=isLtz",function (json) {
+                if (!json.result){
+                    $("#dfjnbz").hide();
+                }
+            });
+            $("#cx_year").focus(function() {
+                document.activeElement.blur();
+            });
+
+            $('#dialog_search').dialog({
+                autoOpen: false,
+                closeBtn: false,
+                buttons: {
+                    '确定': function(){
+                        save();
+                        this.close();
+                    },
+                    '取消': function(){
+                        this.close();
+                    }
+                }
+            }).dialog('this')._options['_wrap'].addClass('login-dialog');
+        });
+
+        function go_back() {
+            sys_goURL("main.html");
+        }
+
+
+        // 点击tab页刷新画面显示相应tab页内容一览list
+        function getNm(dm) {
+            if (dm == "gzcx") {
+                sys_goURL("gzylj.html?nm=0");
+            } else if (dm == "dfjn") {
+                sys_goURL("dfjn.html?nm=1");
+            } else if (dm == "yyfbx") {
+                sys_goURL("yyfbx.html?nm=2");
+            }else if (dm == "cgj") {
+                sys_goURL("../events/entryAndExit/entryAndExit.html");
+            }
+        }
+        function search() {
+            var cx_year = $("#cx_year").val();
+            sys_ajaxGet("/ltz/dfjn/default.do?method=waplist&page_size=15&&page_goto=", {
+                cx_year : cx_year
+            }, function(json) {
+                bind(json, 'up');
+                if (json.gridData.table_list.data.length == 0) {
+                    $(".ui-refresh-down").hide();
+                } else {
+                    $(".ui-refresh-down").show();
+                }
+                _list["table_list"].refresh();
+                _list['table_list'].scrollTo(0, 0, 500, false);
+            });
+        }
+        function callback_trclick_table_list() {
+        }
+        //党费交纳
+        function dfjn(v,dfjnzt,jnbzt,mm) {
+            event.stopPropagation();
+            if (mm==month&&dfjnzt!="1") {
+                $('#dialog_search').dialog('open');
+                $(".ui-btn-1").css("background-color","#d62724");
+                $(".ui-btn-1").css("color","white");
+				$(".ui-btn-2").css("background-color","#ffbdbd");
+                $(".ui-btn-2").css("color","white");
+                guid=v;
+                jnbz=jnbzt;
+            }
+        }
+        function hidethis() {
+            window.location.reload();
+            $("#success").hide();
+        }
+        function save() {
+            sys_ajaxGet("/ltz/dfjn/default.do?method=saveDfjn", {guid: guid,dfbz: jnbz}, function (json) {
+                if (json.result) {
+                    $("#success").show();
+                    // setTimeout(function () {
+
+                    // },1000);
+
+                }
+            });
+        }
+	</script>
+	<style type="text/css">
+		.ui-toolbar-wrap {
+			border: none !important;
+		}
+
+		#yearwrapper ul {
+			margin-left: 0;
+			width: 100%;
+		}
+		.div_item_dfbz {
+			display: inline-block;
+			width: 20%;
+		}
+
+		#yearwrapper {
+			width: 100%;
+		}
+
+		#daywrapper {
+			display: none;
+		}
+
+		#monthwrapper {
+			display: none;
+		}
+
+		.div_btn {
+			position: fixed;
+			bottom: 50px;
+			width: 100%;
+			height: 40px;
+			display: -webkit-box;
+			-webkit-box-orient: horizontal;
+			background-color:#ece9e9;
+		}
+
+		.div_btn>div {
+			display: -webkit-box;
+			-webkit-box-flex: 1;
+			-webkit-box-align: center;
+			-webkit-box-pack: center;
+		}
+
+		.div_bottom_btn {
+			width: 120px;
+			height: 30px;
+			border-radius: 15px;
+			background-color: #D62724;
+			text-align: center;
+			line-height: 30px;
+			color: white;
+			font-weight: bold;
+		}
+		#success{
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+			margin: 0 auto;
+			z-index: 1002;
+			position: absolute;
+			top: 0%;
+			-webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+			background-color: rgba(136, 136, 136, 0.51);
+			-webkit-transform: translateZ(0);
+			-webkit-user-select: none;
+			-webkit-user-drag: none;
+		}
+		#table_list span{
+			display: inline-block;
+			vertical-align: middle;
+		}
+	</style>
+</head>
+<body>
+<div id="toolbar">
+	<span class="btn_bak" onclick="go_back();"></span>
+	<h1 class="toolbar_title">党费交纳</h1>
+</div>
+
+<!-- <div class="c_tabs div_other_40" id="div_tabs">
+	<div id='div_list0'>
+		<div class='c_tabs_text' onclick=getNm('gzcx')>工资查询</div>
+	</div>
+	<div id='div_list1'>
+		<div class='c_tabs_text' onclick=getNm('dfjn')>党费交纳</div>
+	</div>
+	<div id='div_list2'>
+		<div class='c_tabs_text' onclick=getNm('yyfbx')>医疗报销</div>
+	</div>
+	<div id='div_list3'>
+		<div class='c_tabs_text' onclick=getNm('cgj')>出国（境）</div>
+	</div>
+</div> -->
+
+<div id="div_search" class="list_div_search div_other_50">
+	<input type="text" id="cx_year" class="list_search_input"
+		   placeholder="请选择要查询的年份" style="width: 93%;margin-left: 3%;">
+	<div class="list_search_img" id="btn_search" onclick="search()"></div>
+</div>
+
+<div class="div_other_40" >
+	<div class="div_item">
+		<div class="div_item_dfbz" style="text-align: center;width: 33%;">月份</div>
+		<div class="div_item_dfbz" style="text-align: center;width: 33%;">交纳基数</div>
+		<div class="div_item_dfbz" style="text-align: center;">交纳标准</div>
+		<!--<div class="div_item_dfbz" style="margin-left: 10%;">在线交纳</div>-->
+	</div>
+</div>
+<div class="ui-refresh" id="div_table_list">
+
+	<ul class="data-list" id="table_list" style="list-style-type:none">
+		<li style="display: none;">
+			<div style="display: none;">{guid}</div> <!-- 点击行的参数 -->
+			<div class="list_row_con" style="height:50px;min-height:50px;background-color: #ffffff;">
+				<div class="list_row_col2" style="padding-top:11px;margin-left:8px;">
+					<div class="list_row_col2_1 overflow">
+						<span style="font-weight: bold;font-size: 16px;width: 33%;" class="overflow">{ff_date_show} </span>
+						<span style="font-size: 15px;width: 33%;" class="overflow">{jnjs}</span>
+						<span style="font-size: 15px;width: 33%;" class="overflow">{dfbz}</span>
+						<!--<span onclick="dfjn('{guid}','{dfjnzt}','{dfbz}','{mm}')" style="height: 25px;font-size: 15px;margin-right: 3%;color:{color};background-color: {bgcolor};" class="div_item_zxjn overflow">{buttons}</span>-->
+						<!-- <span id="dfjnbz" onclick="dfjn('{guid}','{dfjnzt}','{dfbz}','{mm}')" style="margin-left: 11px;">
+							<img style="height: 25px;width: 85px;" src="{src}">
+						</span> -->
+					</div>
+				</div>
+			</div>
+		</li>
+	</ul>
+	<div class="ui-refresh-down"></div>
+</div>
+<div id="dialog_search">
+	<div style="height: 60px;">
+		<span style="vertical-align:middle;width: 50px;height: 40px;display: inline-block;">
+			<img src="img/dh.png" style="height: 38px;">
+		</span>
+		<span style="font-size:17px;vertical-align:middle;height: 20px;display: inline-block;">您确认在线交纳本月党费？</span>
+	</div>
+</div>
+<div id="success" style="display: none;">
+	<img onclick="hidethis()" src="img/cgts.png" style="height: 22%;width:  80%;margin-left:  10%;margin-top: 65%;">
+</div>
+</body>
+</html>

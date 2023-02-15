@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>医疗报销</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript">
+var guid = null;
+var innerscroll = null;
+	$(function() {
+		$('#toolbar').toolbar();
+		 guid = getQueryStringRegExp("guid");
+		 var _height = getListHeight();
+     	$("#sys_innerscoll").height(window.innerHeight-_height);
+     	innerscroll = new iScroll("sys_innerscoll",{click:true});
+		sys_ajaxGet("/ltz/ylfw/ylbx/default.do?method=wapshow&guid=" + guid, function(json) {
+			bind(json);
+			sys_autoTextarea(innerscroll);
+		});
+
+		$("#btn_bak").click(function() {
+			sys_goURL("yyfbx.html");
+		});
+		
+		
+		var _height = getListHeight();
+		$("#sys_innerscoll").height(window.innerHeight - _height);
+		innerscroll = new iScroll("sys_innerscoll", {
+			click : true
+		});
+	});
+ 
+</script>
+<style type="text/css">
+
+.ui-toolbar-wrap{
+	border:0px;
+}
+.form_cell_label{
+	color:#000000;
+}
+
+ .form-control {
+ 	color: #bcb4b4;
+}
+
+ .c_form_show>div {
+    position: relative;
+}
+.leave_msg_title {
+    margin-right: 10px;
+    height: 30px;
+    line-height: 30px;
+    border-bottom: 2px solid red;
+    padding-top: 5px;
+    position: absolute;
+    bottom: 0;
+}
+.leave_msg_title_lable {
+    float: left;
+    height: 25px;
+    color: red;
+    vertical-align: bottom;
+}
+.data-list li {
+	border-bottom: 0px solid #DBDBDB;
+}
+</style>
+</head>
+<body style="background-color: white!important;">
+	<div id="toolbar">
+		<span id="btn_bak" class="btn_bak"></span>
+		<h1 class="toolbar_title">医疗报销</h1>
+	</div>
+	
+	<div id="sys_innerscoll">
+		<div style="padding:10px;">
+			<form id="form_show">
+				<div class="c_form_show">
+					<div>
+						<div class="form_cell_label">票据金额</div>
+						<div class="form_cell_item">
+							<input type="text" class="form-control" name="bills" id="bills" />
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">扣款金额</div>
+						<div class="form_cell_item">
+							<input type="text" class="form-control" name="charges" id="charges" />
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">实报金额</div>
+						<div class="form_cell_item">
+							<input type="text" class="form-control" name="actuals" id="actuals" />
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">报销时间</div>
+						<div class="form_cell_item">
+							<input type="text" class="form-control" name="handlet" id="handlet" />
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">审核人</div>
+						<div class="form_cell_item">
+							<input type="text" class="form-control" name="auditor" id="auditor" />
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">备注</div>
+						<div class="form_cell_item">
+							<input type="text" class="form-control" name="remark" id="remark" />
+						</div>
+					</div>
+					<div>
+						<div class="form_cell_label">办理进度</div>
+						<div class="form_cell_item">
+							<input type="text" class="form-control" name="handle" id="handle" />
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</body>
+</html>

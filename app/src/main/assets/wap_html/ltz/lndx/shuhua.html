@@ -1,0 +1,237 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+    <title>信息发布</title>
+    <link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/list.css" />
+
+    <script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+    <script type="text/javascript" src="../../js/ict.js"></script>
+    <script type="text/javascript" src="../../js/local.js"></script>
+    <script type="text/javascript" src="../../js/list.js"></script>
+    <script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+    <script type="text/javascript">
+        sys_addMeun = true;
+
+        var lb_dm="71730";
+        var nm=null;
+        var _list = {};
+
+        // slider控件
+        var slider;
+        // slider末位置
+        var lastLoacl;
+        // slider上次滑动位置（初始为0）
+        var slideIndex = getQueryStringRegExp("slideIndex");
+        if(slideIndex==null || slideIndex==''){
+            slideIndex="0"
+        }
+        $(function() {
+            //生成toolbar
+            $('#toolbar').toolbar();
+            //createTabs();
+            $("#cx_zt").width($(document).width()-20);
+            $("#cx_zt").val("");
+
+
+            sys_ajaxGet("/publish/wap.do?method=showTabByLBdm","lb_dm="+lb_dm,function(json2){
+                if(json2.sltbz==1){
+                    $(".list_row_slt").show();
+                }else{
+                    $(".list_row_slt").hide();
+                }
+
+            });
+
+            sys_renderList('table_list', '/publish/wap.do?method=waplist&page_size=10&&page_goto=', {lb_dm:lb_dm}, _list);
+
+            $(".c_tabs_texts").eq(1).addClass("c_tabs_active");
+            // 创建slider
+            slider = new TouchSlider('div_tabs', {
+                auto : false,
+                align : 'left',
+                mousewheel : false,
+                mouse : true,
+                fullsize : false,
+                after : doSlideAfter
+            });
+            // 设定slider展示宽度为页面宽度
+            var clientWidth = document.body.clientWidth;
+            // alert(clientWidth);
+            $("#div_tabs").css("width", clientWidth + "px");
+            $(".slideritem").css("width", (clientWidth / 2) + "px");
+            // 取得slider末index
+            lastLoacl = slider.length - 2;
+            // slider滑动到上次滑动位置
+            slider.slide(parseInt(slideIndex), 0);
+
+        });
+
+        // tab左右滑动后记录滑动位置(末屏未填满时滚动填满)
+        function doSlideAfter(newIndex, newSlide) {
+            slideIndex = newIndex;
+            if (lastLoacl <= 0) {
+                slider.slide(0);
+                slideIndex = 0;
+            } else if (newIndex > lastLoacl && lastLoacl > 0) {
+                slider.slide(lastLoacl);
+                slideIndex = lastLoacl;
+            }
+        }
+        function callback_trclick_table_list(param) {
+            // sys_goURL("show.html?guid=" + param + "&src=list&lb_dm=" + lb_dm + "&nm=" + nm + "&slideIndex="+slideIndex);
+            var url = "/publish/show.html?guid=" + param + "&src=list&lb_dm=" + lb_dm + "&nm=" + nm + "&slideIndex="+slideIndex;
+            sys_showDetail(url);
+        }
+
+        function go_back(){
+            sys_goURL("fczs.html");
+        }
+        function search(){
+            cx_zt = $("#cx_zt").val();
+            sys_ajaxGet("/publish/wap.do?method=waplist&page_size=10&page_goto=",{cx_zt:cx_zt,lb_dm:lb_dm},function(json){
+                bind(json,'up');
+                if(json.gridData.table_list.data.length==0){
+                    $(".ui-refresh-down").hide();
+                }else{
+                    $(".ui-refresh-down").show();
+                }
+                _list["table_list"].refresh();
+                _list['table_list'].scrollTo(0,0,500,false);
+            });
+            //$("#zt").val("");
+        }
+        function gotoShow(num) {
+            if (num == 0){
+                sys_goURL("shuhua.html");
+            } else {
+                sys_goURL("sheying.html");
+            }
+            sys_ajaxGet("/publish/wap.do?method=waplist&page_size=10&page_goto=",{lb_dm:lb_dm},function(json){
+                bind(json,'up');
+                if(json.gridData.table_list.data.length==0){
+                    $(".ui-refresh-down").hide();
+                }else{
+                    $(".ui-refresh-down").show();
+                }
+                _list["table_list"].refresh();
+                _list['table_list'].scrollTo(0,0,500,false);
+            });
+        }
+    </script>
+
+    <style type="text/css">
+        .ui-toolbar-wrap{
+            border: none !important;
+        }
+
+
+        .list_row_col22{
+            display:-webkit-box;
+            -webkit-box-orient:vertical;
+            -webkit-box-vetil:vertical;
+            margin:10px 0px 10px 10px;
+            height:75px;
+            -webkit-box-flex: 1;
+        }
+        .list_row_col22_1{
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow : hidden;
+            text-overflow: ellipsis;
+            height: 48px;
+            color: #4d4d4d;
+            font-family: Microsoft YaHei;
+            line-height:1.5;
+        }
+        .list_row_col22_2{
+            display: -webkit-box;
+            -webkit-box-pack: end;
+            -webkit-box-align: end;
+            height: 27px;
+            padding-right: 10px;
+            color: #808080;
+        }
+        .c_tabs {
+            height: 40px;
+            /*width: 100%;*/
+            background-color: white !important;
+            display: block;
+            border-bottom: #dddddd solid 1px
+        }
+
+        .c_tabs>div {
+            -webkit-box-flex: 1;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            font-size: 15px;
+            font-family: "微软雅黑";
+            /* display:none; */
+            color: #4B5052;
+        }
+
+        .c_tabs_active {
+            color: #FF4854;
+            border-bottom: 2px solid #FF4854;
+            height: 39px !important;
+        }
+        .c_tabs_texts {
+            font-size: 16px;
+            display: -webkit-inline-box;
+        }
+    </style>
+
+</head>
+<body>
+<div id="toolbar">
+    <span class="btn_bak"  onclick="go_back();"></span>
+    <h1 class="toolbar_title">作品展示</h1>
+
+</div>
+<div class="c_tabs div_other_40" id="div_tabs" >
+    <div class="slideritem" id="div_list2">
+        <div class="c_tabs_texts" onclick="gotoShow(1)">摄影展示</div>
+    </div>
+    <div class="slideritem" id="div_list1">
+        <div class="c_tabs_texts" onclick="gotoShow(0)">书画展示</div>
+    </div>
+</div>
+<div id="div_search" class="list_div_search div_other_50">
+    <input type="text" id="cx_zt" class="list_search_input" placeholder="请输入主题" >
+    <div class="list_search_img" id="btn_search" onclick="search()"></div>
+</div>
+
+
+<div class="ui-refresh" id="div_table_list">
+    <ul class="data-list" id="table_list" style="list-style-type:none">
+        <li style="display: none;" >
+            <div style="display: none;">{guid}</div>
+
+            <!-- 点击行的参数 -->
+            <div class="list_row_con" style="height:95px;min-height:95px;background-color: #ffffff;" >
+                <div class="list_row_slt" style="margin-top:10px;margin-left: 10px;">
+                    <img src="{slt}" style="height: 75px;width:121px"/>
+                </div>
+                <div class="list_row_col22">
+                    <div class="list_row_col22_1">{zt}</div>
+
+                    <div class="list_row_col22_2">{cjsj}
+
+                    </div>
+
+                </div>
+
+            </div>
+        </li>
+    </ul>
+    <div class="ui-refresh-down"></div>
+</div>
+
+</body>
+</html>

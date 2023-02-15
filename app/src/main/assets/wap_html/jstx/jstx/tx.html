@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
+
+<title>明细</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="css/oa.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="js/touch.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="js/custom.js"></script>
+<script type="text/javascript" src="js/datadumper.js"></script>
+<script type="text/javascript">
+	sys_addMeun = false;
+	var value = getQueryStringRegExp("value");
+	var guid = getQueryStringRegExp("guid");
+	var senderid = getQueryStringRegExp("senderid");
+	var receiverid = getQueryStringRegExp("receiverid");
+
+	var groupid = getQueryStringRegExp("groupid");
+	var groupname = getQueryStringRegExp("groupname");
+	var py = getQueryStringRegExp("py");
+	var from = getQueryStringRegExp("from");
+	$(function() {
+		//生成toolbar
+		$('#toolbar_addrt').toolbar({
+			fixed : true
+		});
+
+		$("#tx").attr("src", value + "?xxxx=" + Math.random());
+	});
+	function goback() {
+		if (groupid != null && groupid != "") {
+			sys_goURL("groupChat.html?groupId=" + groupid + "&groupName="
+					+ groupname + "&backTarget=message");
+		} else {
+			sys_goURL("chat.html?yhid=" + senderid + "&guid=" + receiverid
+					+ "&backTarget=message" + "&py=" + py + "&from=" + from);
+		}
+
+	}
+</script>
+<style>
+.out_div {
+	text-align: center;
+	width: 100%;
+	height: 70%;
+	padding-top: 15%;
+	padding-bottom: 15%;
+	overflow-y: visible;
+}
+</style>
+</head>
+<body style="background-color:#cccccc;">
+	<div class="out_div" onclick="goback()">
+		<img id="tx" style="width:100%;" src=""></img>
+	</div>
+
+</body>
+</html>

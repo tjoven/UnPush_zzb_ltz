@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>支部交流</title>
+<link rel="stylesheet" type="text/css" href="../../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+<script type="text/javascript" src="../../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../../js/ict.js"></script>
+<script type="text/javascript" src="../../../js/local.js"></script>
+<script type="text/javascript" src="../../../js/list.js"></script>
+<script type="text/javascript" src="../../../js/touchslider.dev.js"></script>
+<script type="text/javascript">
+	sys_addMeun = true;
+	var list = {};
+	var mbid = getQueryStringRegExp("guid");
+	var currId = getQueryStringRegExp("currId");
+	
+	var lx = getQueryStringRegExp("lx");
+	$(function() {
+		
+		$('#toolbar').toolbar();
+
+		sys_renderList(
+				'table_list',
+				'/ltz/branchExchange/default.do?method=Twitter&scope=3&page_size=15&page_goto=',
+				{}, list);
+
+		$(".c_tabs_text").eq(3).addClass("c_tabs_active");
+		
+		$(".toolbar_title").text("我爱我部");
+	});
+
+	// tab左右滑动后记录滑动位置(末屏未填满时滚动填满)
+	function doSlideAfter(newIndex, newSlide) {
+		slideIndex = newIndex;
+		if (lastLoacl <= 0) {
+			slider.slide(0);
+			slideIndex = 0;
+		} else if (newIndex > lastLoacl && lastLoacl > 0) {
+			slider.slide(lastLoacl);
+			slideIndex = lastLoacl;
+		}
+	}
+	
+	function callback_trclick_table_list(param) {
+		
+		sys_showDetail("/jstx/jstx/branchExchange/showExchange.html?guid="
+				+ param);
+	}
+	function go_back() {
+		sys_goURL("../group.html?currId=" + currId);
+	}
+	function add() {
+		sys_goURL("add.html");
+
+	}
+	function go_sphy() {
+		var url = "http://cloud.xylink.com/page/j/TUI0QPKH?from=singlemessage&isappinstalled=0&sysbrowser";
+
+		if (isAndriod) {
+			window.webview.openXiaoyu(url);
+			
+		} else if (isIphone) {
+			window.location.href = 'obj-c://outside//' + url;
+		} else {
+			var iTop = (window.screen.availHeight - 30 - 365) / 2;
+			var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+			window
+					.open(
+							url,
+							'',
+							'height=600,innerHeight=600,width=320,innerWidth=320,top='
+									+ iTop
+									+ ',left='
+									+ iLeft
+									+ ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+		}
+		return;
+	}
+</script>
+
+<style type="text/css">
+.ui-toolbar-wrap {
+	border: none !important;
+}
+
+li {
+	list-style-type: none;
+}
+.list_row_con{
+	height: 80px; min-height: 80px; background-color: #ffffff;
+}
+.list_row_col2{
+	height: 100%;
+	padding: 9px 3px 0px 12px;
+}
+.list_row_col2_1{
+	height: 50%;
+	margin-bottom: 0px;
+}
+.list_row_col2_2 {
+	width: 95%;
+	top: 8px;
+}
+.list_row_slt{
+	margin-top: 20px; margin-left: 10px;
+}
+.add {
+	width: 50px;
+	height: 50px;
+	background: url("../../../img/jiahao.png") no-repeat;
+	background-position: center center;
+	background-size: 28px 28px;
+	border: 0px !important;
+}
+
+
+</style>
+
+</head>
+<body>
+	<div id="toolbar">
+		<i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+		<h1 class="toolbar_title"></h1>
+		<!-- <span id="add" onclick="add();">我要发言</span> -->
+	</div>
+
+	<div class="ui-refresh" id="div_table_list">
+		<ul class="data-list" id="table_list" style="list-style-type: none">
+			<li style="display: none;">
+				<div style='display: none;'>{guid}</div>
+
+				<div class="list_row_con" >
+					<div class="list_row_slt" >
+						<img src="../image/Twitter.png" style="height: 40px; width: 40px" />
+					</div>
+					<div class="list_row_col2">
+						<div class="list_row_col2_1 ">{theme}</div>
+						<div class="list_row_col2_2">
+							<span style="float: left;">{author}</span><span
+								style="float: right;">{msg_num}回复</span><span
+								style="float: right;">{fbsj}&nbsp;&nbsp;</span>
+						</div>
+					</div>
+				</div>
+			</li>
+		</ul>
+		<div class="ui-refresh-down"></div>
+	</div>
+</body>
+</html>

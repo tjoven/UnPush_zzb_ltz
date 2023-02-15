@@ -1,0 +1,366 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=0.5, maximum-scale=1">
+<title>登录</title>
+<link rel="stylesheet" type="text/css" href="gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="css/base.css" />
+<script type="text/javascript" src="gmu/js/gmu.js"></script>
+<script type="text/javascript" src="js/local.js"></script>
+<script type="text/javascript" src="js/ict.js"></script>
+<script type="text/javascript">
+		  sys_addMeun = false;
+		  var autoLogin= getQueryStringRegExp("autoLogin");
+		  $(function(){
+			//$(".div_bottom").css("margin-top",window.innerHeight- $(".div_main").height()- $(".div_bottom").height());
+			var sso_username="";
+			var sso_tenant_id="";
+			//取得用户保存用户名、密码
+// 			if(isAndriod){
+// 				sso_username=window.webview.getSSOparam("sso_username");//WebViewWnd.java
+// 				sso_tenant_id=window.webview.getSSOparam("username");
+				sso_tenant_id="18653176723";
+// 				sso_tenant_id=window.webview.getUsername();
+// 				username	 username=window.webview.getUsername();
+// 				password=window.webview.getPassword();
+// 				zhid=window.webview.getZhid();
+				console.log("-------------"+sso_username);
+				denglu(sso_tenant_id);
+// 			}
+ 		  });
+ 		  function denglu(sso_tenant_id){
+ 			 var device = "U9200*android_4.0.3";
+ 	        var mei = "1234567";
+ 	        var msi = "46001123456";
+ 	        if(isAndriod){
+ 				device = window.webview.getDeviceInfo();
+ 	            mei = window.webview.getMei();
+ 	            msi = window.webview.getImsiLogin();
+ 			}else if(isIphone){
+ 				//需要iphone壳上获取
+ 				mei = __mei;
+ 				device = __device;
+ 				//window.location.href = "xtbg310:getloadpage";
+ 			}
+	        sys_ajaxPost("/khd/loginmlxc.do?method=login&mei="+mei+"&device="+device+"&msi="+msi+"&sso_tenant_id="+sso_tenant_id,function(json){
+	        	//alert(json.yhid);
+	        	console.log(json);
+// 	        	JSON.stringify(json);
+// 	        	alert("对"+json.result);
+	        	if(json.result==1){	     
+	        		window.localStorage.setItem("yhid",json.yhid);
+	        		window.localStorage.setItem("yhxm",json.yhxm);
+	        		//window.localStorage.setItem("zhzh",zhzh);
+	        		window.localStorage.setItem('urlParam','');
+	        		///window.localStorage.setItem("isupdate",json.isupdate);
+	        		if(isAndriod){
+						window.webview.saveTxlupdate(json.isupdate);
+						//window.webview.saveZhzh(zhzh);
+				    	window.webview.saveToken(json.sys_token_khd);
+				    	window.webview.saveBmid(json.bmid);
+				    	
+				    	window.webview.gotoTxlList();
+				    	//sys_goURL("./oa/address/list.html");
+                         }else if(isIphone){
+                         window.location.href='obj-c:getAccessFirst:'+json.isupdate+'_'+json.yhid;
+	                }else{	                	
+	                	gotoDeskUrl();
+	                }
+	        	}else{
+// 	        		alert("错");
+	        		//$(".main").show();
+	        		sys_alert(json.errorMessage);
+	        		return false;
+	        	}
+	        });
+ 		  }
+ 		  
+ 		  function changecheckimg(){
+ 		  	var imgsrc = $("#check_img").attr("src"); 
+ 		  	if(imgsrc.indexOf('check.png')>-1){
+ 		  		$("#check_img").attr("src","oa/image/checked.png"); 
+ 		  	}else if(imgsrc.indexOf('checked.png')>-1){
+ 		  		$("#check_img").attr("src","oa/image/check.png"); 
+ 		  	}
+ 		  }
+ 		  
+		  var __mei = "",msgLogin="",__device = "";
+		  function setMei(_mei,_sp,_device){
+			 __mei = "ios_"+_mei;
+			 __device = _device;
+			  window.location.href = "xtbg310:iphoneSetUserInfo";
+		  }
+		  function setLoadPage(_msgLogin)
+		  {
+			 msgLogin=_msgLogin;
+		  }
+		  function gotoDeskUrl(){
+			  //sys_goURL("oa/address/list.html?jzbz=dl");//加载进度的标志
+			  // window.location.href="oa/address/list.html?jzbz=dl";
+			   window.location.href="main.html";
+		  }
+		  function css_main(){
+			 // $(".div_main").css("padding-top","50%");
+		  }
+		  function wjmm(){
+			  if($("#zhzh").val()==""){
+				  sys_alert("租户账号不能为空");
+		        	return;
+			  }
+			  if($("#username").val()==""){
+				  sys_alert("账号不能为空");
+		        	return;
+			  }
+		  	sys_ajaxGet('/wapqytxl/default.do?method=getGlydh&zhzh='+$("#zhzh").val()+'&dlmc='+$("#username").val(),"",function(json){
+		  		var adminphone=json.adminphone;
+		  		if(json.returnResult=='0'){
+		  			sys_alert(json.errorMessage);
+		        	return;
+		  		}
+		  		if(adminphone!=""){
+		  			adminphone="电话：<a href='tel:"+adminphone+"' >"+adminphone+"</a> (可直接拨打)";
+		  		}
+		  		sys_alert_xgmm("忘记密码请联系系统管理员。"+adminphone);
+	        	return false;
+		  	});
+		  }
+		  function sys_alert_xgmm(msg,callback){
+				var div = $("#sys_alert1");
+				if(div.length==0){
+					$("body").append('<div id="sys_alert1"><p></p></div>');
+				}
+				var alert_dialog = $('#sys_alert1').dialog({
+			        autoOpen: false,
+			        closeBtn: false,
+			        title:'信息提示',
+			        buttons: {
+				            '确定': function(){
+				                this.destroy();
+				                if(callback){
+				                	callback.call(this);
+				                }
+				            }
+				        }
+				 });
+				
+				$("#sys_alert1").find("p").eq(0).html(msg);
+				$('#sys_alert1').dialog('open'); 
+				 
+			}
+	</script>
+<style type="text/css">
+html,body {
+	padding: 0;
+	margin: 0;
+	border: 0;
+	width: 100%;
+	height:100%;
+}
+
+body {
+	font-family: 20px arial, sans-serif;
+	color: #797979;
+	background-color: #eaeaea;
+	text-align: center;
+}
+
+
+
+.div_logo {
+	height: 135px;
+	background: url("oa/image/logo.png") no-repeat;
+	background-position: center center;
+	background-size:130px 130px; 
+}
+
+.div_name {
+	width: 80%;
+	margin: 0px auto 0px auto;
+	border-bottom: 1px solid #dbdbdb;
+}
+
+.div_pas {
+	width: 80%;
+	margin: 0px auto;
+	border-bottom: 1px solid #dbdbdb;
+}
+
+.div_text_1 {
+	background-color: #ffffff;
+	border: 0;
+	height:50px;
+	background: url("oa/image/username.png") no-repeat 0 80%;
+	background-size:25px 25px; 
+}
+.div_text_3 {
+	background-color: #ffffff;
+	border: 0;
+	height:50px;
+	background: url("oa/image/zhzh.png") no-repeat 0 80%;
+	background-size:25px 25px; 
+}
+.div_text_2 {
+	background-color: #ffffff;
+	border: 0;
+	height:50px;
+	background: url("oa/image/password.png") no-repeat 0 80%;
+	background-size:25px 25px; 
+}
+
+.input_text_1 {
+	height: 35px;
+	width: 100%;
+	border: 0px;
+	font-size: 16px;
+	outline: 0;
+	margin-left: 30px;
+	margin-top: 15px;
+	font-family:微软雅黑;
+}
+
+.input_text_2 {
+	height: 35px;
+	width: 100%;
+	border: 0px;
+	font-size: 16px;
+	outline: 0;
+	margin-left: 30px;
+	margin-top: 15px;
+	font-family:微软雅黑;
+}
+
+.input_text:focus {
+	outline: 0;
+}
+
+.div_check {
+	width: 80%;
+	height: 35px;
+	margin: 15px auto 0px auto;
+	text-align: left;
+	font-size: 16px;
+	color: #b3b3b3;
+	-webkit-border-radius: 5px;
+}
+
+.box {
+	width: 200px;
+	height: 30px;
+}
+
+.box img {
+	padding: 2px;
+}
+
+.div_button {
+	width: 80%;
+	height: 35px;
+	line-height: 35px;
+	margin: 25px auto 0px auto;
+	border: 2px solid #00CA62;
+	-webkit-border-radius: 5px;
+	background-color: #00CA62;
+	font-size: 18px;
+	color: #FFFFFF;
+	font-family:微软雅黑;
+}
+.div_main {
+	padding-top:20px;
+	width:100%;
+}
+.div_bottom {
+  /* margin-bottom: 1px;*/
+	height: 16px;
+	width: 100%;
+	text-align: center;
+	font-size: 12px;
+	color: #b3b3b3;
+	position: absolute;
+	bottom: 20px;
+	font-family: 微软雅黑;
+}
+.main {
+	/*background-image: url("oa/imgs/denglu1.png");background-size: 100%; */
+	background-repeat: no-repeat;
+	background-position: center top;
+	background: white;
+	z-index: -1;
+	left:0;
+	background-position: center center;
+  	background-size:100% 100%;
+  	height: 100%;
+}
+.div_sanjiao{
+ 	height: 14px;
+ 	position:relative;
+	/*background: url("oa/image/sanjiao.png") no-repeat;*/
+	background-position: center center;
+}
+.div_jzmm {
+	width: 80%;
+	margin: 0px auto;
+	height:55px;
+	border-bottom: 1px solid #dbdbdb;
+	display:-webkit-box;
+	-webkit-box-align:end;
+}
+/*忘记密码*/
+    .main_wjmm{
+		position: absolute;
+		left: 10%;
+		padding-top:25px;
+		text-align:center;
+		font-size:12px;
+		color:#b3b3b3;
+     }
+</style>
+<link rel="stylesheet" media="screen and (max-height:480px)" href="small_yy.css" type="text/css" />
+</head>
+<body>
+	
+  <div class="main" style="display:none">
+	<div class="div_main">
+		<div class="div_logo"></div>
+		<form id="form_show">
+			<div class="div_name">
+				<div class="div_text_3">
+					<input type="text" name="zhzh" id="zhzh" placeholder="单位账号"
+						class="input_text_1" />
+				</div>
+			</div>
+			<div class="div_name">
+				<div class="div_text_1">
+					<input type="text" name="username" id="username" placeholder="账号"
+						class="input_text_1" onclick="css_main()" />
+				</div>
+			</div>
+			<div class="div_pas">
+				<div class="div_text_2">
+					<input type="password" name="password" id="password"
+						placeholder="密码" class="input_text_2" onclick="css_main()" />
+				</div>
+			</div>
+			<div class="div_jzmm">
+				<div>
+					<img src="oa/image/check.png" id="check_img" width="24px" height="24px" onclick="changecheckimg();"/>
+				</div>
+				<div style="line-height: 28px;color:#A8A7A7;font-family:微软雅黑;font-size:16px;padding-bottom: 3px;padding-left: 4px;" id="zhongwen">记住密码</div>
+			</div>
+		</form>
+		<div class="div_button" onclick="denglu()">登 录</div>
+		<!-- <div class="div_check" >
+			<div class="box">
+				<div style="float: left;" >
+					<img src="oa/image/check.png" id="check_img" width="25px" height="25px" onclick="changecheckimg();"/>
+				</div>
+				<div style="float: left; line-height: 28px;color:#A8A7A7;font-family:微软雅黑;font-size:16px" id="zhongwen">记住密码</div>
+			</div>
+		</div> -->
+		<!-- <div class="main_wjmm" id="wjmm" onclick="wjmm()">忘记密码</div> -->
+	</div>
+	<div class="div_bottom">联通系统集成有限公司山东省分公司 技术支持</div><!-- 联通系统集成有限公司山东省分公司 技术支持 -->
+</div>
+</body>
+</html>

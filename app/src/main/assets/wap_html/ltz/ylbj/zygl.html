@@ -1,0 +1,161 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport"
+		  content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+	<title>住院登记</title>
+	<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css"/>
+	<link rel="stylesheet" type="text/css" href="../../css/list.css"/>
+	<link rel="stylesheet" type="text/css" href="../../css/base.css"/>
+	<link rel="stylesheet" type="text/css" href="../../css/mobiscoller.css" />
+
+	<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+	<script type="text/javascript" src="../../js/mobiscroll.js"></script>
+	<script type="text/javascript" src="../../js/ict.js"></script>
+	<script type="text/javascript" src="../../js/local.js"></script>
+	<script type="text/javascript" src="../../js/list.js"></script>
+	<script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+	<link href="../../bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
+	<script type="text/javascript">
+        var _list = {};
+        $(function () {
+            $('#toolbar').toolbar();
+            $("#cx_zt").width($(document).width() - 20);
+            $("#cx_zt").val("");
+            sys_renderList('table_list', "/ltz/ylfw/zygl/default.do?method=wapLtzList&page_size=10&page_goto=", {}, _list);
+            sys_ajaxGet("/ltz/lndx/default.do?method=isLtz",function (json) {
+                if (!json.result){
+                    $("#btn_add").hide();
+                }
+            });
+            $("#btn_add").click(function () {
+                sys_goURL("save.html?from=zygl&bz=add&guid=");
+            });
+            $('#dialog_query').dialog({
+                autoOpen: false,
+                closeBtn: false,
+                buttons: {
+                    '确定': function(){
+                        sys_ajaxGet("/ltz/ylfw/zygl/default.do?method=wapLtzList&page_size=10&page_goto=1&cx_xm="+$("#cx_xm").val()+"&cx_rysjz="+$("#cx_rysjz").val()+"&cx_rysjq="+$("#cx_rysjq").val()+"&bndzy="+$("input[name = 'bndzy']:checked ").val(), function (json) {
+                            bind(json, 'up');
+                            _list["table_list"].refresh();
+                            _list['table_list'].scrollTo(0, 0, 500, false);
+                        });
+                        this.close();
+                    },
+                    '取消': function(){
+                        this.close();
+                    }
+                }
+            }).dialog('this')._options['_wrap'].addClass('login-dialog');
+
+            $('#btn_query').click(function(){
+                $('#dialog_query').dialog('open');
+            });
+
+            $('.hos_time').scroller({
+                preset: 'date',//日期 date 时间 time  时间日期datetime
+                lang: 'zh',
+                theme:'ios',
+                display:'inline'
+            });
+        });
+
+        function callback_trclick_table_list(param) {
+            sys_goURL("showZydj.html?guid=" + param);
+        }
+
+        // function search() {
+        //     cx_zt = $("#cx_zt").val();
+        //     sys_ajaxGet("/ltz/ylfw/zygl/default.do?method=wapList&page_size=10&page_goto=", {cx_xm: cx_zt}, function (json) {
+        //         bind(json, 'up');
+        //         _list["table_list"].refresh();
+        //         _list['table_list'].scrollTo(0, 0, 500, false);
+        //     });
+        // }
+
+        function go_back() {
+            sys_goURL("main.html");
+        }
+
+	</script>
+
+	<style type="text/css">
+		.ui-toolbar-wrap {
+			border: 0px;
+		}
+		.list_title {
+			font-weight: bold;
+		}
+		.add {
+			color:#ffffff;
+			width: 50px;
+			height: 50px;
+			background: url("../../img/jiahao.png") no-repeat;
+			background-position: center center;
+			background-size: 28px 28px;
+			border: 0px !important;
+		}
+		.query{
+			color:#ffffff;
+			width: 31px;
+			background: url("../../img/search_.png") no-repeat;
+			background-position: center center;
+			background-size: 22px 22px;
+		}
+		#btn_add{
+		    font-size: 18px;
+    		color: #ffffff;
+    		font-weight: normal;
+    }
+	</style>
+
+</head>
+<body>
+<div id="toolbar">
+	<span class="btn_bak" onclick="go_back();"></span>
+	<h1 class="toolbar_title">住院登记</h1>
+	<!--<span class="btn_toolbar_font query" id="btn_query"></span>-->
+	<span class="btn_toolbar_font" id="btn_add">新增</span>
+</div>
+
+<!--<div id="div_search" class="list_div_search div_other_50">
+    <input type="text" id="cx_zt" class="form-control list_search_input" placeholder="输入老同志姓名查询">
+    <div class="list_search_img" id="btn_search" onclick="search()"></div>
+</div>-->
+
+<div class="ui-refresh" id="div_table_list">
+	<ul class="data-list" id="table_list" style="list-style-type:none">
+		<li style="display: none;">
+			<div style="display: none;">{guid}</div>
+			<div class="list_row_con" style="height:75px;min-height:75px;background-color: #ffffff;">
+				<div class="list_row_col1" style="width:15px;"></div>
+				<div class="list_row_col2" style="padding-top: 6px;">
+					<div class="list_row_col2_1">
+						<span class="overflow" style="display: inline-block;width: 75%;font-size: 18px;">医院：{yiyuan}</span>
+						<span class="overflow" style="display: inline-block;width: 15%;float: right;padding-right: 5px;">{ztmc}</span>
+					</div>
+					<div class="list_row_col2_1">
+						<span class="overflow" style="display: inline-block;width: 65%;">{bq}</span><span style="float: right;padding-right: 5px;">{rysj}</span>
+						<!--<span style="">{age}</span>-->
+						<!--<span style="">{xm}</span>-->
+					</div>
+				</div>
+				<div class="list_row_col3" style="width:30px;">
+				</div>
+			</div>
+		</li>
+	</ul>
+	<div class="ui-refresh-down"></div>
+</div>
+<div id="dialog_query">
+	<!--<div>姓名：</div>-->
+	<input type="text" id="cx_xm">
+	<div>入院时间（时间段）：</div>
+	<input type="text" id="cx_rysjq" class="hos_time" placeholder="入院时间起">
+	<input type="text" id="cx_rysjz" class="hos_time" placeholder="入院时间止">
+	<input type="checkbox" value="1" name="bndzy" style="width:15px" >本年度住院
+</div>
+</body>
+</html>

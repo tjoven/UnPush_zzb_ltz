@@ -1,0 +1,273 @@
+<!doctype html>
+<html>
+<head>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+<title>添加群组</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="css/oa.css" />
+<link rel="stylesheet" type="text/css" href="../../css/mobiscoller.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>   
+<script type="text/javascript" src="js/touch.js"></script>   
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="js/custom.js"></script>
+<script type="text/javascript" src="js/datadumper.js"></script>
+<script type="text/javascript" src="../../js/pinyin.js"></script>
+<style type="text/css">
+	.select{
+		background-color: #66C6FC;
+		cursor: default;
+	}
+	button{
+		border-radius:5px;
+	}
+	input,button,select,textarea{ outline:none;}
+</style>
+<script type="text/javascript">
+var iscr_from = null;
+	$(function(){
+	 	$('#toolbar').toolbar();
+ 	var _height = getListHeight();
+	//设置内滚动
+  	$("#iscr_from").height(window.innerHeight-_height);
+  	iscr_from = new iScroll("iscr_from",{click:true});
+	sys_autoTextarea(iscr_from); 
+});
+	sys_addMeun = false;
+	var currId = window.localStorage.getItem("yhid");
+	$(function(){
+		//生成toolbar
+	  	$("#toolbar").toolbar({
+	           fixed : true
+	    });
+		$("#descriptionLength").text("100");
+		$("#nameLength").text("10");
+		$("#groupDescription").bind("input propertychange", function() {
+			var len = estimateContentLength($(this).val());
+			if(100 - len < 0){
+				$("#showAddUser").hide();
+				$("#descriptionLength").css("color","red");
+			}else{
+				$("#showAddUser").show();
+				$("#descriptionLength").css("color","#757575");
+			}
+			$("#descriptionLength").html(100 - len);
+		});
+		$("#groupName").bind("input propertychange", function() {
+			var len = estimateContentLength($(this).val());
+			if(10 - len < 0){
+				$("#showAddUser").hide();
+				$("#nameLength").css("color","red");
+			}else{
+				$("#showAddUser").show();
+				$("#nameLength").css("color","#757575");
+			}
+			$("#nameLength").html(10 - len);
+		});
+	});
+	
+	//获取长度
+	function estimateContentLength(content){
+		return content.length;
+		/* var len = content.replace(/[^\x00-\xff]/g,"aa").length;
+		return len; */
+	}
+	
+	/* window.onload = init;
+	function init(){
+		sys_ajaxPost("/jstx/default.do?method=getUserInfo&yhid="+currId,function(json){
+			json.forEach(function(e){
+				if(e.id != currId){
+					$("#friend").append(
+	   					"<li onclick='select(this)' id=wait"+e.id+" >"+e.mc+"</li>"		
+	   				);
+				}
+				$("#friend > li").live("click",function(){
+					$(this).addClass("select").siblings().removeClass("select");
+				})
+        	})
+		});
+		//绑定li的click事件
+		$("#friend li").live('click',function(){
+			$("#member li").removeClass("select");
+		}); 
+		$("#member li").live('click',function(){
+			$("#friend li").removeClass("select");
+		}); 
+	}; */
+	
+	//返回上一步
+	function showback(){
+		sys_goURL("group.html");
+	};
+	
+	//跳转相关页面
+	function jumper(ob){
+		if("0" == ob){
+			sys_goURL("message.html");
+		}else if("1" == ob){
+			sys_goURL("group.html");
+		}else{
+			sys_goURL("temporary.html");
+		}
+	};
+	
+	/* var addUserId = "";
+	var addUsername = ""; */
+	
+	//创建群组时，选择群组成员时给变量赋值
+	/* function select(ob){
+		addUserId = ob.id;
+		addUsername = ob.innerHTML;
+	} */
+	
+	//创建群组时，添加成员
+	/* function addMember(){
+		addUserId = addUserId.replace("wait","member");
+		if($("#"+addUserId).length == 0){
+			$("#member").append(
+				"<li onclick='select(this)' id='"+addUserId+"'>"+addUsername+"</li>"		
+			);
+		}
+		$("#member > li").click(function(){
+			$(this).addClass("select").siblings().removeClass("select");
+		});
+	} */
+	
+	//创建群组时删除已选成员
+	/* function delMember(){
+		$("#"+addUserId).remove();
+		$("#member > li").click(function(){
+			$(this).addClass("select").siblings().removeClass("select");
+		});
+	} */
+
+	//提交创建群组
+	function createGroup(){
+		var groupName = $("#groupName").val();
+// 		var grouppy = sys_getPinyin(groupName);
+		var grouppy = "";
+		
+		if("" == groupName){
+			alert("请输入群组名称");
+			return false;
+		}
+		//遍历群组成员ul，将成员以‘,’拼接
+		var str =  "";
+		$("#member li").each(function(){
+			str += $(this).attr("id").replace("member",",");
+		});
+		var queryString = $("#groupForm").serialize();
+		sys_ajaxPost("/jstx/default.do?method=createGroup&userId="+currId+"&member="+str+"&createTime="+getCurrTime()+"&grouppy="+grouppy, queryString ,function(json){
+			if(json.result == "succ"){
+				alert("群组创建成功");
+				sys_goURL("group.html");
+				/* sys_goURL("addUsersOfGroup.html?groupId=" + json.groupId + "&groupName="
+						+ json.groupName + "&members=init"); */
+			}
+		});
+	}
+	
+	//获取当前时间
+	function getCurrTime(){
+		var date = new Date();
+		var year = date.getFullYear();
+		var month = date.getMonth()+1;
+		var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+		var hour = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+		var minute = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+		var second = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
+		return year+"-"+month+"-"+day+" "+hour+":"+minute+":"+second;
+	};
+</script>  
+
+<style type="text/css">
+.child_page_title1
+{
+	float: left;
+    width: 40%;
+    height: 65%;
+    color: white;
+    font-size: 18px;
+    text-align: center;
+    line-height: 25px;
+    margin-top: 15px;
+ 
+  	margin-left:15%;
+}
+
+
+.child_page_title2
+{
+	border-radius:6px;
+	width:100%;
+}
+</style>    
+</head>
+<body>
+	<div class="div_body">
+<!-- 		<div id="toolbar" class="blue_top"> -->
+<!-- 			<div class="button_multi" onclick="showback()"> -->
+<!-- 				<img src="img/ztjy/02_06.png" class="img_back_or_xj"></img> -->
+<!-- 			</div> -->
+			
+<!-- 			<div id="toolbar_text" class="child_page_title1"> -->
+<!-- 				<table class="child_page_title2"> -->
+<!-- 					<tr> -->
+<!-- 						<td><label>创建群组</label></td> -->
+<!-- 					</tr> -->
+<!-- 				</table> -->
+<!-- 			</div> -->
+<!-- 			<div class="button_multi" style="width:26%"> -->
+<!--   				<img src="./image/right.png" class="img_back_or_xj" style="float: right;" onclick="createGroup()"></img> -->
+<!--   			</div> -->
+		
+<!-- 		</div>	 -->
+
+
+<div id="toolbar">
+		<span class="btn_bak" onclick="showback();"></span>
+		<div id="toolbar_text" class="child_page_title1"></div>
+		<h1 class="toolbar_title">创建群组</h1>
+		<span class="btn_toolbar_font" id="btn_add" onclick="createGroup()" style="color:#ffffff;">确定</span>  
+		
+		</div>	
+<form id="groupForm">
+		<div class="font-color-bm" id="iscr_from" style="background-color:#ezezez;">
+			<div  class="sear">
+				<div id="tabslist">
+		   	   		<div id="datahtml"> 	   
+		   	   			<div class="txl_ry">
+		   	   				<div style="padding:13px 16px;">群名称：</div>
+		   	   				<div style="padding:15px 1px;">
+		   	   					<input id="groupName" name="groupName" type="text" placeholder="请输入群名称" autocomplete="off" style="border-bottom: 1px solid #FA5F14;width: 165px;border-radius:0px;">
+		   	   				</div>
+		   	   				<div class="txl_ry_cz">
+		   	   					<span id="nameLength" style="float: right;padding: 10px 10px;"></span>
+		   	   				</div>
+		   	   			</div>
+		   	   			
+		   	   			<div class="txl_ry" style="height: auto;">
+		   	   				<div style="padding:13px 16px;">群描述：</div>
+		   	   				<div style="margin-top:16px;margin-left:1px">
+		   	   					<textarea style="border-bottom:1px solid #FA5F14;border-radius:0px" id="groupDescription" name="groupDescription" class="xj_nr_textarea" rows="1" cols="20" placeholder="请输入群描述"></textarea>
+		   	   				</div>
+		   	   				<div class="txl_ry_cz" style="line-height: 15px;">
+		   	   					<span id="descriptionLength" style="float: right;padding: 10px 10px;margin-top:20px"></span>
+		   	   				</div>
+		   	   			</div>
+		   	   		
+		   	   		</div>
+		   	   </div>
+			</div>
+		</div>
+		</form>
+	</div>
+</body>
+</html>

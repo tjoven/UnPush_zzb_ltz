@@ -1,0 +1,126 @@
+<!doctype html>
+<html>
+  <head>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+    <title>缴纳记录</title>
+    <link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/list.css" />
+ 	
+    <script type="text/javascript" src="../../gmu/js/gmu.js"></script> 
+	<script type="text/javascript" src="../../js/ict.js"></script>
+    <script type="text/javascript" src="../../js/local.js"></script>
+    <script type="text/javascript" src="../../js/list.js"></script>
+    <script type="text/javascript">
+      var list = {}; 
+        sys_addMeun = true;		      
+		$(function(){
+			  //生成toolbar
+		   $('#toolbar').toolbar();
+		    clearall();//alert(1);
+		   /*  sys_ajaxPost("/jcdj/service/sqdy/default.do?method=findSqListByDy"); */
+			//sys_renderList('table_list','/jcdj/service/sqdy/default.do?method=findSqListByDy&page_size=20&page_goto=',{},list);
+ 
+           $('#btn_search').click(function(){
+		     	$('#dialog_search').dialog('open'); 
+			  });
+   			$('#dialog_search').dialog({
+		        autoOpen: false,
+		        closeBtn: false,
+		        buttons: {
+		            '确定': function(){
+		            	search();
+		                this.close();
+		            },
+		            '取消': function(){
+		                this.close();
+		            }
+		        }
+		    }).dialog('this')._options['_wrap'].addClass('login-dialog');
+		    
+		});
+		
+   		
+   		function go_back(){
+		 	  sys_goURL("grzx.html"); 		   		
+		}
+		function clearall(){
+		  	$("#cx_hylb").val('');	
+			$("#cx_zt").val('');	
+		
+		}
+		function add(){
+		   sys_goURL("add.html");
+		}	
+    </script>
+
+       <style type="text/css">
+            .ui-toolbar-wrap{
+	    		//background-color: #FFB73E;
+	    		border: none !important;
+    		}
+    		.search{
+    		  width:50px;
+    		  height: 50px;
+    		  background:url("../image/search.png") no-repeat;
+    		  background-position: center center;
+	          background-size: 28px 28px;
+	          border: 0px !important;
+    		}
+    		.add{
+    		  width:50px;
+    		  height: 50px;
+    		  background:url("../image/add.png") no-repeat;
+    		  background-position: center center;
+	          background-size: 28px 28px;
+	          border: 0px !important;
+    		}
+    </style>
+  </head>
+  <body>
+    <div id="toolbar">
+	    <span class="btn_bak" onclick="go_back();"></span>
+	    <h1 class="toolbar_title">缴纳记录</h1>
+	     <span class="add" onclick="add();"></span>
+	</div>
+	
+     <div class="ui-refresh" id="div_table_list" style="background: white !important;">
+		 <!--<div class="ui-refresh-up" id="ui-refresh-up"></div>-->  
+		 <ul class="data-list" id="table_list" >
+	         <li style="display: none;height:60px;" >
+	         	  <div style="display: none;">{guid}</div><!-- 点击行的参数 -->
+	             <div class="list_row_con" style="height: 65px">	            
+					<div class="list_row_col2" style="margin-top:12px;margin-left:8px;">
+						<div class="list_row_col2_1 overflow" style="font-weight: bold;font-size:18px;"></div>
+						<div class="list_row_col2_2 overflow">报到人：{dyxm}</div>
+						<div class="list_row_col2_3 overflow">报到社区：{bmmc}&nbsp;&nbsp;&nbsp;{czrq}</div>			
+					</div>
+					<div class="list_row_col3"></div>
+	             </div> 
+	         </li>
+   		 </ul>
+   		 <div class="ui-refresh-down"></div>     
+    </div>
+    <div id="dialog_search">
+        <div style="height: 10px;"></div>
+       	<div>
+       		<div>会议类别：</div>
+       		<div class="search_jiantou">
+       			<select name="cx_hylb" id="cx_hylb">     			   
+       			</select>
+       		</div>
+       	</div>
+        <div style="height: 10px;"></div>
+        <div>
+       		<div>主  题：</div>
+       		<div>
+       			<input type="text" id="cx_zt" name="cx_zt" />
+       		</div>
+       	</div>
+       	<div style="height: 10px;"></div>
+ 	
+    </div>
+    
+  </body>
+</html>

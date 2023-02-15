@@ -1,0 +1,151 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>便捷服务</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+<script type="text/javascript">
+	sys_addMeun = true;
+	var nm = getQueryStringRegExp("nm");
+	$(function() {
+		//生成toolbar
+		$('#toolbar').toolbar();
+		var _height = getListHeight();
+		$("#sys_innerscoll").height(window.innerHeight - _height);
+		var innerscroll = new iScroll("sys_innerscoll", {
+			click : true
+		});
+		if (nm == '') {
+			nm = 1;
+		}
+		$(".c_tabs_text").eq(nm).addClass("c_tabs_active");
+	});
+	function gotoPageIn(param) {
+		if (isAndriod) {
+			window.webview.loadurl_embed(param);
+		} else if (isIphone) {
+			window.location.href = 'obj-c://outside//' + param;
+		} else {
+			var iTop = (window.screen.availHeight - 30 - 365) / 2;
+			var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+			window.open(param, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+		}
+		return;
+	}
+	function gotoPageOut(param) {
+		if (isAndriod) {
+			window.webview.loadurl_new(param);
+		} else if (isIphone) {
+			window.location.href = 'obj-c://outside//' + param;
+		} else {
+			var iTop = (window.screen.availHeight - 30 - 365) / 2;
+			var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+			window.open(param, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+		}
+		return;
+	}
+	function go_back() {
+		sys_goURL("../../main.html");
+	}
+	function getNm(dm){
+		   if(dm=="shfw"){
+			    sys_goURL(getBaseURL()+"ltz/bjfw/myLive.html");		
+			}else if(dm=="dcsc"){
+			 	sys_goURL(getBaseURL()+"ltz/bjfw/food.html");
+			}		
+		}	
+
+	//window.webview.loadurl_embed(url)  app嵌入
+	//window.webview.loadurl_new(url);  外边打开
+</script>
+<style>
+.ui-toolbar-wrap {
+	border: 0px;
+}
+
+#head div {
+	display: inline-block;
+	width: 46%;
+}
+
+span {
+	display: table-row;
+	text-align: center;
+}
+
+#head img {
+	margin-top: 5px;
+	/*height: 50px;*/
+	width: 100%;
+}
+
+nav ul li {
+	width: 19%;
+	/*padding: 3%;*/
+	display: inline-block;
+	margin-left: 4%;
+	margin-bottom: 25px;
+	vertical-align: middle;
+}
+
+nav ul li img {
+	height: 40px;
+}
+</style>
+</head>
+<body>
+	<div id="toolbar">
+		<i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+		<h1 class="toolbar_title">便捷服务</h1>
+	</div>
+	<div class="c_tabs div_other_40" id="div_tabs">
+		<div id='div_list0'>
+			<div class='c_tabs_text' onclick=getNm('dcsc')>订餐送餐</div>
+		</div>
+		<div id='div_list1'>
+			<div class='c_tabs_text' onclick=getNm('shfw')>生活服务</div>
+		</div>
+	</div>
+	<div id="sys_innerscoll">
+		<header>
+			<div id="head" style="padding-top: 10px;padding-bottom: 10px;">
+				<div style="margin-left: 3%;"
+					onclick="gotoPageOut('http://www.cncaprc.gov.cn/')">
+					<span><img src="../../img/live/llw.png"></span> <span>全国老龄委网站</span>
+				</div>
+				<div style="float: right;margin-right: 3%;"
+					onclick="gotoPageOut('http://www.12348.gov.cn/')">
+					<span><img src="../../img/live/lay1.jpg"></span> <span>中国法律服务网</span>
+				</div>
+			</div>
+			<nav style="margin-top: 10px;">
+				<ul style="width: 100%;">					
+					<li onclick="gotoPageIn('http://m.kuaidi.com/?from=baidu_ala')"><span
+						style="width: 20%;"><img src="../../img/live/ckd.png"></span><span
+						style="font-size: 14px;">&nbsp;&nbsp;查快递&nbsp;&nbsp;</span></li>
+					<li
+						onclick="gotoPageIn('http://www.sf-express.com/mobile/cn/sc/index.html')"><span
+						style="width: 20%;"><img src="../../img/live/sf.png"></span><span
+						style="font-size: 14px;">顺丰快递</span></li>
+					<li
+						onclick="gotoPageIn('http://m.ddky.com/?source=wapbaiduzone_bt')"><span
+						style="width: 20%;"><img src="../../img/live/ddky.png"></span><span
+						style="font-size: 14px;">叮当快药</span></li>
+					<li onclick="gotoPageOut('http://www.12306.cn/mormhweb/')"><span
+						style="width: 20%;"><img src="../../img/live/12306.png"></span><span
+						style="font-size: 14px;">&nbsp;&nbsp;12306&nbsp;&nbsp;</span></li>					
+				</ul>
+			</nav>
+		</header>
+	</div>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+    <title>专家预约</title>
+    <link rel="stylesheet" type="text/css" href="../../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/mobiscoller.css" />
+
+    <script type="text/javascript" src="../../../gmu/js/gmu.js"></script>
+    <script type="text/javascript" src="../../../js/ict.js"></script>
+    <script type="text/javascript" src="../../../js/local.js"></script>
+    <script type="text/javascript" src="../../../js/mobiscroll.js"></script>
+    <script type="text/javascript" src="../../../../js/validate.js?v=123"></script>
+    <script type="text/javascript">
+
+        var innerscroll = null;
+        var guid = null;
+        var ksid = null;
+        $(function() {
+            //生成toolbar
+            $('#toolbar').toolbar();
+
+            var _height = getListHeight();
+            $("#sys_innerscoll").height(window.innerHeight - _height);
+            innerscroll = new iScroll("sys_innerscoll", {
+                click : true
+            });
+            sys_autoTextarea(innerscroll);
+            // setTimeout(function () {
+            //     sys_goURL("main.html");
+            // },2000)
+            $("#btnBack").click(function () {
+                sys_goURL("main.html")
+            })
+        });
+
+
+        function back() {
+            sys_goURL("main.html");
+        }
+
+
+    </script>
+    <style type="text/css">
+
+        .ui-toolbar-wrap{
+            border:0px;
+        }
+
+        .c_form_show>div {
+            min-height: 55px;
+        }
+
+        .form_cell_item input, textarea {
+            font-size: 17px;
+        }
+        textarea{
+            padding-top: 10px;
+            height:80px;
+            min-height:80px;
+            width: 90%;
+        }
+    </style>
+</head>
+<body>
+<div id="toolbar">
+    <span id="btn_bak" class="btn_bak" onclick="back();"></span>
+    <h1 class="toolbar_title">挂号服务</h1>
+</div>
+<div id="sys_innerscoll">
+    <div id="hxxx" style="padding: 15px 3%;">
+        <span style="padding-left: 30px;font-size: 19px;">
+            挂号申请提交成功。我们将尽力为您申请挂号，挂号成功后将第一时间通过此平台通知您，请您关注“办理状态”。祝您身体健康！
+        </span>
+    </div>
+    <div style="text-align: center;">
+        <span id="btnBack" style="background-color: #d62724;color:white;font-size: 19px;width: 110px;border-radius: 10px;display: inline-block;" >明白了</span>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+  <head>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+    <title>会议现场</title>
+    <link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/base.css" />  
+     <link type="text/css" rel="stylesheet" href="../../css/iconfont/iconfont.css" />
+    <script type="text/javascript" src="../../gmu/js/gmu.js"></script> 
+	<script type="text/javascript" src="../../js/ict.js"></script>
+    <script type="text/javascript" src="../../js/local.js"></script>
+
+    
+    <script type="text/javascript">   	
+    	 var innerscroll =null;
+    	   var lb_dm = getQueryStringRegExp("lb_dm");
+			var sfltz =  "1";
+    	   var backUrl = getQueryStringRegExp("backUrl");
+    	   
+		$(function(){
+			  //生成toolbar
+		  	$('#toolbar').toolbar();
+            
+			//保存 
+		   $("#btn_save").click(function(){
+			   
+			   if($("#zt").val() == '' ){
+				   sys_alert('请输入主题');				 
+				   return;
+			   }
+			    if($("#nr").val() == '' ){
+				   sys_alert('请输入内容');				 
+				   return;
+			   }
+			  
+		      
+			   
+			   var queryString=$("#frm1").serialize();
+			   sys_ajaxPost("/ltz/znl/default.do?method=save&lb_dm="+lb_dm,queryString,function(data){
+				 if(data.result == true) {					  	
+					 sys_alert("保存成功");	
+					 go_back();
+					 }else{
+					   sys_alert(data.msg); 
+				     }
+		       });
+        });
+		  
+		    
+		     
+			 
+			 
+		});	
+			function go_back () {
+				sys_goURL(backUrl + ".html?lb_dm="+lb_dm+"&sfltz="+sfltz);
+			} 
+	
+    </script>  
+      <style type="text/css">
+        .ui-toolbar-wrap{
+   		  // background-color: #FFB73E;
+   		   border: none !important;
+  		}
+    	.bx{
+		   color:red;
+	    }
+	    .form_cell_label {
+			width: 95px;
+			font-size: 16px;
+			padding-left: 5px;
+			color:#333333;
+			font-weight:bold;
+			font-family:宋体;
+		}
+    	.c_form_show>div {
+			border-bottom: 1px solid #eaeaea;
+			display: -webkit-box;
+			-webkit-box-align: center;
+			color: #151515;
+			min-height: 45px;
+		}
+		/*form表单区域css  无行分割线*/
+		.c_form_show_addqz>div {
+			display: -webkit-box;
+			-webkit-box-align: center;
+			color: #151515;
+			min-height: 45px;
+		}
+		
+		.hyxz_pz {
+			background-image: url("../img/hyxz_zx.png");
+			background-size: 90% 90%;
+		}
+         .hyxz_lx {
+			background-image: url("../img/hyxz_lx.png");
+			background-size: 90% 90%;
+		}
+		.form_cell_picture1 {
+			width: 100px;
+			height: 100px;
+			 
+			background-position: center center;
+			background-repeat: no-repeat;
+		}
+    </style>     
+  </head>
+  <body>
+    <div id="toolbar">
+	     <i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+	    <h1 class="toolbar_title" >新增主题</h1>
+	    <span class="btn_toolbar_font" id="btn_save" style="color:#fff;">提交</span>
+	</div>
+   <div id="sys_innerscoll">
+    <div>
+	    <form id="frm1">
+        <input type="hidden" name="guid" id="guid"/>
+        <input type="hidden" name="sfltz" id="sfltz" value="1"/>
+          
+       <div  class="c_form_show">
+		       <div >
+		         <div class="form_cell_label" ><span class="bx">*</span>主  题：</div>
+		          <div class="form_cell_item">
+		            <input type="text" name="zt" id="zt" placeholder="请输入主题">
+		          </div>
+		       </div>       
+		       <div >
+		         <div class="form_cell_label" ><span class="bx">*</span>内  容：</div>
+		          <div class="form_cell_item">
+		            <textarea id="nr"  name ="nr" rows="6" cols="100" placeholder="请输入内容"></textarea>
+		          </div>
+		          
+		       </div>          
+         </div>   
+         
+     </form>   	
+        
+        
+    	  <div   style="text-align:center;height: 10px;"> </div> 
+    	</div>
+	</div>
+  </body>
+</html>

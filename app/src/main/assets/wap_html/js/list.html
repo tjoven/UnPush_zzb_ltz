@@ -1,0 +1,220 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>在线学习</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript">
+    var innerscroll=null;
+    var nm = getQueryStringRegExp("nm");
+	$(function() {
+		//生成toolbar
+		$('#toolbar').toolbar();
+		if(nm == ''){			    	
+			nm=0;
+		}	
+		$(".c_tabs_text").eq(0).addClass("c_tabs_active");
+		imgList();
+	
+	});
+function imgList(){
+       sys_ajaxGet("/ltz/elearning/default.do?method=waplist",function(json){
+            var html_str='';
+            if(json.imglist.length>0){
+			           var list=json.imglist;
+						var sspHtml = "";
+						
+				       
+						for (var i = 0; i < list.length; i++) {
+							if(list[i].xh=='45'){
+							 
+								 continue;
+							}
+					        				         
+					          sspHtml +=" <div class='item'>";
+				              sspHtml +=" <div class='item_img block_height' onclick=goUrl('" + list[i].link_url + "','"+list[i].embed+"') style=\"background-image: url('"+getUrl()+list[i].imgurl+"');\"></div>	";               
+				              //sspHtml +=" <div class='item_img block_height' onclick=goUrl('" + list[i].link_url + "','"+list[i].embed+"') style=\"background-image: url('"+location.protocol + "//" + location.hostname + ":" + location.port+list[i].imgurl+"');\"></div>	";                
+				              sspHtml +=" </div> ";
+				              					       
+						}
+						
+						$('#main_block').html("");
+						$('#main_block').html(sspHtml);
+						
+						var _height = window.innerHeight - getListHeight();
+						$("#innerscroller").height(_height);
+						 innerscroll = new iScroll("innerscroller", {
+							hScrollbar : false,
+							vScrollbar : false,
+							click : true
+						});						
+		         }   			
+	        
+        });                      
+   }
+	function goUrl(url,param){
+	           if(isAndriod){
+	                if(param=='0'){
+	                  window.webview.loadurl_embed(url)
+	                }else if(param=='1'){
+	                  window.webview.loadurl_new(url);
+	                }else{
+	                  window.webview.loadurl_new(url);
+	                }
+                	
+                }else if(isIphone){
+                	window.location.href='obj-c://outside//'+url;                        	
+                }else{
+                   var iTop = (window.screen.availHeight - 30 - 365) / 2;
+		           var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+		           window.open(url, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+                }
+                return;	      
+	 }
+	 
+  	// 点击tab页刷新画面显示相应tab页内容一览list
+	/* function getNm(dm){
+		   if(dm=="xxzl"){//学习专栏
+			    sys_goURL(getBaseURL()+"ltz/elearning/list.html");		
+			}else if(dm=="wdsj"){//我的书架
+			 	sys_goURL(getBaseURL()+"ltz/publication/list.html");
+			}else if(dm=="xxtj"){
+			 	sys_goURL(getBaseURL()+"ltz/lgsy/list.html?lb_dm=71680");
+			}else if(dm=="yqlj"){
+			    sys_goURL(getBaseURL()+"ltz/link/list.html");
+			}				
+		}	 */
+		function getNm(dm){
+			if(dm=="xxzl"){
+				sys_goURL(getBaseURL()+"list.html");
+			}
+		}
+</script>
+
+<style type="text/css">
+.ui-toolbar-wrap {
+	border: none !important;
+}
+
+.main {
+	padding: 5px;
+}
+
+.row {
+	width: 100%;
+	display: -webkit-box;
+	-webkit-box-orient: horizontal;
+	height: 100px;
+}
+
+.item {
+	width: 50%;
+	
+	float: left;
+}
+
+.item_img {
+	margin: 5px 5px 5px 5px;
+	background-repeat: round;
+	background-size: 100% 100%;
+}
+
+.block_height {
+	height: 90px;
+}
+
+.link_height {
+	height: 50px;
+}
+
+.title_link {
+	width: 100%;
+	height: 30px;
+	color: #D62724;
+	line-height: 30px;
+	font-size: 16px;
+	text-align: center;
+	margin-top: 10px;
+}
+
+#link_gcdyw {
+	background-image: url("img/gcdyw.png");
+}
+
+#link_djw {
+	background-image: url("img/djw.png");
+}
+
+#link_ycjyw {
+	background-image: url("img/ycjyw.png");
+}
+
+#link_rsbxww {
+	background-image: url("img/rsbxww.png");
+}
+
+</style>
+
+</head>
+<body>
+	<div id="toolbar">
+		<span class="btn_bak" onclick="sys_goURL('main.html');"></span>
+		<h1 class="toolbar_title">学习专栏</h1>
+		<span class='c_tabs_text' onclick=getNm('xxzl')></span>
+	</div>
+	<!-- 学习专栏和我的书架 -->
+	<!-- <div class="c_tabs div_other_40" id="div_tabs">
+		<div id='div_list0'>
+			<div class='c_tabs_text' onclick=getNm('xxzl')>学习专栏</div>
+		</div>
+		<div id='div_list1'>
+			<div class='c_tabs_text' onclick=getNm('wdsj')>我的书架</div>
+		</div>
+		<div id='div_list2'>
+			<div class='c_tabs_text' onclick=getNm('xxtj')>信息推荐</div>
+		</div>
+		<div id='div_list3'>
+			<div class='c_tabs_text' onclick=getNm('yqlj')>友情链接</div>
+		</div>
+	</div> -->
+
+	<div id="innerscroller">
+		<div style="margin: 5px 5px 0px 5px;">
+			<div class="main" id="main_block"></div>
+			<!--
+			<div class="title_link">友情链接</div>
+
+			<div class="main" id="main_link">
+							<div class="row" style="height: 60px;">
+								<div class="item">
+									<div class="item_img link_height" id="link_gcdyw"
+										onclick="goUrl('http://www.12371.cn/','0')"></div>
+								</div>
+								<div class="item">
+									<div class="item_img link_height" id="link_djw"
+										onclick="goUrl('http://www.dangjian.cn/','1')"></div>
+								</div>
+							</div>
+						<div class="row" style="height: 60px;">
+							<div class="item">
+								<div class="item_img link_height" id="link_rsbxww"
+									onclick="goUrl('http://www.zuzhirenshi.com/','1')"></div>
+							</div>
+							<div class="item">
+								<div class="item_img link_height" id="link_ycjyw"
+									onclick="goUrl('http://dygbjy.12371.cn/kjpd/','0')"></div>
+							</div>
+						</div>
+				 
+			</div> -->
+			
+		</div>
+	</div>
+</body>
+</html>

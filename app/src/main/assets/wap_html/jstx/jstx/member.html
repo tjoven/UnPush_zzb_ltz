@@ -1,0 +1,519 @@
+<!doctype html>
+<html>
+<head>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+<title>群成员</title>
+<link rel="stylesheet" type="text/css" href="css/oa.css?v=3" />
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>   
+<!-- <script type="text/javascript" src="../../gmu/js/touch.js"></script> -->   
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="js/custom.js"></script>
+<script type="text/javascript" src="js/datadumper.js"></script>
+<script type="text/javascript" src="./js/getPath.js"></script>
+<style type="text/css">
+	body{background-color: #F7F7F7}
+   	li{list-style-type:none;}
+   	input,button,select,textarea{ outline:none;}
+</style>
+<script type="text/javascript">
+var iscr_from = null;
+$(function(){
+ 	$('#toolbar').toolbar();
+	var _height = getListHeight();
+//设置内滚动
+	$("#iscr_from").height(window.innerHeight-_height);
+	iscr_from = new iScroll("#memberData",{click:true});
+sys_autoTextarea(iscr_from); 
+});
+	sys_addMeun = false;
+	var groupId = getQueryStringRegExp("groupId");
+	var groupName = getQueryStringRegExp("groupName");
+	var currId = window.localStorage.getItem("yhid");
+	var currUsername = getQueryStringRegExp("currUsername");
+	var iscr_from = null;
+	$(function(){
+		//生成toolbar
+	  	$('#toolbar').toolbar({
+            fixed: true
+        });
+	  	$("#descriptionLength").text("100");
+		$("#nameLength").text("10");
+		$("#toolbar_text").text(groupName);
+		$("#memberData").height(window.innerHeight * 0.6);
+		$("#groupDescription").bind("input propertychange", function() {
+			var len = estimateContentLength($(this).val());
+			if(100 - len < 0){
+				$("#descriptionLength").css("color","red");
+			}else{
+				$("#descriptionLength").css("color","#757575");
+			}
+			$("#descriptionLength").html(100 - len);
+		});
+		$("#showGroupName").bind("input propertychange", function() {
+			var len = estimateContentLength($(this).val());
+			if(10 - len < 0){
+				$("#nameLength").css("color","red");
+			}else{
+				$("#nameLength").css("color","#757575");
+			}
+			$("#nameLength").html(10 - len);
+		});
+		iscr_from = new iScroll("memberData",{checkDOMChanges:true,useTransition:true});
+	});
+	
+	//获取长度
+	function estimateContentLength(content){
+		return content.length;
+		/* var len = content.replace(/[^\x00-\xff]/g,"aa").length;
+		return len; */
+	}
+	
+	//重新加载时，计算群组名称、描述文字长度
+	function count(length,id,value){
+		var len = estimateContentLength(value);
+		$("#"+id).html(length - len);
+	}
+	
+	var updateGroupName = "";
+	var updateGroupDescription = "";
+	var members = "";
+	window.onload = init;
+	function init(){
+		sys_ajaxPost("/jstx/default.do?method=queryMember&yhid="+currId+"&groupId="+groupId,function(json){
+			var str = "";
+			updateGroupDescription = json[0].groupDescription;
+			if(groupName != updateGroupName && "" != updateGroupName){
+				groupName = updateGroupName;
+				$("#toolbar_text").text(groupName);
+			}
+			$("#memberContent").empty();
+			$("#memberNum").text("群成员("+json.length+"人)");
+			$("#showGroupName").val(groupName);
+			$("#groupCreateTime").text(json[0].createTime);
+			$("#groupDescription").val(json[0].groupDescription);
+			count(10,"nameLength",$("#showGroupName").val());
+			count(100,"descriptionLength",$("#groupDescription").val());
+           	if(json.length > 0){
+           		
+           		members = "";
+           		for(var i = 0;i < json.length; i++){
+           			var groupMaster = json[i].username == "系统管理员" ? json[i].username : json[i].username ;//+ "("+json[i].department+")"
+           			members += (json[i].yhid + ",");
+           			if(currId == json[0].createrId){
+           				$("#addUserBtn").show();
+           				$("#updateInfo").show();
+           				str = json[0].createrId == json[i].yhid ? "群主" : "<img src='./image/minus.png' style='cursor:pointer;' onclick='delMember("+json[i].yhid+","+json[0].groupId+",\""+json[0].groupName+"\")'>";
+           			}else{
+           				
+           				$("#showGroupName").attr("readonly",true);
+           				$("#groupDescription").attr("readonly",true);
+           				if(json[0].createrId == json[i].yhid)
+           				{
+           					str="群主";
+           				}else{
+           					if(currId==json[i].yhid)
+           					{
+           						str="<img src='./image/exit.png' style='cursor:pointer;' onclick='exitOrDestroyGroup(\""+json[0].createrId+"\","+json[0].groupId+")'>";
+           					}else{
+           						str="";
+           					}
+           					
+           				}
+           				//str = json[0].createrId == json[i].yhid ? "群主" : "<img src='./image/exit.png' style='cursor:pointer;' onclick='exitOrDestroyGroup(\""+json[0].createrId+"\","+json[0].groupId+")'>";
+           			}
+           			
+           			$("#memberContent").append(
+       					"<div class='txl_ry'>" +
+		   	   				"<div class='txl_ry_img'>" +
+		   	   					"<img class='txl_img_cz' src="+sys_ctxStr()+headPortraitPath+"/pic/breviary"+json[i].yhid+".jpg onerror=\"javascript:this.src='img/txl/03_09.png'\">" +
+		   	   				"</div>" +
+		   	   				"<div class='txl_ry_rm' style='width:60%;'>" +
+		   	   					groupMaster +
+		   	   				"</div>" +
+		   	   				"<div class='txl_ry_cz' style='text-align:right;padding:16px;'>" +
+		   	   					str +
+		   	   				"</div>" +
+		   	   			"</div>"
+       				);
+       				if(i == json.length - 1){
+       					
+       					var temp = json[0].createrId == currId ? "解散该群" : "退出该群";
+       					if(json[0].createrId == currId){
+       						$(".txl_ry").last().after(
+       							"<div class='div_addr_row_last' style='padding-top: 30px;'>" +
+       								"<div class='db_an' onclick='exitOrDestroyGroup(\""+json[0].createrId+"\","+json[0].groupId+")'>" +
+       									temp +
+       								"</div>" +
+       								"<div class='div_add_info'></div>" +
+       							"</div>"
+       						);
+       					}
+       				};
+           		}
+           	}
+		});
+		iscr_from.refresh();
+	}
+	
+	//退出或解散群组时，清空对应聊天记录
+	function clearRelatedGroupMessage(status,yhid,groupId){
+		sys_ajaxPost("/jstx/default.do?method=clearRelatedGroupMessage&status="+status+"&yhid="+yhid+"&groupId="+groupId,function(json){
+			
+		});
+	}
+	
+	//当群组删除时，清除群组相关事件
+	function clearGroupEvent(groupId){
+		sys_ajaxPost("/jstx/default.do?method=clearGroupEvent&groupId="+groupId,function(json){
+			
+		});
+	}
+	
+	var members = "";
+	//查询群组成员
+	function queryGroupUser(groupId){
+		sys_ajaxPost("/jstx/default.do?method=queryMember&yhid="+currId+"&groupId="+groupId,function(json){
+			if(json.length > 0){
+        		members = "";
+           		for(var i = 0;i < json.length; i++){
+           			members += (json[i].yhid + ",");
+           		}
+        	}
+		});
+	}
+
+	//销毁或退出群
+	function exitOrDestroyGroup(userId,groupId){
+		var status = userId == currId ? "destroy" : "exit";
+		var showStr = status == "exit" ? "确定要退出该群吗？" : "确定要删除该群吗？";
+		sys_confirm(showStr,function(result){
+			if(result == false){
+				return false;
+			}else{
+				
+// 			}
+// 		});
+// 		if (window.confirm(showStr) == false){
+// 			return false;	
+// 		}else{
+			queryGroupUser(groupId);
+			if("" != members){
+				sys_ajaxPost("/jstx/default.do?method=exitOrDestroyGroup&userId="+currId+"&groupId="+groupId+"&status="+status,function(json){
+					if("unable_exit"==json.unable_exit){
+						alert("该群不允许退出");
+						return ;
+					}
+					var showSucc = undefined != json.exit ? "已退出该群!" : "该群已删除!";
+		        	alert(showSucc);
+		        	var message = new Object();
+		        	if("该群已删除!" == showSucc){
+		            	message.exitOrDestroyStatus = "destroy";
+		            	clearGroupEvent(groupId);
+		            	clearRelatedGroupMessage("destroy",currId,groupId);
+		        	}else{
+		        		message.exitOrDestroyStatus = "exit";
+		        		clearRelatedGroupMessage("exit",currId,groupId);
+		        	}
+		        	message.exitOrDestroyCreaterId = currId;
+		        	message.exitOrDestroyExiterId = currId;
+		        	message.exitOrDestroyExiterName = currUsername;
+	            	message.exitOrDestroyMembers = members;
+	            	message.exitOrDestroyGroupId = groupId;
+	            	message.exitOrDestroyGroupName = json.groupName;
+	            	message.createrId = json.createrId;
+	            	websocket.send(JSON.stringify(message));
+	            	if("该群已删除!" == showSucc){
+	            		sys_goURL("group.html");
+	            	}else{
+	            		init();
+	            	}
+	            	memebers = "";
+				});
+			}
+// 		}
+	}
+});
+	}
+	
+	//删除群组成员
+	/* function delMember(delId,groupId,groupName){
+		if (window.confirm("确定要删除选中的数据吗？")==false){
+			return false;	
+		}else{
+			sys_ajaxPost("/jstx/default.do?method=delMember&yhid="+yhid+"&delId="+delId+"&groupId="+groupId,function(json){
+				if(json.result == "succ"){
+					alert("人员删除成功!");
+	        		$("#showMember"+groupId).empty();
+	        		$("#addDescription"+groupId).empty();
+	        		queryMember(groupId,groupName);
+	        		var message = new Object();
+	        		message.kickOutMemberId = delId;
+	        		message.kickOutGroupId = groupId;
+	        		message.kickOutGroupName = groupName;
+	        		websocket.send(JSON.stringify(message));
+				}
+			});
+		}
+	} */
+	
+	//群组操作
+	/* function groupOperate(createrId){
+		var show = createrId == currId ? "确定删除该群？" : "确定退出该群？";
+		if (window.confirm(show)==false){
+			return false;	
+		}else{
+			var status = createrId == currId ? "destroy" : "exit";
+			sys_ajaxPost("/jstx/default.do?method=clearRelatedGroupMessage&status="+status+"&yhid="+currId+"&groupId="+groupId,function(json){
+				
+			});
+			sys_ajaxPost("/jstx/default.do?method=exitOrDestroyGroup&status="+status+"&userId="+currId+"&groupId="+groupId,function(json){
+				if(null != json){
+					alert(null != json.exit ? "已退出该群" : "该群解散成功");
+					queryGroupUser(groupId);
+					if(members != ""){
+						var message = new Object();
+			        	if("该群已删除!" == showSucc){
+			            	message.exitOrDestroyStatus = "destroy";
+			            	clearGroupEvent(groupId);
+			            	clearRelatedGroupMessage("destroy",currId,groupId);
+			        	}else{
+			        		message.exitOrDestroyStatus = "exit";
+			        		clearRelatedGroupMessage("exit",currId,groupId);
+			        	}
+			        	message.exitOrDestroyCreaterId = currId;
+			        	message.exitOrDestroyExiterId = currId;
+			        	message.exitOrDestroyExiterName = currUsername;
+		            	message.exitOrDestroyMembers = members;
+		            	message.exitOrDestroyGroupId = groupId;
+		            	message.exitOrDestroyGroupName = json.groupName;
+		            	message.createrId = json.createrId;
+		            	websocket.send(JSON.stringify(message));
+					}
+				}
+				sys_goURL("group.html");
+			});
+		}
+	} */
+	
+	//删除群组成员
+	function delMember(delId,groupId){
+		sys_confirm("确定将该人员请出该群吗？",function(result){
+			if(result == false){
+				return false;
+			}else{
+// 		if (window.confirm("确定将该人员请出该群吗？")==false){
+// 			return false;	
+// 		}else{
+			sys_ajaxPost("/jstx/default.do?method=delMember&yhid="+currId+"&delId="+delId+"&groupId="+groupId,function(json){
+				if(json.result == "succ"){
+					alert("操作成功");
+					init();
+				}
+			});
+		}
+			});
+	}
+	
+	function sys_ctxStr() {
+// 		var count = 0;
+// 		var end = 0;
+// 		for (var i = 0; i < sys_ctx.length; i++) {
+// 			var c = sys_ctx.charAt(i);
+// 			if (c == '/') {
+// 				count++;
+// 				if (count == 3) {
+// 					end = i;
+// 				}
+// 			}
+// 		}
+		var hostUrl = sys_ctx.replace("ltzfwpt","");
+		return hostUrl;
+	}
+
+	//返回上一页
+	function goback() {
+		sys_goURL("groupChat.html?groupId=" + groupId + "&groupName="
+				+ groupName);
+	}
+
+	//添加人员
+	function addUsersOfGroup() {
+		
+		sys_goURL("addUsersOfGroup.html?groupId=" + groupId + "&groupName="
+				+ groupName + "&members="+members + "&currUsername=" + currUsername);
+	}
+	
+	//更新群组信息
+	function updateGroup(){
+		if("" == $("#showGroupName").val().trim()){
+			alert("群主名称不能为空");
+			$("#showGroupName").val(groupName);
+			return false;
+		}else if($("#showGroupName").val().trim() == groupName && $("#groupDescription").val().trim() == updateGroupDescription){
+			alert("群组名称、描述都没有改动");
+			return false;
+		}else if($("#descriptionLength").text() < 0 || $("#nameLength").text() < 0){
+			alert("群组名称或描述超出长度，请重新修改！");
+			return false;
+		}else{
+			updateGroupName = $("#showGroupName").val();
+			var groupDescription = $("#groupDescription").val();
+			sys_ajaxPost("/jstx/default.do?method=updateGroup&groupId="+groupId+"&groupName="+updateGroupName+"&groupDescription="+groupDescription,function(json){
+				alert(json.result);
+				init(updateGroupName);
+			});
+		}
+	}
+	
+	
+	
+	//websocket对象
+	var websocket = null;
+	//判断当前浏览器是否支持WebSocket
+	if("WebSocket" in window){
+	    websocket = new WebSocket(sys_ctx.replace("http","ws")+"/websocket/"+("mobile" + currId));
+	}else{
+	    alert("Not support websocket");
+	}
+	
+	//连接发生错误的回调方法
+	websocket.onerror = function(){
+	    
+	};
+	 
+	//连接成功建立的回调方法
+	websocket.onopen = function(event){
+		
+	};
+	 
+	//接收到消息的回调方法
+	websocket.onmessage = function(event){
+		
+	};
+	 
+	//连接关闭的回调方法
+	websocket.onclose = function(){
+	    
+	};
+	 
+	//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+	window.onbeforeunload = function(){
+	    websocket.close();
+	};
+	 
+	//将消息显示在网页上
+	function setMessageInnerHTML(json){
+		
+	};
+	 
+	//关闭连接
+	function closeWebSocket(){
+		
+	};
+</script>
+<style type="text/css">
+.child_page_title1
+{
+	float: left;
+  
+    height: 65%;
+    color: white;
+    font-size: 14px;
+    text-align: center;
+    line-height: 25px;
+    margin-top: 12px;
+  	width:70%;
+}
+.ui-toolbar-button{
+	border:none;
+}
+
+.ui-toolbar-wrap { //
+	background-color: #D58900;
+	border: none !important;
+}
+
+.child_page_title2
+{
+	border-radius:6px;
+	width:100%;
+}
+</style>      
+</head>
+<body>
+	<div class="div_body">
+		
+<!-- 		<div id="toolbar" class="blue_top"> -->
+<!-- 			<div class="button_multi" > -->
+<!-- 				<img src="img/ztjy/02_06.png" class="img_back_or_xj" onclick="goback()"></img> -->
+<!-- 			</div> -->
+<!-- 			<div class="child_page_title1">	 -->
+<!-- 				<h1 id="toolbar_text" style="font-size:18px"></h1> -->
+<!-- 			</div> -->
+			
+<!-- 			<div class="button_multi" style="position:absolute;float:right;right:20px"" > -->
+<!--   				<span onclick="groupDetails()"> -->
+<!-- 		    		<img src="./image/right.png" style="width:20px;height:20px;margin-top: 13px;margin-left: 75%;" id="showSave" onclick="updateGroup()"> -->
+<!-- 		   		</span> -->
+<!--   			</div> -->
+		
+<!-- 		</div>	 -->
+<div id="toolbar">
+		<span class="btn_bak" onclick="goback();"></span>
+		<h1 class="toolbar_title">群成员</h1>
+	</div>
+		<div class="font-color-bm" id="iscr_from" style="background-color:#ezezez;">
+			<div  class="sear">
+				<div id="tabslist">
+		   	   		<div id="datahtml"> 	   
+		   	   			<div class="txl_ry" style="border-bottom: none;">
+		   	   				<div style="padding:13px 16px;">名称：</div>
+		   	   				<div style="padding:15px 16px;">
+		   	   					<input id="showGroupName" type="text" style="padding-left: 10px;border-radius:0px;border-bottom: 1px solid #FA5F14;width: 165px;" autocomplete="off" maxlength="10">
+		   	   				</div>
+		   	   				
+		   	   				<div class="txl_ry_cz">
+		   	   					<span id="nameLength" style="float: right;padding: 10px 10px;"></span>
+		   	   				</div>
+		   	   			</div>
+		   	   			<div class="txl_ry" style="height: auto;">
+		   	   				<div style="padding:13px 16px;margin-top:-10px">群描述：</div>
+		   	   				<div>
+		   	   					<textarea style="border-bottom:1px solid #FA5F14;border-radius:0px" id="groupDescription" name="groupDescription" class="xj_nr_textarea" rows="1" cols="20" placeholder=""></textarea>
+		   	   				</div>
+		   	   				<div class="txl_ry_cz" style="line-height: 20px;">
+		   	   					<span id="descriptionLength" style="float: right;padding: 10px 10px;"></span>
+		   	   				</div>
+		   	   			</div>
+		   	   			<div class="txl_ry">
+		   	   				<div style="padding:13px 16px;">创建时间：</div>
+		   	   				<div style="padding-top:13px;">
+		   	   					<span id="groupCreateTime"></span>
+		   	   				</div>
+		   	   			</div>
+		   	   			<div></div>
+		   	   			<div class="txl_ry">
+		   	   				<div style="padding:10px 16px;" id="memberNum"></div>
+		   	   				<div class="txl_ry_cz" id="addUserBtn" style="display: none;">
+		   	   					<img class="txl_img_cz" src="./image/add.png" onclick="addUsersOfGroup()">
+		   	   				</div>
+		   	   			</div>
+		   	   		</div>
+		   	   		<div id="memberData">
+		   	   			<div id="memberContent">
+		   	   			</div>
+		   	   		</div>
+		   	   </div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

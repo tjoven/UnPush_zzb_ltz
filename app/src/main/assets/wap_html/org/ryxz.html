@@ -1,0 +1,673 @@
+<!doctype html>
+<html>
+  <head>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+    <title>社区选择</title>
+    <link rel="stylesheet" type="text/css" href="../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../css/base.css" />
+	<link rel="stylesheet" type="text/css" href="../css/oa.css" />
+    <script type="text/javascript" src="../gmu/js/gmu.js"></script> 
+	<script type="text/javascript" src="../js/ict.js"></script>
+    <script type="text/javascript" src="../js/local.js"></script>
+
+    <script type="text/javascript">
+    sys_addMeun = false;
+	var sys_fsfw = getQueryStringRegExp("sys_fsfw");
+	var sys_fsfw_mc = getQueryStringRegExp("sys_fsfw_mc");
+	var sys_bm = getQueryStringRegExp("sys_bm");
+	var sys_mkdm = getQueryStringRegExp("sys_mkdm");
+	var sys_qxid = getQueryStringRegExp("sys_qxid");
+	var sys_zdyz = "";//是否开启自定义组0为不开启
+	var yhfw = getQueryStringRegExp("yhfw");
+	var date = 0,date_r=0,date_rs=0,date_g=0,date_gs=0;
+	var divheight = $(window).height();
+	var flag = 0;
+	var scr_menus_left = null;
+	var scr_menus_right = null;
+	var scr_menus_search = null;
+	var zdy_list="";
+    $(function(){
+		//noBarsOnTouchScreen("main_left");
+		//noBarsOnTouchScreen("main_right");
+		//noBarsOnTouchScreen("search_rtn");
+		if(sys_fsfw_mc.indexOf(',')>-1){
+			sys_zdyz=sys_fsfw_mc.split(',')[1];
+			sys_fsfw_mc=sys_fsfw_mc.split(',')[0];
+		}
+    	$("#search_rtn").hide();
+    	$("#quit_search").hide();
+    	
+    	//生成toolbar
+	  	$('#toolbar').toolbar();
+    	
+		sys_ajaxGet("/wap/org/default.do?method=getBmYhList","hasbm=0&yhfw="+yhfw+"&sys_bm="+sys_bm+"&qxid="+sys_qxid+"&mk_dm="+sys_mkdm,function(json){
+			if(json.list){
+				setTreeList(json.list);
+				if(json.list.length>0){
+					$("#initbmid").val(json.initbmid);
+				}
+			}
+			if(json.choose_info){
+				setChoosed(json.choose_info.choose,json.choose_info.choosed_value);
+			}
+			if(json.zdy_list){
+				zdy_list=json.zdy_list;
+				if(sys_zdyz!='0'){
+					setZdyTreeList(json.zdy_list);
+				}
+			}
+			//var _height = getListHeight();
+			//$("#main_left").css("min-height",window.innerHeight-_height);
+			
+		});
+			
+		$('#btn_search').click(function(){
+		     	$('#dialog_search').dialog('open'); 
+			});
+			  
+        $('#dialog_search').dialog({
+	        autoOpen: false,
+	        closeBtn: false,
+	        buttons: {
+	            '确定': function(){
+	            	search_bmyh();
+	                this.close();
+	            },
+	            '取消': function(){
+	                this.close();
+	            }
+	        }
+	    }).dialog('this')._options['_wrap'].addClass('login-dialog');
+		
+ 	});
+ 	
+ 	function setTreeList(list,bt){//处理部门人员树区域
+		var output = new Array();
+		var outputzdy = new Array();
+		if(bt===undefined){
+			bt = '';
+		}
+		//output.push("<table class='c_wap_db_table' width='100%'>");
+		if(bt !='' && bt.length>0){
+			var i=0;
+			var head = '>';
+			output.push("<tr><td colspan='3'>"); 
+			output.push("&nbsp;<a href='javascript:void(0)' style='text-decoration:underline;' onclick=getBmyh('201','','','')><font color='gray'><b>单 位</b></font></a>");
+			output.push("<td></tr>"); 
+			output.push("<tr class='c_tr_spliter'><td class='c_td_bottom_line2' width='100%' colspan='3'></td></tr>");
+			for (i=0;i<bt.length;i=i+1)
+			{
+				output.push("<tr><td colspan='3'>"); 
+		  		output.push(head+"<a href='javascript:void(0)' style='text-decoration:underline;' onclick=getBmyh('201','"+bt[i].bmid+"','"+bt[i].mc+"','')><font color='gray'><b>"+bt[i].mc+"</b></font></a>"); 
+		  		if(i != bt.length-1){
+		  			head += '>';
+		  		}
+		  		output.push("<td></tr>"); 
+		  		if(i != bt.length-1){
+					output.push("<tr class='c_tr_spliter'><td class='c_td_bottom_line2' width='100%' colspan='3'></td></tr>");
+				}
+			}
+		  	output.push("<tr class='c_tr_spliter'><td class='c_td_bottom_line' width='100%' colspan='3'></td></tr>");
+		}
+		var choosed = '';
+		if(list.length<=0){
+			output.push("<tr>"); 
+		  	output.push("<td align='left' colspan='3'><font color='gray'>&nbsp;&nbsp;无信息</font></td>"); 
+		  	output.push("</tr>"); 
+		}else{
+			var i=0;	
+	  		choosed = $("#choose").val(); //已选代码值
+			for (i=0;i<list.length;i=i+1)
+			{
+				var mc = list[i].mc;
+				mc = mc.replace(/[ ]/g,''); //替换所有空格
+				output.push("<tr>"); 
+				output.push("<td width='6px'></td><td align='center' width='8%'>"); 
+				if(list[i].lx_dm!='204' || sys_bm =='1'){
+					output.push("<input class='c_checkbox' type='checkbox' id='a"+list[i].lxid+"' name='check' onclick=checkMethod(this.checked,'"+list[i].lxid+"','"+mc+"','') >");
+				}
+				output.push("</td><td align='left' onclick=getBmyh('"+list[i].lx_dm+"','"+list[i].lxid+"','"+mc+"','')>&nbsp;");
+				output.push(mc);
+				output.push("</td></tr>");
+				output.push("<tr class='c_tr_spliter'><td class='c_td_bottom_line' width='100%' colspan='3'></td></tr>");
+			}
+		}
+		//output.push("</table>"); 
+	  	$("#bmyh").html(output.join(""));
+		
+	    //设置滚动
+	    if(scr_menus_left==null){
+			$("#main_left").height(window.innerHeight - 50);  	
+		    scr_menus_left = new iScroll("main_left",{click:true}); 
+	    }else{
+	    	scr_menus_left.refresh();
+	    }
+	  	
+		//若右侧已选，设为选中
+		for (var j=0;j<list.length;j=j+1){
+			if(choosed.indexOf(list[j].lxid+',')>-1){//已经选择
+				var treeid_check = document.getElementById('a'+list[j].lxid);
+				if(treeid_check){
+					treeid_check.checked = true;
+				}
+			}
+		}
+	}
+	function setZdyTreeList(zdylist){//处理部门人员树区域
+		var outputzdy = new Array();
+		//output.push("<table class='c_wap_db_table' width='100%'>");
+		var choosed="";
+		if(zdylist&&zdylist.length>0){
+			choosed = $("#choose").val(); //已选代码值
+			outputzdy.push("<tr><td colspan='3'>"); 
+			outputzdy.push("&nbsp;<a href='javascript:void(0)' style='text-decoration:underline;' onclick=getZdys()><font color='gray'><b>自定义组</b></font></a>");
+			outputzdy.push("<td></tr>"); 
+			for(var i=0;i<zdylist.length;i++){
+				if(zdylist[i].lx_dm=='0'){
+					var mc = zdylist[i].mc;
+					mc = mc.replace(/[ ]/g,''); //替换所有空格
+					outputzdy.push("<tr class='c_tr_spliter zdyz' style='display:none'><td class='c_td_bottom_line' width='100%' colspan='3'></td></tr>");
+					outputzdy.push("<tr class='zdyz' style='display:none'>"); 
+					outputzdy.push("<td width='5px'></td><td align='center' width='8%'>"); 
+					outputzdy.push("<input class='c_checkbox' type='checkbox' id='azdyzid"+zdylist[i].id+"' name='check' onclick=checkMethodzdy(this.checked,'"+zdylist[i].id+"','"+mc+"','') >");
+					outputzdy.push("</td><td align='left' onclick=treeCheckzdy('"+zdylist[i].id+"','"+mc+"','')>&nbsp;");
+					outputzdy.push(mc);
+					outputzdy.push("</td></tr>");
+				}
+			}
+			outputzdy.push("<tr class='c_tr_spliter'><td class='c_td_bottom_line' style='border-bottom: #0973c5 solid 2px;' width='100%' colspan='3'></td></tr>");
+		}
+	  	$("#zdy").html(outputzdy.join(""));
+	    //设置滚动
+	    if(scr_menus_left==null){
+			$("#main_left").height(window.innerHeight - 50);  	
+		    scr_menus_left = new iScroll("main_left",{click:true}); 
+	    }else{
+	    	scr_menus_left.refresh();
+	    }
+		//若右侧已选，设为选中
+		for (var j=0;j<zdylist.length;j=j+1){
+			if(choosed.indexOf(zdylist[j].id+',')>-1){//已经选择
+				var treeid_check = document.getElementById('azdyzid'+zdylist[j].id);
+				if(treeid_check){
+					treeid_check.checked = true;
+				}
+			}
+		}
+	}
+	function getZdys(){
+		var t=$(".zdyz");
+		if(t.css('visibility') != 'hidden' && t.css('display') != 'none'){
+			t.hide();
+		}else{
+			t.show();
+		}
+	}
+	function setChoosed(choosed,choosed_value){//初始化已选择数据
+		$("#choose").val(choosed);
+		$("#choose_value").val(choosed_value);
+		setTreeChoosed(choosed,choosed_value);
+		
+		//若右侧已选，设为选中
+		var choosed = $("#choose").val();
+		choosed = choosed.substring(0,choosed.length-1).split(",");
+		for (var j=0;j<choosed.length;j=j+1){
+			var treeid_check = document.getElementById('a'+choosed[j]);
+			if(treeid_check){
+				treeid_check.checked = true;
+			}
+		}
+	}
+	
+	function setTreeChoosed(choosed,choosed_value){//设置已选区域html
+		var choose_temp = choosed.substring(0,choosed.length-1).split(",");
+		var show_temp = choosed_value.substring(0,choosed_value.length-1).split(",");
+		var output = new Array();
+		if(show_temp.length>0 && show_temp !=''){
+			output.push("<table class='c_wap_db_table' width='100%'>");
+			output.push("<tr><td align='left'><font color='gray'><b>&nbsp;&nbsp;已选择:("+show_temp.length+")</b></font><td></tr>"); 
+			output.push("<tr class='c_tr_spliter'><td class='c_td_bottom_line' width='100%'></td></tr>");	
+			var i = 0;	  
+			for (i=0;i<show_temp.length;i=i+1)
+			{
+				output.push("<tr id='"+choose_temp[i]+"' onclick=removeChoose('"+choose_temp[i]+"','"+show_temp[i]+"')>"); 
+				output.push("<td align='left'>&nbsp;&nbsp;"+show_temp[i]+"</td>"); 
+				output.push("</tr>");
+				output.push("<tr class='c_tr_spliter'><td class='c_td_bottom_line' width='100%'></td></tr>");
+			}
+			output.push("</table>"); 
+			$("#main_right").html(output.join(""));
+	  	}else{
+	  		$("#main_right").html("");
+	  	}
+		//设置滚动
+		scr_menus_right=null;
+		if(scr_menus_right==null){
+			$("#main_right").height(window.innerHeight - 50);  	
+	    	scr_menus_right = new iScroll("main_right",{click:true}); 
+	    }else{
+	    	scr_menus_right.refresh();
+	    }
+	}
+	
+	function getBmyh(lx_dm,id,mc,bmmc){//获取下级部门用户
+		if(date != 0){
+			date_g = new Date();
+			date_gs = date_g.getTime()-date.getTime(); //时间差的毫秒数
+			if(date_gs<=500){
+				return;
+			}
+		}
+		if(lx_dm =='201'){
+			sys_ajaxGet("/wap/org/default.do?method=getBmYhList","org_bmid="+id+"&sys_bm="+sys_bm+"&qxid="+sys_qxid+"&mk_dm="+sys_mkdm+"&initbmid="+$("#initbmid").val(),function(json){
+				if(json.list){
+					if(json.list.length>0){
+						setTreeList(json.list,json.sjbmList);
+					}else{
+						treeCheck(id,mc,bmmc);
+					}
+				}
+			});
+		}else{
+			treeCheck(id,mc,bmmc);
+		}
+	}
+	
+	function treeCheck(id,mc,bmmc){//组织目录树末级节点点击处理
+		var tree_check = document.getElementById('a'+id);
+		if(tree_check){
+			if(tree_check.checked){ //左侧树中check为选中
+				tree_check.checked = false;
+				if(bmmc && bmmc!=' '){
+					mc = mc + bmmc;
+				}
+				mc = mc.replace(/[ ]/g,''); //替换所有空格
+				removeChoose(id,mc);
+			}else{
+				tree_check.checked = true;
+				singleChoose('list',id,mc,bmmc);
+			}
+		}
+	}
+	
+	function checkMethod(flag,id,mc,bmmc){//组织目录树点击check选择框处理
+		if(flag){
+			singleChoose('list',id,mc,bmmc);
+		}else{
+			if(bmmc && bmmc!=' '){
+				mc = mc + bmmc;
+			}
+			mc = mc.replace(/[ ]/g,''); //替换所有空格
+			removeChoose(id,mc);
+		}
+	}
+	function treeCheckzdy(zdyzid,mc,bmmc){//组织目录树末级节点点击处理
+		//alert(JSON.stringify(zdy_list));
+		var tree_check = document.getElementById('azdyzid'+zdyzid);
+		if(tree_check){
+			if(tree_check.checked){ //左侧树中check为选中
+				tree_check.checked = false;
+				for(var i=0;i<zdy_list.length;i++){ 
+					var id="",mc="";
+					if(zdy_list[i].sjid==zdyzid){
+						if(zdy_list[i].lx_dm=='204'){
+							id="yh"+zdy_list[i].id;
+						}else if(zdy_list[i].lx_dm=='201'){
+							id="bm"+zdy_list[i].id;
+						}
+						mc=zdy_list[i].mc;
+						if(bmmc && bmmc!=' '){
+							mc = mc + bmmc;
+						}
+						mc = mc.replace(/[ ]/g,''); //替换所有空格
+						removeChoose(id,mc);
+					}
+				}
+				removeChoose("zdyzid"+zdyzid);
+			}else{
+				tree_check.checked = true;
+				for(var i=0;i<zdy_list.length;i++){
+					var id="",mc="";
+					if(zdy_list[i].sjid==zdyzid){
+						if(zdy_list[i].lx_dm=='204'){
+							id="yh"+zdy_list[i].id;
+						}else if(zdy_list[i].lx_dm=='201'){
+							id="bm"+zdy_list[i].id;
+						}
+						mc=zdy_list[i].mc;
+						if(bmmc && bmmc!=' '){
+							mc = mc + bmmc;
+						}
+						mc = mc.replace(/[ ]/g,''); //替换所有空格
+						singleChoose('list',id,mc,bmmc);
+					}
+				}
+				singleChoose('list',"zdyzid"+zdyzid);
+			}
+		}
+	}
+	
+	function checkMethodzdy(flag,zdyzid,mc,bmmc){//组织目录树点击check选择框处理
+		for(var i=0;i<zdy_list.length;i++){ 
+			var id="",mc="";
+			if(zdy_list[i].sjid==zdyzid){
+				if(zdy_list[i].lx_dm=='204'){
+					id="yh"+zdy_list[i].id;
+				}else if(zdy_list[i].lx_dm=='201'){
+					id="bm"+zdy_list[i].id;
+				}
+				mc=zdy_list[i].mc;
+				if(flag){
+					singleChoose('list',id,mc,bmmc);
+				}else{
+					if(bmmc && bmmc!=' '){
+						mc = mc + bmmc;
+					}
+					mc = mc.replace(/[ ]/g,''); //替换所有空格
+					removeChoose(id,mc);
+				}
+			}
+		}
+		if(flag){
+			singleChoose('list',"zdyzid"+zdyzid);
+		}else{
+			removeChoose("zdyzid"+zdyzid);
+		}
+	}
+	
+	function singleChoose(source,id,mc,bmmc){//将选择数据加入已选择区域
+		date = new Date();
+		if(bmmc && bmmc!=' '){
+			mc = mc + bmmc;
+		}
+		if(mc && mc!=' '){
+			mc = mc.replace(/[ ]/g,''); //替换所有空格
+		}
+		var choosed = $("#choose").val(); //已选代码值
+		if(choosed.indexOf(id+',')>-1){//已经选择过的跳过
+		}else{
+			var choosed_value = $("#choose_value").val(); //已选择代码对应名称
+			choosed += id +',';
+			//用来控制只能选择一个组织
+			var xxx = choosed.split(",");
+			for(var i = 0; i < xxx.length ; i++){
+				if(xxx[1] != ''){
+					sys_alert("您只能选择一个!");
+					return;
+				}
+			}
+			
+			
+			if(mc && mc!=' '){
+				choosed_value += mc +',';
+			}
+			setTreeChoosed(choosed,choosed_value);
+			$("#choose").val(choosed);
+			$("#choose_value").val(choosed_value);
+		}
+		//console.log("single==choosed="+choosed+"==id="+id);
+		//alert($("#choose").val());
+		if(source == 'cx'){	//清空拼音及列表	
+			$("#user_search").val('');
+			//已经选择
+			var treeid_check = document.getElementById('a'+id);
+			if(treeid_check){
+				treeid_check.checked = true;
+			}
+		}
+	}
+	
+	function removeChoose(id,mc){//删除已选择
+		if(date != 0){
+			date_r = new Date();
+			date_rs = date_r.getTime()-date.getTime(); //时间差的毫秒数
+			if(date_rs<=500){
+				return;
+			}
+		}
+		//去掉左侧树中check
+		var tree_check = document.getElementById('a'+id);
+		if(tree_check){
+			tree_check.checked = false;
+		}
+		//移除隐藏域已删除值
+		var choosed = $("#choose").val();
+		var choosed_value = $("#choose_value").val();
+		choosed = choosed.replace(id+',','');
+		choosed_value = choosed_value.replace(mc+',','');
+		//console.log("remove==choosed="+choosed+"==id="+id);
+		$("#choose").val(choosed);
+		$("#choose_value").val(choosed_value);
+		setTreeChoosed(choosed,choosed_value);
+	}
+	
+	function search_bmyh(){//搜索
+        $("#main_left").hide();
+        $("#main_right").hide();
+        $("#search_rtn").show();
+        $("#quit_search").show();
+        
+        sys_ajaxGet("/wap/org/default.do?method=getBmYhCx&sys_bm="+sys_bm+"&qxid="+sys_qxid+"&mk_dm="+sys_mkdm+"&page_size=100&page_goto=1",{cx_py:$("#user_search").val()},function(json){
+        	if(json.gridData.table_list.data){
+        		set_searchrtn(json.gridData.table_list.data);
+        	}else{
+        		$("#search_rtn").html("<font color='gray'>&nbsp;&nbsp;无信息</font>");
+        	}
+	    });
+		
+	} 
+	
+	function set_searchrtn(list){//设置搜索结果区域
+		if(list.length>0){
+			var output = new Array();
+			output.push("<table class='c_wap_db_table' width='100%'>");
+			for (var i=0;i<list.length;i=i+1)
+			{
+				var mc = list[i].mc;
+				mc = mc.replace(/[ ]/g,''); //替换所有空格
+				output.push("<tr onclick=callback_main('"+list[i].id+"','"+mc+"','')>"); 
+				output.push("<td align='left'>&nbsp;&nbsp;"+mc+"</td>"); 
+				output.push("</tr>");
+				output.push("<tr class='c_tr_spliter'><td class='c_td_bottom_line' width='100%'></td></tr>");
+			}
+			output.push("</table>"); 
+			$("#search_rtn").html(output.join(""));
+		}else{
+			$("#search_rtn").html("<font color='gray'>&nbsp;&nbsp;无信息</font>");
+		}
+		//设置滚动
+		scr_menus_search=null;
+	    if(scr_menus_search==null){
+			$("#search_rtn").height(window.innerHeight - 50);  	
+	    	scr_menus_search = new iScroll("search_rtn",{click:true}); 
+	    }else{
+	    	scr_menus_search.refresh();
+	    }
+	}
+	
+	function quit_search(){ //退出搜索
+		$("#user_search").val('');
+		$("#quit_search").hide();
+		$("#search_rtn").hide();
+		$("#main_left").show();
+        $("#main_right").show();
+	}
+	
+	function callback_main(id,mc,bmmc){ //搜索结果行点击事件
+		//设置选择区可见，查询区隐藏
+		$("#quit_search").hide();
+        $("#search_rtn").hide();
+        $("#main_left").show();
+        $("#main_right").show();
+		singleChoose('cx',id,mc,bmmc);
+	}	
+	
+	function noBarsOnTouchScreen(arg){ //设置滚动
+	  var elem, tx, ty;
+	  if('ontouchstart' in document.documentElement ) {
+	          if (elem = document.getElementById(arg)) {
+	              elem.style.overflow = 'hidden';
+	              elem.ontouchstart = ts;
+	              elem.ontouchmove = tm;
+	          }
+	  }
+	
+	  function ts( e )
+	  {
+	    var tch;
+	    if(  e.touches.length == 1 )
+	    {
+	      e.stopPropagation();
+	      tch = e.touches[ 0 ];
+	      tx = tch.pageX;
+	      ty = tch.pageY;
+	    }
+	  }
+	
+	  function tm( e )
+	  {
+	    var tch;
+	    if(  e.touches.length == 1 )
+	    {
+	      e.preventDefault();
+	      e.stopPropagation();
+	      tch = e.touches[ 0 ];
+	      this.scrollTop +=  ty - tch.pageY;
+	      ty = tch.pageY;
+	    }
+	  }
+	}
+	
+ 	function saveuser(){//保存
+		var choose = $("#choose").val(); /*已选择代码值*/
+		var choose_value = $("#choose_value").val(); //已选择代码对应名称
+	  	var show_temp = choose_value.substring(0,choose_value.length-1).split(",");
+	  	if(show_temp.length==1){
+	  		choose_value = choose_value.substring(0,choose_value.length-1);
+	  	}else if(show_temp.length>1){
+	  		choose_value = '已选择'+show_temp.length+'个';
+	  	}
+		if(isPad){
+			sys_ryxz_confirm(sys_fsfw,sys_fsfw_mc,choose,choose_value);
+			removefloat();
+		}else{
+			if(isAndriod){
+			     window.webview.closeWin("sys_ryxz_confirm('"+sys_fsfw+"','"+sys_fsfw_mc+"','"+choose+"','"+choose_value+"')"); //调用外壳方法
+			}else if(isIphone){
+			     window.location.href="obj-c://closeWin/sys_ryxz_confirm('"+sys_fsfw+"','"+sys_fsfw_mc+"','"+choose+"','"+choose_value+"')";
+			}else{
+				window.opener.document.getElementById(sys_fsfw).value=choose;
+				window.opener.document.getElementById(sys_fsfw_mc).value=choose_value;
+				window.close();
+			}
+		}
+	}
+	
+	function tuichu(){//关闭
+		if(isPad){
+			removefloat();
+		}else{
+			if(isAndriod){
+				window.webview.exitWin();
+			}else if(isIphone){
+				window.location.href="obj-c://exitWin/";
+			}else{
+				window.close();
+			}
+		}
+	}
+
+    </script>
+    <script type="text/javascript" src="../js/pad.js"></script>
+    <style type="text/css">
+    html,body{
+		padding:0;
+		margin:0;
+		border:0;
+		width: 100%;
+	}
+    body {
+		font-family: 16px Helvetica;
+		background-color:#FFFFFF;
+	}
+	#search_rtn {
+		position: absolute; 
+		width: 100%;
+		overflow-y:auto;
+	}
+	.m_div{
+		
+		overflow-y:auto;
+		margin:0px;
+	}
+	#main_left{
+		width: 70%;
+		position: absolute; 
+		left:0; 
+		border-right:1px solid #B2AA9E;
+    }
+    #main_right{
+    	width: 30%;
+		position: absolute; 
+		right:0; 
+    }
+    .c_wap_db_table tr {
+		height:40px;
+		line-height:40px;
+    }
+    tr.c_tr_spliter {
+		height:1px;
+		line-height:1px;
+    }
+    .c_wap_db_table td.c_td_bottom_line {
+		border-bottom: #A0A0A0 solid 1px;
+    }
+    .c_wap_db_table td.c_td_bottom_line2 {
+		border-bottom: #FFFFFF solid 1px;
+    }
+    .c_checkbox{
+		vertical-align:middle; 
+    }
+	A:link {
+		COLOR: #000000;TEXT-DECORATION: none
+	}
+	A:visited {
+		COLOR: #000000; TEXT-DECORATION: none
+	}
+	A:active {
+		COLOR: #000000; TEXT-DECORATION: none
+	}
+	A:hover {
+		COLOR: #000000; TEXT-DECORATION: none
+	}
+    </style>
+  </head>
+  <body>
+	<div id="toolbar">
+    	<span class="btn_bak" onclick="tuichu();"></span>
+	    <h1 class="toolbar_title">社区选择</h1>
+	    <span class="btn_toolbar_font" onclick="saveuser();" style="color: white;">确定</span>
+	    <span class="btn_toolbar_font" id="btn_search" style="color: white;">搜索</span>
+	</div>
+
+  	<div id="main_left" class="m_div">
+  		<div>
+  		<table class='c_wap_db_table' id="zdy" width='100%'></table>
+  		<table class='c_wap_db_table' id="bmyh" width='100%'></table>
+  		</div>
+  	</div>
+  	<div id="main_right" class="m_div">&nbsp;</div>
+  	
+  	<div id="search_rtn">&nbsp;</div>
+	
+	<div id="dialog_search">
+		<div>
+       		<div>名称:</div><input type="search" id="user_search" value="" size="20" placeholder="请输入拼音或汉字"/>
+       	</div>
+	</div>
+	<input type="hidden" name="choose" id="choose"/> 
+  	<input type="hidden" name="choose_value" id="choose_value"/>
+  	<input type="hidden" name="initbmid" id="initbmid"/>
+  </body>
+</html>

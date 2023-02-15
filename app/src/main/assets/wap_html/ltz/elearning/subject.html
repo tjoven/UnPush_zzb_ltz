@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>主题教育</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+<script type="text/javascript">
+	var dm = getQueryStringRegExp("dm"); // 列表类型，所有页面都使用一个列表页
+	var nm = getQueryStringRegExp("nm");
+	var _list = {};
+
+	$(function() {
+		//生成toolbar
+		$('#toolbar').toolbar();
+
+		if(nm == ''){			    	
+			nm=0;
+		}	
+		$(".c_tabs_text").eq(nm).addClass("c_tabs_active");
+		 loadList();				   
+	  });
+	
+     	function loadList() {
+			sys_ajaxGet('/ltz/subject/default.do?method=waplist', function(json) {
+				//bind(json);	
+				var list = json.list;
+				if (list.length > 0) {
+					bindList(list);
+				}
+				var _height = window.innerHeight - getListHeight();
+				$("#innerscroller").height(_height);
+				 innerscroll = new iScroll("innerscroller", {
+					hScrollbar : false,
+					vScrollbar : false,
+					click : true
+				});
+	
+			});
+	 }
+	  function bindList(list) {
+		if (list.length > 0) {
+			var sspHtml = "";
+			if(list.length>0){
+	          sspHtml=sspHtml+"<div class='row'>";
+	       } 
+			for (var i = 0; i < list.length; i++) {				
+		        if(i%2==0){
+		          sspHtml=sspHtml+'</div> <div class="row">';
+		          sspHtml +="<div class='item' onclick=callback_trclick_table_list('" + list[i].url + "')  style='background-image: url("+list[i].imgurl+");'></div>";
+		        }else{
+		          sspHtml +="<div class='item' onclick=callback_trclick_table_list('" + list[i].url + "')  style='margin-right: 10px;;background-image: url("+list[i].imgurl+");'></div>";
+		        }
+			}
+			if(!(list.length>0&&list.length%2==0)){
+				  sspHtml=sspHtml+"</div>";
+				}
+			$('#main').html("");
+			$('#main').html(sspHtml);
+		}
+	  }
+   		function callback_trclick_table_list(param){
+   		       if(isAndriod){
+                	window.webview.loadurl_new(param);
+                }else if(isIphone){
+                	window.location.href='obj-c://outside//'+param;                        	
+                }else{
+                   var iTop = (window.screen.availHeight - 30 - 365) / 2;
+		           var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+		           window.open(param, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+                }
+                return;
+			
+   		}
+   			
+		// 点击tab页刷新画面显示相应tab页内容一览list
+		function getNm(dm){
+		   if(dm=="ztjy"){
+			    sys_goURL("subject.html");		
+			}else if(dm=="xxzl"){
+			 	sys_goURL("data.html?nm=1&lb_dm=70880");
+			}			
+		}
+	    function go_back(){	  
+    		 sys_goURL("../../main.html");  		
+    	}
+		
+</script>
+
+ <style type="text/css">
+         .ui-toolbar-wrap {
+			//background-color: #ff0000;
+			border: none !important;
+		 }
+		 #main{
+		   width: 100%;
+		   display:-webkit-box;
+	       -webkit-box-orient:vertical;
+	       -webkit-box-align:center;
+		 }
+		
+		.row{
+         width:100%;
+		   display:-webkit-box;
+			-webkit-box-orient: horizontal;
+         }  
+         .row>div{
+            display:-webkit-box;
+            -webkit-box-flex: 1;
+            border: 0px red solid;
+            height: 100px;
+            margin: 10px 0px 0px 10px;        
+            background-repeat:round;
+	        background-size:100% 100%;
+         }
+    </style>
+
+</head>
+<body>
+	<div id="toolbar">
+		 <span class="btn_bak"  onclick="go_back();"></span>
+		<h1 class="toolbar_title">在线学习</h1>
+	
+	</div>
+	   <div class="c_tabs div_other_40" id="div_tabs" >
+		     <div  id='div_list0' >
+			    <div class='c_tabs_text' onclick=getNm('ztjy')>主题教育</div>
+		 	 </div>   
+		 	 <div  id='div_list1' >
+			    <div class='c_tabs_text' onclick=getNm('xxzl')>学习资料</div>
+		 	</div>
+		</div>
+		
+	<div id="innerscroller">
+       <div  id="main"> 
+       <!-- 
+		   <div class="row">
+		       <div class="item"></div>
+		        <div class="item" style="margin-right: 10px;"></div>
+		   </div>
+		   <div class="row">
+		        <div class="item"></div>
+		        <div class="item" style="margin-right: 10px;"></div>
+		   </div>
+		    -->
+       </div>
+   </div>
+  </body>
+</html>

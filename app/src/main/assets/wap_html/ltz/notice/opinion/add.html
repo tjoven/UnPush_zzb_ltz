@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+    <title>通知公告>意见建议</title>
+    <link rel="stylesheet" type="text/css" href="../../../gmu/css/gmu.css"/>
+    <link rel="stylesheet" type="text/css" href="../../../css/base.css"/>
+    <link type="text/css" rel="stylesheet" href="../../../css/iconfont/iconfont.css"/>
+    <script type="text/javascript" src="../../../gmu/js/gmu.js"></script>
+    <script type="text/javascript" src="../../../js/ict.js"></script>
+    <script type="text/javascript" src="../../../js/local.js"></script>
+
+
+    <script type="text/javascript">
+
+        $(function () {
+            $('#toolbar').toolbar();
+
+            $("#btn_save").click(function () {
+
+                if ($("#theme").val() == '') {
+                    sys_alert('请输入主题');
+                    return;
+                }
+                if ($("#content").val() == '') {
+                    sys_alert('请输入内容');
+                    return;
+                }
+
+                var queryString = $("#form_show").serialize();
+                sys_ajaxPost("/ltz/opinion/default.do?method=WapOSave", queryString, function (data) {
+                    if (data.result == true) {
+                        sys_alert("保存成功");
+                        sys_goURL('opinion.html');
+                    } else {
+                        sys_alert(data.msg);
+                    }
+                });
+            });
+        });
+
+    </script>
+    <style type="text/css">
+        .ui-toolbar-wrap{
+            border: none !important;
+        }
+      .bx {
+            color: red;
+        }
+
+        .form_cell_label {
+            width: 95px;
+            font-size: 16px;
+            padding-left: 5px;
+            color: #333333;
+            font-weight: bold;
+            font-family: 宋体;
+        }
+
+        .c_form_show > div {
+            border-bottom: 1px solid #eaeaea;
+            display: -webkit-box;
+            -webkit-box-align: center;
+            color: #151515;
+            min-height: 45px;
+        }
+        .c_form_show_addqz > div {
+            display: -webkit-box;
+            -webkit-box-align: center;
+            color: #151515;
+            min-height: 45px;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="toolbar">
+        <i class="icon iconfont icon-back btn_bak" onclick="sys_goURL('opinion.html');"></i>
+        <h1 class="toolbar_title">意见建议</h1>
+        <span class="btn_toolbar_font" id="btn_save" style="color:#fff;">提交</span>
+    </div>
+    <div id="sys_innerscoll">
+        <form id="form_show">
+            <input type="hidden" name="guid" id="guid"/>
+
+            <div class="c_form_show">
+                <div>
+                    <div class="form_cell_label"><span class="bx">*</span>主 题：</div>
+                    <div class="form_cell_item">
+                        <input type="text" name="theme" id="theme" placeholder="请输入主题">
+                    </div>
+                </div>
+                <div>
+                    <div class="form_cell_label"><span class="bx">*</span>内 容：</div>
+                    <div class="form_cell_item">
+                        <textarea id="content" name="content" rows="6" cols="100" placeholder="请输入内容"></textarea>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</body>
+</html>

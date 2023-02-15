@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>订餐送餐</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript" src="../../js/touchslider.dev.js"></script>
+<script type="text/javascript">
+	sys_addMeun = true;
+	var nm = getQueryStringRegExp("nm");
+	$(function() {
+		$('#toolbar').toolbar();
+		var _height = getListHeight();
+		$("#sys_innerscoll").height(window.innerHeight - _height);
+		var innerscroll = new iScroll("sys_innerscoll", {
+			click : true
+		});
+		if (nm == '') {
+			nm = 1;
+		}
+		$(".c_tabs_text").eq(nm).addClass("c_tabs_active");
+	});
+	function go_back() {
+		sys_goURL("food.html");
+	}
+
+</script>
+<style>
+.ui-toolbar-wrap {
+	border: 0px;
+}
+img{
+	width:90%;
+	margin-left: 15px;
+	margin-top: 15px;
+}
+</style>
+</head>
+<body>
+	<div id="toolbar">
+		<i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+		<h1 class="toolbar_title">资格证书</h1>
+	</div>
+	<div id="sys_innerscoll">
+		<header>
+			<div>
+				<img src="yyzz.jpg"/>
+				<img src="jjxkz.jpg"/>
+			</div>
+		</header>
+	</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

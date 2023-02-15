@@ -1,0 +1,278 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+    <title>专家预约</title>
+    <link rel="stylesheet" type="text/css" href="../../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/mobiscoller.css" />
+
+    <script type="text/javascript" src="../../../gmu/js/gmu.js"></script>
+    <script type="text/javascript" src="../../../js/ict.js"></script>
+    <script type="text/javascript" src="../../../js/local.js"></script>
+    <script type="text/javascript" src="../../../js/mobiscroll.js"></script>
+    <script type="text/javascript" src="../../../../js/validate.js?v=123"></script>
+    <script type="text/javascript">
+
+        var innerscroll = null;
+        var guid = null;
+        var ksid = null;
+        $(function() {
+            //生成toolbar
+            $('#toolbar').toolbar();
+            guid = getQueryStringRegExp("guid");
+            ksid = getQueryStringRegExp("ksid");
+            $("#department").val(ksid);
+            $("#hospital").val(guid);
+            sys_ajaxGet("/ltz/ylfw/ylzj/default.do?method=dict");
+            sys_ajaxGet("/ltz/dailyManagement/demandAndHandle/default.do?method=wapShowZjyy&guid="+guid+"&ksid="+ksid,function (json) {
+                bind(json);
+            })
+            setCurrentDate("#jzrq");
+            setCurrentDate1("#register_time_start");
+            setCurrentDate1("#register_time_stop");
+
+            var _height = getListHeight();
+            $("#sys_innerscoll").height(window.innerHeight - _height);
+            innerscroll = new iScroll("sys_innerscoll", {
+                click : true
+            });
+            sys_autoTextarea(innerscroll);
+        });
+
+        function setCurrentDate(elementID){
+            if(!$(elementID)){
+                return ;
+            }
+            var myDate = new Date();
+            var mon = myDate.getMonth()+1;
+            var hh =myDate.getHours();       //获取当前小时数(0-23)
+            var mm = myDate.getMinutes();     //获取当前分钟数(0-59)
+            var day;
+            var days;
+            if (myDate.getDate()<10){
+                days = "0"+myDate.getDate();
+            } else {
+                days = myDate.getDate();
+            }
+            if (hh<10){
+                hh = "0"+hh;
+            }
+            if (mm<10){
+                mm = "0"+mm;
+            }
+            if(mon<10){
+                // day=myDate.getFullYear()+"-0"+mon+"-"+days+" "+hh+":"+mm;
+                day=myDate.getFullYear()+"-0"+mon+"-"+days;
+            }else{
+                // day=myDate.getFullYear()+"-"+mon+"-"+days+" "+hh+":"+mm;
+                day=myDate.getFullYear()+"-"+mon+"-"+days;
+            }
+            $(elementID).val(day);
+            $(elementID).scroller({
+                preset: 'date',//日期 date 时间 time  时间日期datetime
+                lang: 'zh',
+                theme:'ios',
+                display:'inline'
+            });
+        }
+
+        function setCurrentDate1(elementID){
+            $(elementID).scroller({
+                preset: 'date',//日期 date 时间 time  时间日期datetime
+                lang: 'zh',
+                theme:'ios',
+                display:'inline'
+            });
+        }
+        function checkForm() {
+            if (trim($("#sj").val()) == '') {
+                sys_alert('请输入手机号');
+                return false;
+            }else if ($("#department").val() == '') {
+                sys_alert('请选择科室');
+                return false;
+            }else if (trim($("#expert_name").val()) == '') {
+                sys_alert('请填写专家姓名');
+                return false;
+            }else if (trim($("#nr").val()) == '') {
+                sys_alert('请输入简要病情');
+                return false;
+            }else if ($("#jzrq").val() == '') {
+                sys_alert('请输入就诊日期');
+                return false;
+            }
+
+            return true;
+        }
+
+        function save() {
+            if (!checkForm())
+                return;
+            var queryString = $("#form_show").serialize();
+            sys_ajaxGet("/ltz/ylfw/ylzj/default.do?method=wapZjyy", queryString, function (json) {
+                if (json.result === true) {
+                    sys_goURL("success.html");
+                    // $("#hxxx").show();
+                    // setTimeout(function () {
+                    //     sys_goURL("main.html");
+                    // },2000);
+                } else {
+                    sys_alert_xgmm(json.msg);
+                }
+            });
+        }
+
+        function back() {
+            sys_goURL("main.html");
+        }
+        //去掉前后空格
+        function trim(str)
+        {
+            return str.replace(/(^\s*)|(\s*$)/g, "");
+        }
+
+    </script>
+    <style type="text/css">
+
+        .ui-toolbar-wrap{
+            border:0px;
+        }
+
+        .c_form_show>div {
+            min-height: 55px;
+        }
+
+
+
+        .save{
+            width: 50px;
+            height: 50px;
+            background: url(../../../img/save1.png) no-repeat;
+            background-position: center center;
+            background-size: 28px 28px;
+            border: 0px !important;
+        }
+        .form_cell_label{
+            color:#000000;
+            width: 125px;
+            font-size: 17px;
+            margin-left: 20px;
+        }
+
+        .form_cell_item input, textarea {
+            font-size: 17px;
+        }
+        textarea{
+            padding-top: 10px;
+            height:80px;
+            min-height:80px;
+            width: 90%;
+        }
+    </style>
+</head>
+<body>
+<div id="toolbar">
+    <span id="btn_bak" class="btn_bak" onclick="back();"></span>
+    <h1 class="toolbar_title">预约挂号</h1>
+   <!--  <span class="btn_toolbar_font save" style="color:#ffffff;" onclick="save()"></span> -->
+   <span class="btn_toolbar_font" id="btn_save" onclick="save()" style="color:#fff;font-size: 18px;">提交</span>
+</div>
+<div id="sys_innerscoll">
+    <!--<div id="hxxx" style="display: none;padding: 5px 3% 5px 3%;">
+        <span style="padding-left: 30px;">
+            挂号申请提交成功。我们将尽力为您申请挂号，挂号成功后将第一时间通过此平台通知您，请您关注“办理状态”。祝您身体健康！
+        </span>
+    </div>-->
+    <form id="form_show">
+        <input type="hidden" name="guid" id="guid" value=""/>
+        <div class="c_form_show">
+            <div>
+                <div class="form_cell_label"><span style="color:red">*&nbsp;</span>联系手机号</div>
+                <div class="form_cell_item">
+                    <input type="text" class="form-control input_font" name="sj" id="sj" value="" maxlength="20" placeholder="请填写">
+                </div>
+            </div>
+            <div>
+                <div class="form_cell_label"><span style="color:red">*&nbsp;</span>挂号科室</div>
+                <div class="form_cell_item">
+                    <select class="form-control input_font" name="department" required id="department">
+                    </select>
+                </div>
+                <div class="form_cell_jiantou"></div>
+            </div>
+            <div>
+                <div class="form_cell_label"><span style="color:red">*&nbsp;</span>专家姓名</div>
+                <div class="form_cell_item">
+                    <input type="text" class="form-control input_font" name="expert_name" id="expert_name" value="" required placeholder="请填写">
+                </div>
+            </div>
+            <div>
+                <div class="form_cell_label"><span style="color:red">*&nbsp;</span>简要病情</div>
+                <div class="form_cell_item">
+                    <input type="text" class="form-control input_font" name="nr" id="nr" maxlength="200" value="" required placeholder="请填写">
+                </div>
+            </div>
+            <div>
+                <div class="form_cell_label"><span style="color:red">*&nbsp;</span>预约就诊日期</div>
+                <div class="form_cell_item">
+                    <input type="text" class="form-control" required name="jzrq" id="jzrq" placeholder="请选择">
+                </div>
+                <div class="form_cell_jiantou"></div>
+            </div>
+            <div>
+                <div class="form_cell_label"></div>
+                <div class="form_cell_item">
+                    <input type="radio" name="sxw" value="0" checked>上午
+                    <input type="radio" name="sxw" value="1">下午
+                </div>
+                <!--<div class="form_cell_jiantou"></div>-->
+            </div>
+            <div>
+                <div class="form_cell_label">备选日期</div>
+                <div class="form_cell_item">
+                    <input type="text" class="form-control" required name="bxrq" id="bxrq" placeholder="请填写">
+                </div>
+                <!--<div class="form_cell_jiantou"></div>-->
+            </div>
+            <!--<div>
+                <div class="form_cell_label">备选日期起</div>
+                <div class="form_cell_item">
+                    <input type="text" class="form-control" maxlength="100" showName="备选日期起" name="register_time_start"
+                           id="register_time_start" placeholder="备选日期起">
+                </div>
+                <div class="form_cell_jiantou"></div>
+            </div>
+            <div>
+                <div class="form_cell_label">备选日期止</div>
+                <div class="form_cell_item">
+                    <input type="text" class="form-control" maxlength="100" showName="备选日期止" name="register_time_stop"
+                           id="register_time_stop" placeholder="备选日期止">
+                </div>
+                <div class="form_cell_jiantou"></div>
+            </div>-->
+            <div>
+                <div class="form_cell_label">备注</div>
+                <div class="form_cell_item">
+                    <input type="text" class="form-control input_font" name="bz" id="bz" value="" placeholder="请填写">
+                </div>
+            </div>
+            <div>
+                <div class="form_cell_label">联系人</div>
+                <div class="form_cell_item">
+                    <input type="text" class="form-control" readonly name="lxr" id="lxr" value="五处李忠平" maxlength="100" placeholder="联系人">
+                </div>
+            </div>
+            <div>
+                <div class="form_cell_label">联系人电话</div>
+                <div class="form_cell_item">
+                    <input type="text" class="form-control" readonly name="lxrdh" id="lxrdh" value="58588972" maxlength="100" placeholder="联系人">
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

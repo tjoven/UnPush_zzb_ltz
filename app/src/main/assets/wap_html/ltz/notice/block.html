@@ -1,0 +1,160 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>通知公告</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../css/list.css" />
+
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="../../js/list.js"></script>
+<script type="text/javascript">
+	sys_addMeun = true;
+	var lb_dm=getQueryStringRegExp("lb_dm");
+	//var lb_dm=8103
+	var nm = getQueryStringRegExp("nm");
+	var _list = {};
+	var qx_send=false;
+
+	$(function() {
+		//生成toolbar
+		$('#toolbar').toolbar();		
+		sys_ajaxGet("/tzsf/wap.do?method=getUnreadNumByLB",function(json){
+		
+		 var list=json.lbList;
+  				if(json.result&&list){
+  				    for(var i=0;i<list.length;i++){
+  				       if(list[i].code_num!=0){
+  				         $("#notice_"+list[i].code).addClass("notice_num");
+  				         $("#notice_"+list[i].code).text(list[i].code_num);
+  				       }
+  				       
+  				    }
+  				}
+  		});		
+		
+	});
+   function goUrl(param,mc){
+         if(param==3){//追忆与思念
+           sys_goURL("list_leave.html?lb_dm="+lb_dm+"&dm="+param+"&mc="+escape(mc));
+         }else if (param==5){
+             sys_goURL("opinion/opinion.html");
+         }else if (param==6){
+             sys_goURL("../../publish/common.html?lb_dm=73690&backUrl=/ltz/notice/block.html");
+         }else{
+           sys_goURL("list.html?lb_dm="+lb_dm+"&dm="+param+"&mc="+escape(mc));
+         }
+   }
+		
+</script>
+
+<style type="text/css">
+   .ui-toolbar-wrap{
+	    		border: none !important;
+    		}
+   
+
+  .div_outer{
+   float: left;
+   width: 50%;
+   margin-top: 20px;
+  
+  }
+  .div_left{
+    margin-left: 20px;
+    margin-right: 10px;
+  }
+  .div_right{
+    margin-left: 10px;
+    margin-right: 20px;
+  }
+  .div_inner{
+   height: 75px; 
+   //border: 1px solid red;
+   //background-image: url("img/hyxcy.png");
+   background-repeat: round;
+   background-size: 100% 100%;
+   background-position: center center;
+   position:relative;
+   
+  }
+  .xyxcy_img{
+    background-image: url("img/hyxcy.png");
+  }
+  .zbhd_img{
+   background-image: url("img/zbhd.png");
+  }
+  .qtsx_img{
+    background-image: url("img/qtsx.png");
+  }
+  .zyysn_img{
+   background-image: url("img/zyysn.png");
+  }
+   .zyxx_img{
+	   background-image: url("img/zyxx.png");
+   }
+   .opinion_img{
+	   background-image: url("img/opinion.png");
+   }
+.notice_num {
+    width:20px;
+    height:20px;
+    line-height:20px;
+    font-size:10px;
+    color:#fff;
+    text-align:center;
+    background-color:#f00;
+    border-radius:50%;
+    position:absolute;
+    right:-5px;
+    top:-5px;
+}
+</style>
+
+</head>
+<body>
+
+	<div id="toolbar">
+		<span class="btn_bak" onclick="sys_goURL('../../main.html');"></span>
+		<h1 class="toolbar_title">通知公告</h1>
+	</div>
+	<div>
+		   <div class="div_outer">
+		       <div class="div_inner div_left xyxcy_img" onclick="goUrl('2','欢迎新成员')"> 		          
+                    <div  id="notice_2" ></div>
+		       </div>
+		   </div>
+		   <div class="div_outer">
+		     <div class="div_inner div_right zbhd_img" onclick="goUrl('4','支部工作')">  
+		       <div id="notice_4"></div>
+		    </div>
+		    </div>
+		   <div class="div_outer">
+		       <div class="div_inner div_left qtsx_img" onclick="goUrl('1','其他事项')">  
+		         <div  id="notice_1"></div>
+		      </div>
+		    </div>
+		   <div class="div_outer">
+		      <div class="div_inner div_right zyxx_img" onclick="goUrl('6','住院信息')">
+		        <div  id="notice_6" style="background-color: #616161;"></div>
+		     </div>
+		  </div>
+		<div class="div_outer">
+			<div class="div_inner div_left opinion_img" onclick="goUrl('5','意见建议')">
+				<div  id="notice_5" style="background-color: #616161;"></div>
+			</div>
+		</div>
+		<div class="div_outer">
+			<div class="div_inner div_right zyysn_img" onclick="goUrl('3','追忆与思念')">
+				<div  id="notice_3" style="background-color: #616161;"></div>
+			</div>
+		</div>
+	</div>
+	
+</body>
+</html>

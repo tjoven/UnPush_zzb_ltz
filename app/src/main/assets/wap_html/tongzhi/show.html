@@ -1,0 +1,151 @@
+<!doctype html>
+<html>
+  <head>
+  	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+    <title>详情</title>
+    <link rel="stylesheet" type="text/css" href="../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../css/base.css" />
+    <script type="text/javascript" src="../gmu/js/gmu.js"></script> 
+	<script type="text/javascript" src="../js/ict.js"></script>
+    <script type="text/javascript" src="../js/local.js"></script>
+    <script type="text/javascript">
+		var guid = getQueryStringRegExp("guid");
+		var src = getQueryStringRegExp("src");
+		var lb_dm = getQueryStringRegExp("lb_dm");
+		var nm = getQueryStringRegExp("nm");
+		var dm = getQueryStringRegExp("dm"); // 列表类型，所有页面都使用一个列表页
+		var slideIndex = getQueryStringRegExp("slideIndex");
+		var oprate = getQueryStringRegExp("oprate");
+		$(function(){
+			//生成toolbar
+		  	$('#toolbar2').toolbar();
+			sys_ajaxGet("/tzsf/wap.do?method=tzShow&lb_dm="+lb_dm,{guid:guid,oprate:oprate},function(json){
+	        	bind(json);
+	        	//调用积分
+	        	/*
+	        	if(json.ydbz==0){//未阅读积分	       	  
+	        	  sys_ajaxPost("/dy/queryJfpm/jfpm.do?method=addJf&khbm=101");
+	        	}	  
+	        	*/      	
+	        	if(json.formData.ggnr && json.formData.ggnr.length>0){
+	        		var nr = replaceImgPath(json.formData.ggnr);
+	        		$("#ggnr").html(nr);
+	        	}
+	        	if(json.formData){
+		        	var fjhtml = getFj(json.formData);
+		        	if(fjhtml==""){
+		        	  $(".c_fujian").hide();
+		        	}else{
+		        	  $("#_fujian").html(fjhtml);
+		        	  $(".c_fujian").show();
+		        	}      	
+	        	}
+	        
+	        	var imgs=document.getElementsByTagName("img");
+		        if(imgs.length>0){
+		        	var imgArr = [];
+					for (var i = 0; i < imgs.length; i++) {
+					    imgArr.push(imgs[i].src);
+					}
+					var imageArr = [];
+					var n = 0;
+					for (var j = 0; j < imgArr.length; j++) {
+					    imageArr.push(new Image());
+					    imageArr[j].src = imgArr[j];
+					    imageArr[j].onload  = function(){
+							n++; //每加载完成一张图片就累加1
+							if (n == imageArr.length) {//全部图片加载完成
+							  showImg();
+					        	//设置内容内滚动
+					        	var _height = getListHeight();
+					        	$("#sys_innerscoll").height(window.innerHeight-_height);
+					        	var innerscroll = new iScroll("sys_innerscoll",{click:true});
+							}
+					  	};
+					}
+		        }else{
+		        	var _height = getListHeight();
+		        	$("#sys_innerscoll").height(window.innerHeight-_height);
+		        	var innerscroll = new iScroll("sys_innerscoll",{click:true});
+		        }
+		        msgNOreadnum();
+	        });
+	        
+	        var title_mc="";	 
+			title_mc= "详   情";			 
+			$(".toolbar_title").text(title_mc); 
+		});
+		
+		function go_back(){
+			if(src == "list"){
+  				sys_goURL("list.html?lb_dm="+lb_dm+ "&nm=" + nm+ "&dm=" + dm+"&slideIndex="+slideIndex);
+  			}
+   		}
+		function showImg(){            
+		       var imgs = document.getElementsByTagName("img");
+		       var w=window.innerWidth-10;
+					for(var i=0; i<imgs.length; i++)
+					{
+					  var img = imgs[i];
+					  if(img.width>w){
+						  img.width=w;
+					  }
+					   //img.style.width="90%";
+					   //img.style.height="90%";
+					 // img.style.vertical-align="middle";
+					}
+           }
+    </script>
+
+    <style type="text/css">
+    	.c_item_value{
+			padding-top: 15px;
+			font-size:.8em;
+		}
+	    .c_item_container{
+			min-height: 46px;
+			border-bottom: 1px solid #DDD;
+		}
+		
+		.ui-toolbar-wrap{
+    		//background-color: #FFB73E;
+    		border: none !important;
+    	}
+    	.div_back{
+    	  	width: 30%;
+			height: 35px;
+			line-height: 35px;
+			margin: 15px auto 0px auto;
+			-webkit-border-radius: 4px;
+			background-color: #D62724;
+			font-family: 微软雅黑;
+			color: white;
+		    font-size: 19px;
+		    font-weight: bold;
+		    text-align: center;
+    	}
+    	 
+    </style>
+  </head>
+  <body>
+    <div id="toolbar2">
+	    <!--  <span class="btn_bak" onclick="window.history.go(-1);"></span>-->
+	    <h1 class="toolbar_title"></h1>
+	</div>
+
+	<div id="sys_innerscoll">
+		<div style="margin:0px 8px;">
+			<div style="width:100%;font-size:18px;font-weight:bold;margin-top:15px;text-align:center;text-overflow:ellipsis;-o-text-overflow:ellipsis;overflow:hidden;" id="zt"></div>
+			<div style="width:100%;font-size:12px;color:#BFBFBF;margin-top:15px;text-align:center;text-overflow:ellipsis;overflow:hidden;">&nbsp;<span id="yhid"></span>&nbsp;&nbsp;&nbsp;&nbsp;<span id="cjsj"></span></div>
+			<div><hr style="width:96%;"/></div>
+			<div class="c_item_value2" id="ggnr"></div>
+			<div style="height:25px;"></div>
+			<div class="c_item_container c_fujian"><div class="c_item_value" style="font-weight:bold;font-size:.7em;color:#666;"><br>相关附件：</div></div>
+			<div class="c_item_container"><div class="c_item_value" id="_fujian"></div></div>
+			<div class="div_back" onclick="window.history.go(-1);">返&nbsp;&nbsp;回</div>
+			<div style="height:30px;"></div>
+		</div>
+	</div>	
+  </body>
+</html>

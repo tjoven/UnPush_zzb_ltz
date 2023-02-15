@@ -1,0 +1,652 @@
+<!doctype html>
+<html>
+<head>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+<title>消息</title>
+<link rel="stylesheet" type="text/css" href="css/oa.css" />
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>   
+<script type="text/javascript" src="js/touch.js"></script>   
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="js/custom.js"></script>
+<script type="text/javascript" src="js/datadumper.js"></script>
+<script type="text/javascript" src="./js/getPath.js"></script>
+<style type="text/css">
+   	.listSize{
+   		font-size: 13px !important;
+   		color: gray !important;
+   	}
+   	.badge{
+   		display: inline-block;
+   		min-width: 10px;
+   		font-size: 12px;
+   		font-weight: bold;
+   		line-height: 1;
+   		color: #fff;
+   		text-align: center;
+   		white-space: nowrap;
+   		vertical-align: middle;
+   		border-radius:10px;
+   	}
+   	body{
+   		font-family: microsoft weiruanyahei;
+   	}
+   	.yaoqun{
+   		float:left;width:37px;border:1px solid gray;line-height:20px;text-align:center;font-size:13px;	
+   	}
+
+
+* {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+ }
+  
+ header {
+  background: #f7483b;
+  border-bottom: 1px solid #ccc
+ }
+  
+ header h2 {
+  text-align: center;
+  line-height: 54px;
+  font-size: 16px;
+  color: #fff
+ }
+ .list-ul {
+  overflow: hidden
+ }
+  
+ .list-li {
+  line-height: 60px;
+  border-bottom: 1px solid #fcfcfc;
+  position: relative;
+  color: #666;
+  background: #f2f2f2;
+  -webkit-transform: translateX(0px);
+  width:100%;
+ }
+  
+ .btn {
+  position: absolute;
+  top: -2px;
+  right: -80px;
+  text-align: center;
+  background: #FF3A31;
+  color: white;
+  width: 80px;
+  height:100%;
+  line-height:65px;
+ }
+ 
+ </style>
+ <script type="text/javascript">
+ 
+	var inviterId = null;
+	var beInviterId = null;
+	var inviteGroupId = null;
+	var inviteGroupName = null;
+	var currId = window.localStorage.getItem("yhid");
+	var currUsername = getQueryStringRegExp("senderName");
+	var iscr_from = null;
+	var sendcontent = getQueryStringRegExp("sendcontent");
+	var receiverIdfrom = getQueryStringRegExp("receiverIdfrom");
+	var receivernamefrom = getQueryStringRegExp("receivernamefrom");
+	var url = getQueryStringRegExp("url");
+	var filename = getQueryStringRegExp("filename");
+	var sjid = getSjid();
+	var py = getQueryStringRegExp("py");
+	var from = getQueryStringRegExp("from");
+	$(function(){
+		sys_ajaxPost("/jstx/default.do?method=getUsername&senderId="+currId,function(json){
+			currUsername = json.senderName;
+		});
+		
+		//生成toolbar
+	  	$('#toolbar').toolbar({
+            fixed: true
+        });
+		
+	  	$("td").click(function(){
+	 		$("td").css("background","#0973c5");  
+	 		$(this).css("background","white");
+	 		
+	  	});
+	  	
+	  	$("#tabslist").height(window.innerHeight - 150);
+	  	iscr_from = new iScroll("tabslist",{checkDOMChanges:true,useTransition:true});
+	  	
+	});
+	
+	
+	 function getSjid(){
+			var sjid = getQueryStringRegExp("sjid");
+			if(sjid=='undefined' || sjid=='' || sjid==null){
+				sjid=0;
+			}
+			return sjid;
+	    }
+	
+	//消息发送时间与当前时间比较
+	function compareDate(send_time){
+		var sendYear = send_time.substring(0,4);
+		var sendMonth = send_time.substring(5,7);
+		var sendDay = send_time.substring(8,10);
+		var nowYear = getCurrTime().substring(0,4);
+		var nowMonth = getCurrTime().substring(5,7);
+		var nowDay = getCurrTime().substring(8,10);
+		if(nowYear == sendYear){
+			if(nowMonth == sendMonth){
+				return nowDay - sendDay;
+			}else{
+				return 1;
+			}
+		}else{
+			return 1;
+		}
+	}
+	
+	//获取当前时间
+	function getCurrTime(){
+		var date = new Date();
+		var year = date.getFullYear();
+		var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
+		var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+		var hour = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+		var minute = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+		var second = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
+		return year+"-"+month+"-"+day+" "+hour+":"+minute+":"+second;
+	};
+	
+	//弹出转发窗口
+	function goTrans(sendid,sendname,receiveid,receivename){
+		$("#sendcontent").empty();
+		if((receiveid+"").length==11)
+		{
+			if(filename!=null && filename!=undefined && filename!="")
+			{
+				var sendcontentfile = "<div>" + filename.substring(23) + "&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='downloadFile(\""+url+"\",\""+filename+"\")'>查看</a>" +  "</div>";
+				$("#sendcontent").append(sendcontentfile);
+			}else{
+			
+				$("#sendcontent").append(sendcontent);
+			}
+			$("#sendname").text("发送给："+receivename);
+			
+			$("#sendid").val(sendid);
+			$("#sendname").val(sendname);
+			$("#receiveid").val(receiveid);
+			$("#receivename").val(receivename);
+		}else{
+			if(filename!=null && filename!=undefined&& filename!="")
+			{
+				var sendcontentfile  = "<div>" + filename.substring(23) + "&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='downloadFile(\""+url+"\",\""+filename+"\")'>查看</a>" +  "</div>";
+				$("#sendcontent").append(sendcontentfile);
+			}else{
+				
+				$("#sendcontent").append(sendcontent);
+			}
+			$("#sendname").text("发送给："+receivename);
+			
+			$("#sendid").val(sendid);
+			$("#sendname").val(sendname);
+			$("#receiveid").val(receiveid);
+			$("#receivename").val(receivename);
+		}
+		$("#xzsfbm").css("display", "block");
+		$("#floatdiv").css("display", "block");		
+	}
+	
+	window.onload = init;
+	function init(){
+		sys_ajaxPost("/jstx/default.do?method=messageCount&yhid="+currId,function(json){
+			
+			if(json.length > 0){
+				
+        		for(var i = 0; i < json.length; i++){
+        			var nowReceiverId = json[i].receiver_id;
+        			var content = json[i].send_content.indexOf("http") > 0 && (json[i].send_content.indexOf("img") > 0 
+        						&& json[i].send_content.indexOf(".amr") < 0 && json[i].send_content.indexOf(".aac") < 0 ) ?
+        					"[图片]" : json[i].send_content;
+                     
+        			if("[图片]" != content){
+        				content = json[i].send_content.indexOf("http") > 0 && ((json[i].send_content.indexOf(".amr") > 0)||(json[i].send_content.indexOf(".aac") > 0)) ?
+	            			"[语音]" : json[i].send_content;
+        			}
+        			//var showContent = estimateFileLength(content);
+        			var compareNum = compareDate(json[i].send_time);
+        			var showCompare = compareNum == 0 ? json[i].send_time.substring(11,16) : json[i].send_time.substring(5,10);
+        			if(content.indexOf("</div>") > 1 && content.indexOf("http") < 0){
+       					var tempContent = content.replace("word-wrap:break-word","").replace("float:right","").replace("line-height:19px","line-height:30px");
+       					content = tempContent.replace(tempContent.substring(tempContent.indexOf("font-size"),tempContent.indexOf("'>")),"");
+       				}
+        			if(json[i].receiver_id.length == 11){
+        				
+        				var showGroupKindCount = json[i].kindCount2 == 0 ? "" : json[i].kindCount2;
+        				$("#datahtml").append(
+        				" <li id='li' class='list-li' style='transform:translateX(0px)' >"+
+        					"<div class='txl_ry con' style='height:50px;' onclick='goTrans("+currId+",\""+currUsername+"\","+json[i].receiver_id+",\""+json[i].receiver_name+"\")'>" +
+			   	   				"<div class='txl_ry_img' style='padding-top:6px;'>" +
+			   	   					"<img height='40px' width='40px' style='margin:1px 16px;margin-top:-1px' src="+sys_ctxStr()+headPortraitPath+json[i].yhid+" onerror=\"javascript:this.src='./image/group.png'\">" +
+			   	   				"</div>" +
+			   	   				"<div class='txl_ry_rm' style='width:66%;'>" +
+			   	   					"<div style='height:100%;width:100%;font-size:16px;font-weight:500;font-family:microsoft yahei;padding-left:20px;overflow:hidden;'>"+json[i].receiver_name+"</div>" +
+			   	   					
+			   	   				"</div>" +
+			   	   				
+		   	   				"</div>"+
+		   	   			 
+		   	   			"</li>"
+   	           			);
+   	           			if("" == showGroupKindCount){
+        					$("#unreadCount"+i).text("");
+        				}
+        			}else if(json[i].receiver_id == currId || json[i].sender_id == currId){
+        				var showSenderId = null;
+        				var showSenderName = null;
+        				var isTemporary = "";
+        				if(currId == json[i].receiver_id){
+        					showSenderId = json[i].sender_id;
+        					showSenderName = json[i].sender_name;
+        				}else{
+        					showSenderId = json[i].receiver_id;
+        					showSenderName = json[i].receiver_name;
+        				}
+        				if(json[i].is_temporary == "1"){
+        					//isTemporary = "(临时会话)";
+        				}
+        				var showKindCount = json[i].kindCount == 0 ? "" : json[i].kindCount;
+        				
+        				$("#datahtml").append(
+     						" <li id='li' class='list-li' style='transform:translateX(0px)'>"+
+        					"<div class='txl_ry con' style='height:50px;' onclick='goTrans("+currId+",\""+currUsername+"\","+showSenderId+",\""+showSenderName+"\")'>" +
+			   	   				"<div class='txl_ry_img' style='padding-top:6px;'>" +
+			   	   					"<img width='40px' height='40px' style='margin:1px 16px;margin-top:-1px' src="+sys_ctxStr()+headPortraitPath+"/pic/breviary"+showSenderId+".jpg?xxxx="+Math.random()+" onerror=\"javascript:this.src='./image/user.png'\">" +
+			   	   				"</div>" +
+			   	   				"<div class='txl_ry_rm' style='width:66%;'>" +
+			   	   					"<div style='height:100%;width:100%;font-size:16px;font-weight:500;font-family:microsoft yahei;padding-left:20px;overflow:hidden;'>"+(showSenderName+isTemporary)+"</div>" +
+			   	   					
+			   	   				"</div>" +
+			   	   			
+		   	   				"</div>"+
+		   	   			
+		   	   			"</li>"
+   	           			);
+        				if("" == showKindCount){
+        					$("#unreadCount"+i).text("");
+        				}
+        			}
+        		}
+        		
+        	}else{
+        		$("#datahtml").append(
+       				"<div style='text-align:center;margin-top:200px;'>没有聊天信息!</div>"
+       			);
+        	}
+		});
+		
+		
+	}
+	
+	function sys_ctxStr() {
+		var count = 0;
+		var end = 0;
+		for (var i = 0; i < sys_ctx.length; i++) {
+			var c = sys_ctx.charAt(i);
+			if (c == '/') {
+				count++;
+				if (count == 3) {
+					end = i;
+				}
+			}
+		}
+		var hostUrl = sys_ctx.substring(0, end);
+		return hostUrl;
+	}
+	
+	//返回上一步
+	function goback(){
+		var guid = getQueryStringRegExp("guid");
+		var senderId = currId;
+		if((receiverIdfrom+"").length==11)
+    	{
+			sys_goURL("groupChat.html?groupId="+receiverIdfrom+"&groupName="+receivernamefrom+"&backTarget=message&py="+py+"&from="+from);
+		}else{
+    		sys_goURL("chat.html?yhid="+senderId+"&guid="+receiverIdfrom+"&backTarget=message&py="+py+"&from="+from);
+    	    
+    	}
+		//sys_goURL("../desk/desk.html?guid="+guid);
+	}
+	
+	function jumper(ob){
+		if(0 == ob){
+			sys_goURL("message.html");
+		}else if(1 == ob){
+			sys_goURL("group.html");
+		}
+	}
+	
+	function showUsers(){
+		sys_goURL("showUsers.html");
+	}
+	
+	function delGroupRelated(yhid,groupId,groupName,event,ob){
+		$(ob).parent().parent().parent().remove();
+		sys_ajaxPost("/jstx/default.do?method=delGroupRelatedEvent&yhid="+yhid+"&groupId="+groupId+"&groupName="+groupName+"&event="+event,function(json){
+			
+		});
+	}
+	
+	//websocket对象
+	var websocket = null;
+	//判断当前浏览器是否支持WebSocket
+	if("WebSocket" in window){
+	    websocket = new WebSocket(sys_ctx.replace("http","ws")+"/websocket/"+("mobile" + currId));
+	}else{
+	    alert("Not support websocket");
+	}
+	
+	//连接发生错误的回调方法
+	websocket.onerror = function(){
+	    
+	};
+	 
+	//连接成功建立的回调方法
+	websocket.onopen = function(event){
+		
+	};
+	 
+	//接收到消息的回调方法
+	websocket.onmessage = function(event){
+		var json = JSON.parse(event.data);
+		//如果被邀请人同意入群，并且当前邀请群在线，刷新群组成员信息
+		if(undefined != json.mobileOnline){
+			var str = json.refreshStatus == "agree" ? json.refreshBeInviterName + "同意了您的邀请!" : refreshBeInviterName + "拒绝了您的邀请!";
+			$("#datahtml > div:first-child").before(
+   				"<div class='txl_ry' style='height:66px;'>" +
+ 	   				"<div class='txl_ry_img' style='padding-top:6px;'>" +
+ 	   					"<img height='40px' width='40px' style='margin:6px 16px;' src="+sys_ctxStr()+"/oainfo/ydyypt/yhface/pic onerror=\"javascript:this.src='../img/txl/03_09.png'\">" +
+ 	   				"</div>" +
+ 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+ 	   					"<div style='height:32px;width:100%;font-size:16px;font-weight:500;font-family:microsoft yahei;line-height:33px;padding-left:30px;overflow:hidden;'>群通知</div>" +
+ 	   					"<div style='height:32px;width:100%;color:gray;line-height:30px;padding-left:30px;overflow:hidden;' class='listSize'>" + 
+ 	   						str + 
+ 	   					"</div>" +
+ 	   				"</div>" +
+ 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+ 	   					"<div style='height:32px;width:100%;'></div>" +
+ 	   					"<div style='height:32px;width:100%;padding-bottom:6px;'>" +
+ 	   						"<div style='float:left;height:100%;width:50px;border:1px solid gray;line-height:26px;text-align:center;font-size:15px;margin-left:60px;' onclick='delGroupRelated("+json[i].member_id+","+json[i].group_id+",\""+json[i].group_name+"\",\""+json[i].event+"\",this)'>确定</div>" +
+ 	   					"</div>" +
+ 	   				"</div>" +
+	   			"</div>"
+           	);
+			delGroupRelated(json.beInviterId,json.refreshGroupId,json.refreshGroupName,"invite");
+		}else if(undefined != json.inviteGroupId){
+			var str = json.inviterName + "邀请您加入" + json.inviteGroupName;
+			show = "<div style='float:left;height:100%;width:50px;border:1px solid gray;line-height:26px;text-align:center;font-size:15px;' onclick='agreeJoin("+json.inviterId+","+json.beInviterId+","+json.inviteGroupId+",\""+json.inviteGroupName+"\",this)'>同意</div>" +
+			   	   	"<div style='float:left;height:100%;width:50px;border:1px solid gray;line-height:26px;text-align:center;font-size:15px;margin-left:10px;' onclick='rejectJoin("+json.inviterId+","+json.beInviterId+","+json.inviteGroupId+",\""+json.inviteGroupName+"\",this)'>拒绝</div>";
+			if($("#datahtml").children().length > 0){
+				$("#datahtml > div:first-child").append(
+	   				"<div class='txl_ry' style='height:66px;'>" +
+	 	   				"<div class='txl_ry_img' style='padding-top:6px;'>" +
+	 	   					"<img height='40px' width='40px' style='margin:6px 16px;' src="+sys_ctxStr()+"/oainfo/ydyypt/yhface/pic onerror=\"javascript:this.src='../img/txl/03_09.png'\">" +
+	 	   				"</div>" +
+	 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+	 	   					"<div style='height:32px;width:100%;font-size:16px;font-weight:500;font-family:microsoft yahei;line-height:33px;padding-left:30px;overflow:hidden;'>群通知</div>" +
+	 	   					"<div style='height:32px;width:100%;color:gray;line-height:30px;padding-left:30px;overflow:hidden;' class='listSize'>" + 
+	 	   						str + 
+	 	   					"</div>" +
+	 	   				"</div>" +
+	 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+	 	   					"<div style='height:32px;width:100%;'></div>" +
+	 	   					"<div style='height:32px;width:100%;padding-bottom:6px;'>" +
+	 	   						show +
+	 	   					"</div>" +
+	 	   				"</div>" +
+		   			"</div>"
+	           	);
+			}else{
+				$("#datahtml").append(
+   					"<div class='txl_ry' style='height:66px;'>" +
+	 	   				"<div class='txl_ry_img' style='padding-top:6px;'>" +
+	 	   					"<img height='40px' width='40px' style='margin:6px 16px;' src="+sys_ctxStr()+"/oainfo/ydyypt/yhface/pic onerror=\"javascript:this.src='../img/txl/03_09.png'\">" +
+	 	   				"</div>" +
+	 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+	 	   					"<div style='height:32px;width:100%;font-size:16px;font-weight:500;font-family:microsoft yahei;line-height:33px;padding-left:30px;overflow:hidden;'>群通知</div>" +
+	 	   					"<div style='height:32px;width:100%;color:gray;line-height:30px;padding-left:30px;overflow:hidden;' class='listSize'>" + 
+	 	   						str + 
+	 	   					"</div>" +
+	 	   				"</div>" +
+	 	   				"<div class='txl_ry_rm' style='width:50%;'>" +
+	 	   					"<div style='height:32px;width:100%;'></div>" +
+	 	   					"<div style='height:32px;width:100%;padding-bottom:6px;'>" +
+	 	   						show +
+	 	   					"</div>" +
+	 	   				"</div>" +
+	   				"</div>"
+           		);
+			}
+			
+		}
+		//setMessageInnerHTML(json);
+	};
+	 
+	//连接关闭的回调方法
+	websocket.onclose = function(){
+	    
+	};
+	 
+	//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+	window.onbeforeunload = function(){
+	    websocket.close();
+	};
+	 
+	//将消息显示在网页上
+	function setMessageInnerHTML(json){
+		
+	};
+	 
+	//关闭连接
+	function closeWebSocket(){
+		
+	};
+	
+	 function search_(){
+ 	
+ 		//sys_goURL("searchgroup.html?sjid="+sjid+"&py="+$("#search").val()+"&from=transmit&senderName="+currUsername);
+ 		sys_goURL("searchgroup.html?receiverIdfrom="+receiverIdfrom+"&receivernamefrom="+receivernamefrom+"&senderId="+currId+"&senderName="+currUsername+"&sendcontent="+sendcontent+"&url="+url+"&filename="+filename+"&py="+$("#search").val()+"&from=transmit"); 
+ 	}
+	 //转发
+	 function transsend()
+	 {
+		 if(filename!=null && filename!=undefined && filename!="")
+		 {
+			sendcontent = "<div>" + filename.substring(23) + "&nbsp;&nbsp;&nbsp;&nbsp;<a href='javascript:void(0)' onclick='downloadFile(\""+url+"\",\""+filename+"\")'>查看</a>" +  "</div>";
+		 }
+		 var Num=""; 
+		 for(var i=0;i<5;i++) 
+		 { 
+			 Num+=Math.floor(Math.random()*10); 
+		 } 
+		var myDate = new Date();
+		var mouth=myDate.getMonth()+1;
+		if(mouth<10)
+		{
+			mouth="0"+mouth;
+		}
+		var guid = (myDate.getFullYear()+""+mouth+""+myDate.getDate()+""+myDate.getHours()+""+myDate.getMinutes()+""+myDate.getSeconds()+""+myDate.getMilliseconds()+""+Num);
+		var senderId = $("#sendid").val();
+		var senderName = $("#sendname").val();
+		var receiverId = $("#receiveid").val();
+		var receiverName = $("#receivename").val();
+		
+		var message = new Object();
+		message.senderId = senderId;
+		message.senderName = senderName;
+		message.receiverId = receiverId;
+		message.receiverName = receiverName;
+		message.guid=guid;
+		
+		sys_ajaxPost("/jstx/default.do?method=getServerTime",function(json){
+			message.sendTime = json.time;
+			message.sendContent = $("#sendcontent").html();
+			
+	    	websocket.send(JSON.stringify(message));
+	    	if((receiverIdfrom+"").length==11)
+	    	{
+				sys_goURL("groupChat.html?groupId="+receiverIdfrom+"&groupName="+receivernamefrom+"&backTarget=message&py="+py+"&from="+from);
+			}else{
+	    		sys_goURL("chat.html?yhid="+senderId+"&guid="+receiverIdfrom+"&backTarget=message&py="+py+"&from="+from);
+	    	    
+	    	}
+			
+		});
+			
+	 }
+	
+	 function goList()
+	 {
+		 if((receiverIdfrom+"").length==11){
+			 sys_goURL("transmitlist.html?receiverIdfrom="+receiverIdfrom+"&receivernamefrom="+receivernamefrom+"&senderId="+currId+"&senderName="+currUsername+"&sendcontent="+sendcontent+"&url="+url+"&filename="+filename); 
+		 }else{
+			 sys_goURL("transmitlist.html?receiverIdfrom="+receiverIdfrom+"&senderId="+currId+"&senderName="+currUsername+"&sendcontent="+sendcontent+"&url="+url+"&filename="+filename); 
+		 }
+		 
+	 }
+	 
+	 function goGroup()
+	 {
+		 if((receiverIdfrom+"").length==11){
+			 sys_goURL("transmitgroup.html?receiverIdfrom="+receiverIdfrom+"&receivernamefrom="+receivernamefrom+"&senderId="+currId+"&senderName="+currUsername+"&sendcontent="+sendcontent+"&url="+url+"&filename="+filename); 
+		 }else{
+			 sys_goURL("transmitgroup.html?receiverIdfrom="+receiverIdfrom+"&senderId="+currId+"&senderName="+currUsername+"&sendcontent="+sendcontent+"&url="+url+"&filename="+filename); 
+		 }
+		 
+	 }
+</script>   
+<style type="text/css">
+.child_page_title1
+{
+	float: left;
+    width: 46%;
+    height: 65%;
+    color: white;
+    font-size: 12px;
+    text-align: center;
+    line-height: 26px;
+    margin-top: 12px;
+   
+    margin-left:13%;
+}
+
+.child_page_title2
+{
+	border-radius:6px;
+	width:100.1%;
+	border: 1px solid;
+}
+
+table{  
+        border-collapse: collapse;  
+        border: 0px solid #999;  
+    }  
+table td {  
+        border-top: 0;  
+        border-right: 0;  
+        border-bottom:0;  
+        border-left:1px solid #FFF; 
+    }  
+      
+table tr.lastrow td {  
+    border-bottom: 0;  
+}  
+      
+table tr td.lastCol {  
+    border-right: 0;  
+} 
+</style> 
+</head>
+<body>
+	<div class="div_body">
+	<div id="toolbar">
+		<span class="btn_bak" onclick="goback();"></span>
+		<h1 class="toolbar_title">转发</h1>
+	</div>
+<!-- 		<div id="toolbar" class="blue_top"> -->
+<!-- 			<div class="button_multi" onclick="goback()"> -->
+<!-- 				<img src="img/ztjy/02_06.png" class="img_back_or_xj"></img> -->
+<!-- 			</div> -->
+<!-- 			<div class="child_page_title1">	 -->
+<!-- 				<h1 id="toolbar_text" style="font-size:18px">发送</h1> -->
+<!-- 			</div> -->
+			
+<!-- 			<div class="button_multi"> -->
+<!-- 			</div> -->
+<!-- 		</div>	 -->
+<!-- 		<div id="search_div" class="search_div"> -->
+<!--   			<div class="search_div_inner"> -->
+<!--   				<div style="display:inline-block;"> -->
+<!--   					<input type="text" id="search"  class="cx_input" name="search" placeholder="请输入名称或拼音首字母"></input> -->
+<!--   				</div> -->
+<!--   				<div class="search_div_img" onclick="search_()"> -->
+<!--   					<img src="img/ztjy/02_11.png" id="c_search_icon" class="cx_img" ></img> -->
+<!--   				</div> -->
+<!--   			</div> -->
+<!--   		</div>		 -->
+		<div class="font-color-bm" id="iscr_from" style="background-color:#ezezez;">
+			<div  class="sear">
+			 
+				<div id="tabslist">
+		   	   		<div>
+		   	   			<section  class="list">
+		   	   				<ul id="datahtml" class="list-ul">
+		   	   					<li onclick = "goList()" class="list-li" style="line-height:50px;background-color:#fff;border-bottom:1px solid #f2f2f2;height:50px">
+		   	   						<label style="margin-left:20px;">选择联系人</label></li>
+		   	   					<li onclick = "goGroup()" class="list-li" style="line-height:50px;background-color:#fff; border-bottom:1px solid #f2f2f2;height:50px">
+		   	   						<label style="margin-left:20px;">选择群聊</label>
+		   	   					</li>
+		   	   					<li class="list-li" style="line-height:35px;background-color:#fff; border-bottom:1px solid #f2f2f2;height:35px">
+		   	   						<label style="margin-left:20px;color:#b4b4b4;font-size:15px">最近</label>
+		   	   					</li>
+		   	   				</ul>
+		   	   			</section>
+		   	   		</div>
+		   	   </div>
+		   	  
+			</div>
+		</div>
+	</div>
+	
+	<div id="xzsfbm" class="xzqsyj" style="min-height:80px;">
+		<div  class="font-color-rm div-xz" style="margin-top:10px;border-bottom:0px;height:auto">
+			<span id="sendname"></span>
+		</div>
+		<div class="font-color-rm div-xz" style="border-bottom:none;height: auto;max-height:230px;overflow: auto;font-size:14px;color:gray"  id="sendcontent"  contenteditable="true">
+			<!-- <span style="font-size:14px;color:gray"  id="sendcontent"></span> -->
+		</div>
+		<div class="an_jh" style="border-top:1px solid #e7e7e7">
+			
+			<div class="an_yj" onclick="$('#xzsfbm').css('display', 'none');$('#floatdiv').css('display', 'none');">
+				取消
+			</div>
+			<div class="an_yj" onclick="$('#xzsfbm').css('display', 'none');$('#floatdiv').css('display', 'none');transsend()" style="border-left:1px solid #e7e7e7;">
+				发送
+			</div>
+		</div>	
+		<input type="hidden" name="senderid" id="sendid"/>
+		<input type="hidden" name="sendername" id="sendname"/>
+		<input type="hidden" name="receiveid" id="receiveid"/>
+		<input type="hidden" name="receivename" id="receivename"/>
+			
+	</div>	
+	<div id="floatdiv" class="floatdiv"></div>
+</body>
+</html>

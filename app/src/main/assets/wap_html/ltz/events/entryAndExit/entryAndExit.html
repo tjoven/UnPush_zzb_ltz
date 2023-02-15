@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+<title>我的事项</title>
+<link rel="stylesheet" type="text/css" href="../../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+<script type="text/javascript" src="../../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="../../../js/ict.js"></script>
+<script type="text/javascript" src="../../../js/local.js"></script>
+<script type="text/javascript" src="../../../js/list.js"></script>
+<script type="text/javascript" src="../../../js/touchslider.dev.js"></script>
+<script type="text/javascript"
+	src="../../../bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+<link href="../../../bootstrap-3.3.7-dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<script type="text/javascript">
+	sys_addMeun = true;
+	var list = {};
+	var nm = getQueryStringRegExp("nm");
+	$(function() {
+		//生成toolbar
+		$('#toolbar').toolbar();
+		sys_renderList('table_list', '/ltz/dailyManagement/getEntryAndExitInfo/default.do?method=wapList&page_size=15&page_goto=', {}, list); 
+			
+		// 刷新时选中刷新前选中的tab页
+		if (nm == '') {
+			nm = 3;
+		}
+		$(".c_tabs_text").eq(3).addClass("c_tabs_active");
+	});
+
+	// tab左右滑动后记录滑动位置(末屏未填满时滚动填满)
+	function doSlideAfter(newIndex, newSlide) {
+		slideIndex = newIndex;
+		if (lastLoacl <= 0) {
+			slider.slide(0);
+			slideIndex = 0;
+		} else if (newIndex > lastLoacl && lastLoacl > 0) {
+			slider.slide(lastLoacl);
+			slideIndex = lastLoacl;
+		}
+	}
+	// 点击tab页刷新画面显示相应tab页内容一览list
+	function getNm(dm) {
+		if (dm == "gzcx") {
+			sys_goURL("../../mylive/gzylj.html?nm=0");
+		} else if (dm == "dfjn") {
+			sys_goURL("../../mylive/dfjn.html?nm=1");
+		} else if (dm == "yyfbx") {
+			sys_goURL("../../mylive/yyfbx.html?nm=2");
+		}else if (dm == "cgj") {
+			sys_goURL("entryAndExit.html");
+		}
+	}
+	function callback_trclick_table_list(param) {
+		//alert(param);
+		sys_goURL("detail.html?guid=" + param );
+
+	}
+	function go_back() {
+		sys_goURL("../../mylive/main.html");
+	}
+</script>
+
+<style type="text/css">
+.ui-toolbar-wrap {
+	border: none !important;
+}
+.overflow1 {
+	
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	
+	overflow: hidden;
+}
+
+</style>
+
+</head>
+<body>
+	<div id="toolbar">
+		<i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+		<h1 class="toolbar_title">出国（境）</h1>
+	</div>
+	<!-- <div class="c_tabs div_other_40" id="div_tabs">
+		 <div id='div_list0'>
+			<div class='c_tabs_text' onclick=getNm('gzcx')>工资查询</div>
+		</div>
+		<div id='div_list1'>
+			<div class='c_tabs_text' onclick=getNm('dfjn')>党费交纳</div>
+		</div>
+		<div id='div_list2'>
+			<div class='c_tabs_text' onclick=getNm('yyfbx')>医疗报销</div>
+		</div>
+		<div id='div_list3'>
+			<div class='c_tabs_text' onclick=getNm('cgj')>出国（境）</div>
+		</div>
+	</div> -->
+	
+	<div class="ui-refresh" id="div_table_list">
+		<ul class="data-list" id="table_list" style="list-style-type:none">
+			<li style="display: none;">
+			
+				<div style="display: none;">{guid}</div>
+				<div class="list_row_con" style="height:75px;min-height:75px;background-color: #ffffff;">
+					<div class="list_row_col1" style="width:15px;"></div>
+					<div class="list_row_col2" style="padding-top: 6px;">
+						<div class="list_row_col2_1">
+							<span class="overflow" style="display: inline-block;width: 40%;font-size: 16px;">{destination}</span>
+							<span class="overflow" style="display: inline-block;width: 30%;font-size: 16px;">{apply_time}</span>
+							<span class="overflow" style="display: inline-block;width: 21%;font-size: 16px;float: right;text-align: right;">{handle_state}</span>
+						</div>
+						<div class="list_row_col2_1">
+							<span class="overflow1" style="display: inline-block;    font-size: 15px;">出国（境）证件是否交由组织统一管理</span><span style="font-size: 15px;display: inline-block;float: right;color: {cgjcolor};">{cgjzj}</span>
+						</div>
+					</div>
+					<div class="list_row_col3" style="width:30px;"></div>
+				</div>
+			</li>
+		</ul>
+		<div class="ui-refresh-down"></div>
+	</div>
+	
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1.0">
+    <title>我的事项</title>
+    <link rel="stylesheet" type="text/css" href="../../../gmu/css/gmu.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../../css/list.css" />
+
+    <script type="text/javascript" src="../../../gmu/js/gmu.js"></script>
+    <script type="text/javascript" src="../../../js/ict.js"></script>
+    <script type="text/javascript" src="../../../js/local.js"></script>
+    <script type="text/javascript" src="../../../js/list.js"></script>
+    <script type="text/javascript" src="../../../js/touchslider.dev.js"></script>
+    <script type="text/javascript">
+        sys_addMeun = true;
+        var list = {};
+        var nm = getQueryStringRegExp("nm");
+        $(function() {
+            //生成toolbar
+            $('#toolbar').toolbar();
+            //$("#toolbar h1").text(rwlxmc);
+            //获取列表
+            // sys_renderList('table_list', '/ltz/dailyManagement/demandAndHandle/default.do?method=wapList&page_size=15&page_goto=', {}, list);
+            sys_renderList('table_list', '/ltz/ylfw/ylzj/default.do?method=wapKsList&page_size=15&page_goto=', {}, list);
+            //跳转新增页
+            $("#btn_add").click(function() {
+                sys_goURL("add.html?from=main&guid=");
+            });
+            // 刷新时选中刷新前选中的tab页
+            if (nm == '') {
+                nm = 1;
+            }
+            $(".c_tabs_text").eq(nm).addClass("c_tabs_active");
+        });
+
+        function callback_trclick_table_list(param) {
+            sys_goURL("showList.html?ksid=" + param);
+
+        }
+        function go_back() {
+            sys_goURL("main.html");
+        }
+        function search(){
+            var ksmc = $("#ksmc").val();
+            sys_ajaxGet("/ltz/ylfw/ylzj/default.do?method=wapKsList&ksmc="+ksmc+"&page_size=15&page_goto=",function(json){
+                bind(json,'up');
+                list["table_list"].refresh();
+                list['table_list'].scrollTo(0,0,500,false);
+            });
+        }
+    </script>
+
+    <style type="text/css">
+        .ui-toolbar-wrap {
+            border: none !important;
+        }
+
+        li {
+            list-style-type: none;
+        }
+
+        .add {
+            width: 50px;
+            height: 50px;
+            background: url("../../../img/jiahao.png") no-repeat;
+            background-position: center center;
+            background-size: 28px 28px;
+            border: 0px !important;
+        }
+    </style>
+
+</head>
+<body>
+<div id="toolbar">
+    <i class="icon iconfont icon-back btn_bak" onclick="go_back();"></i>
+    <h1 class="toolbar_title">挂号服务</h1>
+</div>
+<div id="div_search" class="list_div_search div_other_50">
+    <input type="text" id="ksmc" class="list_search_input" style="width: 93%;margin-left: 3%;" placeholder="输入科室名称查询" >
+    <div class="list_search_img" id="btn_search" onclick="search()"></div>
+</div>
+<div class="ui-refresh" id="div_table_list">
+    <ul class="data-list" id="table_list" style="list-style-type:none">
+        <li style="display: none;">
+            <div style="display: none;">{code}</div> <!-- 点击行的参数 -->
+            <div class="list_row_con" style="height:65px;min-height:65px;background-color: #ffffff;">
+
+                <div class="list_row_col1" style="width:15px;"></div>
+                <div class="list_row_col2" style="width:100%;">
+                    <div class="list_row_col2_1 overflow" style="padding-top: 20px;">
+                        <span style="margin-left: 8px;">{name}</span>
+                    </div>
+                </div>
+                <div class="list_row_col3" style="width:50px;">
+                </div>
+            </div>
+        </li>
+    </ul>
+    <div class="ui-refresh-down"></div>
+</div>
+</body>
+</html>

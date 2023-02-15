@@ -1,0 +1,737 @@
+<!doctype html>
+<html>
+<head>
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Expires" CONTENT="0">
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1">
+<title>添加群组成员</title>
+<link rel="stylesheet" type="text/css" href="../../gmu/css/gmu.css" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css" />
+<link rel="stylesheet" type="text/css" href="css/oa.css" />
+<script type="text/javascript" src="../../gmu/js/gmu.js"></script>
+<script type="text/javascript" src="js/touch.js"></script>
+<script type="text/javascript" src="../../js/ict.js"></script>
+<script type="text/javascript" src="../../js/local.js"></script>
+<script type="text/javascript" src="js/custom.js"></script>
+<script type="text/javascript" src="js/datadumper.js"></script>
+
+<style>
+a{
+    text-decoration:none;
+}
+.txl_ry_rm{
+	width:200px;
+}
+
+</style>
+<script type="text/javascript">
+    	var sjid = getSjid();
+    	//alert(sjid);
+        var iobj=null;
+        var iobj2=null;
+        var iobj3=null;
+	   	var addr_list = {};
+	   	var text = gettext();//标题
+	   	var jzbz = getjzbz();//标题
+        var flag = getQueryStringRegExp("flag");
+	   	
+        sys_addMeun = false;
+    	var groupId = getQueryStringRegExp("groupId");
+    	var groupName = getQueryStringRegExp("groupName");
+    	var members = getQueryStringRegExp("members");
+    	var currId = window.localStorage.getItem("yhid");
+    	var currUsername = getQueryStringRegExp("currUsername");
+    	var iscr_from = null;
+        function getflag(){
+            var flag = getQueryStringRegExp("flag");
+            if(flag=='undefined' || flag=='' || flag==null){
+                flag=0;
+            }
+            return flag;
+        }
+		var iscr_from = null;
+	   	//sys_expendRow['table_list']=false;
+	    //加载标志
+	    function getjzbz(){
+			var jzbz = getQueryStringRegExp("jzbz");
+			if(jzbz=='undefined' || jzbz=='' || jzbz==null){
+				jzbz=0;
+			}
+			return jzbz;
+	    }
+	   	
+	    if(sys_pageData["table_list"]){
+	     	sys_pageData["table_list"] = null;
+	     	
+	    }
+	    
+	    function getSjid(){
+			var sjid = getQueryStringRegExp("sjid");
+			if(sjid=='undefined' || sjid=='' || sjid==null){
+				sjid=0;
+			}
+			return sjid;
+	    }
+	    
+	    //标题
+	    function gettext(){
+			var text = getQueryStringRegExp("text");
+			if(text=='undefined' || text=='' || text==null){
+				text=0;
+			}
+			return text;
+	    }
+	    
+	  //跳转聊天页面
+    	function goChat(id){
+    		var currId = window.localStorage.getItem("yhid");
+    		sys_ajaxPost("/jstx/default.do?method=updateReadStatus&senderId=" + currId + "&receiverId=" + id + "&groupMessageSenderId=random",function(json){
+    			
+    		});
+    		window.event.stopPropagation();
+    		sys_goURL("../../jstx/chat.html?guid="+id+"&yhid="+window.localStorage.getItem("yhid")+"&backTarget=linkman");
+    	}
+	    
+    	$(function(){
+    		//alert("isupdate is ok");
+            //检查通讯录是否有更新
+         
+    		if(jzbz=="dl"){
+    			//$("#div_table_list").css('display','none');
+    			 
+    				$("#jzz").css('display','block');
+    			 
+    		}
+    		else{
+    	   		//$("#div_table_list").css('display','');
+    			 
+    				$("#jzz").css('display','none');
+    			 
+    	   	}
+    		//生成toolbar
+		  	$('#toolbar').toolbar({
+	            fixed: true
+	        });		 
+    		
+    		//一级部门页面不显示返回按钮
+		  	if(sjid == "0"){
+	    		$("#back").css('display','none');
+	    		$("#menu").css('display','block');
+	    	} else {
+	    		$("#menu").css('display','none');
+	    	}
+    		
+		  	 
+	                loadList() ;
+	            
+		  	setTimeout('refreshfirst()',1200);
+    		
+		  	$("td").click(function(){
+		 		$("td").css("background","#0973c5");  
+		 		$(this).css("background","white");
+		 		
+		  	});
+   		});
+  
+    	function refreshfirst(){
+    		$("#iscr_from").height(window.innerHeight-100);
+		  	iscr_from = new iScroll("iscr_from",{click:true, bounce:true});
+		  	sys_autoTextarea(iscr_from); 
+    	}
+    	
+    	//选中添加群组成员
+    	function select(ob){
+    		var id = ob.id;
+    		if($("#input"+id).is(":checked")){
+    			$("#input"+id).prop("checked",false);
+    			var yxzry = $("#xzry").val();
+    			var str = yxzry.split(",");
+    			str.remove(id);
+    			$("#xzry").val(str);
+    		}else{
+    			$("#input"+id).prop("checked",true);
+    			var xz = $("#input"+id).val();
+    			var yxzry = $("#xzry").val();
+    			$("#xzry").val(yxzry+","+xz);
+    		}
+    	}
+    	
+    	//选中添加群组成员
+    	function select1(yhid){
+    		var id = yhid;
+    		if($("#input"+id).is(":checked")){
+    			$("#input"+id).prop("checked",false);
+    			var yxzry = $("#xzry").val();
+    			var str = yxzry.split(",");
+    			str.remove(id);
+    			$("#xzry").val(str);
+    		}else{
+    			$("#input"+id).prop("checked",true);
+    			var xz = $("#input"+id).val();
+    			var yxzry = $("#xzry").val();
+    			$("#xzry").val(yxzry+","+xz);
+    		}
+    	}
+    	
+    	Array.prototype.indexOf = function(val) {
+    		for (var i = 0; i < this.length; i++) {
+    		if (this[i] == val) return i;
+    		}
+    		return -1;
+    		};
+    		
+    	Array.prototype.remove = function(val) {
+    		var index = this.indexOf(val);
+    		if (index > -1) {
+    		this.splice(index, 1);
+    		}
+    		};
+    		
+  
+    	//设置内滚动
+    	function refreshinner(){
+			if(iscr_from!=null){
+				iscr_from.refresh();
+			}else{
+				$("#iscr_from").height(window.innerHeight-140);
+			  	iscr_from = new iScroll("iscr_from",{click:true, bounce:true});
+			  	sys_autoTextarea(iscr_from); 
+			}
+    	}
+   		function loadList(){
+			sys_ajaxPost("/jstx/lxr/default.do?method=getAddressBm&sjid=70670_70680",function(json){
+                getTableHtml(json.gridData.table_list.data);
+    			$("#jzz").css('display','none');
+    			
+                iscr_from.refresh();
+			});
+		}
+		
+    	function callback_trclick_table_list(param){
+    		var params = param.split(",");
+   			var type = params[1];
+   			var guid = params[2];
+   			var bmmc = params[3];
+   			
+	   			if(type == "201"){//单位
+	   				//标题显示上级单位
+	   				document.getElementById("toolbar_text").innerText=bmmc;
+	   	   			var text =document.getElementById("toolbar_text").innerText;
+	   	   			
+	   				sys_goURL("list.html?sjid="+guid+"&text="+text);
+	   			}
+    	}
+    	
+    
+    	
+    	//返回群组成员列表页面
+    	function showback(){
+    		sys_goURL("member.html?groupId="+groupId+"&groupName="+groupName+"&currUsername="+currUsername);
+    	};
+    	
+    	function gobackIphone(sjbmid){
+    		sys_goURL("list.html?sjid="+sjbmid);
+    	}
+    	
+    	function sys_renderList2(tableid,url,params,_refresh){
+    		var refreshDown = $("#div_"+tableid).find(".ui-refresh-down");
+    		if(refreshDown.length>0){
+    			refreshDown.hide();
+    		}
+    		if(!tableid){
+    			alert("请设置tableid");
+    			return false;
+    		}
+    		var refreshDIV = "div_"+tableid;
+    		var height = getListHeight();
+    		var removeStyle = (typeof(_refresh.removeStyle)!='undefined')?_refresh.removeStyle:true;
+    	    $('#'+refreshDIV).css('height',window.innerHeight-parseInt(height)-65).refresh({
+    			  load:function(dir,type){
+    	               	var me = this;
+    	               	var page_goto = sys_getPageNum(tableid,dir);
+    	               	if(!page_goto){
+    	               		me.afterDataLoading(dir);  
+    	               		me.disable('down',false);
+    	               		return ;
+    	               	}
+    	               
+	   						loadList();
+	   					 
+    	           	},
+    	           	ready:function(){
+    	           		this.trigger("load");
+    	           	},
+    	           	statechange:function(event,elem,state,dir){}
+    	      });
+    	      
+    	}
+    	function search_(){
+    		//alert($("#search").val());
+    		
+    		//sys_goURL("search.html?groupId="+groupId+"&sjid="+sjid+"&py="+$("#search").val());
+    		
+    		sys_goURL("search.html?groupId=" + groupId + "&groupName="
+    				+ groupName + "&members="+members + "&currUsername=" + currUsername+"&py="+$("#search").val());
+    	}
+    	function showMenu(){
+    		$('#left_panel').panel('toggle', 'reveal');
+    	}
+		/*************************************/
+		//
+		function getTableHtml(data){
+			var list = data;
+			var strHtml = "";
+			for(var i=0;i<list.length;i++){
+				var lxdm=list[i].lx_dm;
+				var mc = list[i].mc;
+				var id = list[i].lxid;
+				var guid = list[i].guid;
+				strHtml += "<div class=\"ui-refresh\" id=\"z_"+id+"\" onclick=\"clickDiv('"+id+"','"+lxdm+"','"+guid+"')\">";
+				strHtml += "	<ul class=\"data-list\" id=\"table_list\">";
+				strHtml += "		<li>";
+				
+				strHtml += "			<div>";
+				strHtml += "				<div class=\"txl_bm font-color-bm dis_sj\">&nbsp;" + "<img id='img_" + guid + "' src=\"../img/txl/you.png\"><div>" + mc+"</div></div>";
+				
+				//strHtml += "				<div class=\"txl_bm font-color-bm2 dis_sj\">&nbsp;&nbsp;&nbsp;" + "<img id='img_" + guid + "' src=\"../../img/txl/you.png\"><div>" + mc+"</div></div>";
+
+				
+				
+				strHtml += "            </div>";				
+				
+				strHtml += "		</li>";
+				strHtml += "	</ul>";
+				strHtml += "</div>";
+				strHtml += "<div id=\"datahtml_"+guid+"\" style=\"display:none;\"></div>";
+			}
+	   	  	//$("#datahtml").html("");
+	   	  	//alert(strHtml);
+	   	 	$("#datahtml").html(strHtml);
+// 	   	 	clickDiv('1004521','201','1004521');
+		}
+      
+		function clickDiv(obj,obj2,obj3){
+			//alert(obj + "--" + obj2 + "--" + obj3);
+			if(obj2=='201'){
+                
+                	var o =document.getElementById("datahtml_"+obj3).style.display;
+    				if(o=='none'){
+    					sys_ajaxPost("/jstx/lxr/default.do?method=getAddressYh&sjid="+obj,function(json){
+                        var list = json.gridData.table_list.data;
+                        var strHtml = "";
+	    				for(var i=0;i<list.length;i++){
+	    					var lxdm=list[i].lx_dm;
+	    					var mc = list[i].mc;
+	    					var id = list[i].lxid;
+	    					var guid = list[i].guid;
+	    					
+	    					strHtml += "<div class=\"ui-refresh\" onclick=\"clickDiv('"+id+"','"+lxdm+"','"+guid+"')\">";
+	    					strHtml += "	<ul class=\"data-list\">";
+	    					strHtml += "		<li>";
+	    					strHtml += "			<div>";
+	    					
+	    					if(lxdm=='201'){
+	    						var id_sz = list[i].lxid.split("_");
+	    						if(id_sz.length == 1){
+	    						strHtml += "				<div class=\"txl_bm font-color-bm2 dis_sj\">&nbsp;&nbsp;&nbsp;" + "<img id='img_" + guid + "' src=\"../img/txl/you.png\"><div>" + mc+"</div></div>";
+	    						}else
+	    						if(id_sz.length == 2){
+	    						strHtml += "				<div class=\"txl_bm font-color-bm2 dis_sj\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+"<img id='img_" + guid + "' src=\"../img/txl/you.png\"><div>" + mc+"</div></div>";
+	    						}else
+	    						if(id_sz.length == 3){
+	    						strHtml += "			    <div class=\"txl_bm font-color-bm2 dis_sj\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+"<img id='img_" + guid + "' src=\"../img/txl/you.png\"><div>" + mc+"</div></div>";
+	    						}else
+	    						if(id_sz.length == 4){
+	    						strHtml += "			    <div class=\"txl_bm font-color-bm2 dis_sj\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+"<img id='img_" + guid + "' src=\"../img/txl/you.png\"><div>" + mc+"</div></div>";
+	    						}
+	    						
+	    					}else if(lxdm=='204'){
+	    						//根据用户id和groupid判断该用户是否已属于该组，或已经发送了邀请
+	    						var gwmc = list[i].gwmc;
+		    					var mobile = list[i].mobile;
+		   						var yhid = list[i].lxid;
+		   						var grtx = list[i].grtx;
+		   						
+		   						strHtml += "			<div class='txl_ry' style='border-bottom: 1px solid #e1e1e1;' onclick='select(this)' id='"+list[i].lxid+"'>";
+	    						strHtml += "			<div class='txl_ry_rm' style='padding-left:30px;line-height:50px;width:20px'>";
+	    						strHtml += "			    <input name='member' type='checkbox' onclick='select1("+yhid+")' id='input"+yhid+"'  value='"+list[i].lxid+"'>";
+	    						strHtml += "			</div>";
+	    						strHtml += "				<div class=\"txl_ry_img\">";
+	    						strHtml += "					<img src=\" " + sys_ctxStr() + grtx + " \" onerror=\"javascript:this.src='../img/txl/03_09.png'\" class=\"txl_img\"></img>";
+	    						strHtml += "				</div>";
+	    						strHtml += "				<div class=\"txl_ry_rm\">&nbsp;" + mc;
+	    						strHtml += "				</div>";
+	    						strHtml += "			</div>";
+		   					
+	    						//setTimeout(function(){ifInvite2(yhid,yhid)},200);
+	    						ifInvite2(yhid,yhid);
+	    					}
+	    					
+	    					strHtml += "			</div>";
+	    					strHtml += "		</li>";
+	    					strHtml += "	</ul>";
+	    					strHtml += "</div>";
+	    					strHtml += "<div id=\"datahtml_"+guid+"\" style=\"display:none;\"></div>";
+	    					
+	    				}
+	    				
+	    				
+	    				
+	    				document.getElementById("datahtml_"+obj3).style.display="block";
+	    				document.getElementById("img_"+obj3).src = "../img/txl/xia.png";
+	    				$("#datahtml_"+obj3).html(strHtml);
+	    				setTimeout('refreshinner()',500);
+    					});
+    				}else{
+    					document.getElementById("datahtml_"+obj3).style.display="none";
+    					document.getElementById("img_"+obj3).src = "../img/txl/you.png";
+    					/* $("#iscr_from").height(window.innerHeight-140);
+    				  	iscr_from = new iScroll("iscr_from",{click:true, bounce:true}); */
+    				  	if(iscr_from!=null){
+    		                iscr_from.refresh();
+    		            } 
+    		            //sys_autoTextarea(iscr_from);
+    					if(obj2=='201'){
+    						//document.getElementById('pic_'+obj3).style.backgroundImage="url(../img/sk.png)";
+    					}
+    				}
+				//strHtml += "</div>";
+                 
+			}
+// 			sys_autoTextarea(iscr_from);
+		}
+		function ifInvite2(id,yhid){//alert(id);
+			
+			sys_ajaxPost("/jstx/default.do?method=ifInvite2&membersId=" + yhid + "&groupId=" + groupId,function(json){
+				
+				if(json.flag)
+    			{
+					document.getElementById("input"+yhid).disabled = true;
+    				document.getElementById("input"+yhid).checked = true;
+    				
+    			}
+				
+				
+				//根据已经选中的人员设置选中状态
+				var yxzry = $("#xzry").val();
+				var yxzrystr = yxzry.split(",");
+				
+				for(var k =0;k<yxzrystr.length;k++)
+				{
+					
+					if(yhid==yxzrystr[k])
+					{
+						
+						document.getElementById("input"+yhid).checked = true;
+					}
+				}
+    		});
+			
+			
+		}
+		function showDiv(guid){
+			//alert(guid);
+			window.event.stopPropagation();
+			//document.getElementById("cylxr").style.display="block";
+			
+			sys_ajaxGet("/deskinfo/default.do?method=getCylxr", function(json){
+				 //Dumper.alert(json);
+				 //alert(json.gridData.table_list.data.length);
+				 var strHtml = '';
+				 var data = json.gridData.table_list.data;
+				 
+				 strHtml = strHtml + "<input type=\"hidden\" id=\"tjguid\" class=\"ky\" value=\"" + guid + "\" />";
+				 
+				 for(var i=0;i<data.length ;i++){
+				 	if(data[i].flag == "fz"){
+	 					if(i == (data.length - 1)){
+	 						strHtml = strHtml + "<div class=\"font-color-rm div-xz\" style=\"border-bottom:none;\" >";	
+	 					}else{
+	 						strHtml = strHtml + "<div class=\"font-color-rm div-xz\">";	
+	 					}
+	 					 
+					 	strHtml = strHtml + "	<span>&nbsp;" + data[i].mc + "</span>";
+					 	strHtml = strHtml + "	<input type=\"radio\" name=\"lxrfz\" class=\"ky\" value=\"" + data[i].guid + "\" style=\"margin-top:13px;\"/>";
+					 	strHtml = strHtml + "</div>";				 		
+				 	}
+				 	
+				 }
+	 
+/* 				 if(data.length == 0){
+					 alert("请先编辑常用联系人组");	 
+				 }else{ */
+					 //$("#tc_lxr").html(strHtml);
+					// $("#cylxr").css("display", "block");
+					 $("#floatdiv").css("display", "block");
+				/*  } */
+			});				
+			
+		}
+		
+		function sys_list_open(guid){
+			sys_goURL("update.html?guid=" + guid);
+		}
+		
+		
+    	
+		function sys_ctxStr(){
+// 	           var count = 0;
+// 	           var end = 0;
+// 	           for(var i=0;i<sys_ctx.length;i++) {
+// 	               var c = sys_ctx.charAt(i);
+// 	               if(c == '/') {
+// 	                   count ++;
+// 	                   if(count == 3) {
+// 	                       end = i;
+// 	                   }            
+// 	               } 
+// 	           }
+	           var hostUrl=sys_ctx.replace("ltzfwpt","");
+			   return hostUrl;			
+		}    	
+		 function iosload(){
+             if(isIphone){
+                 if(flag==1||flag=='1'){
+                     $("#jzz2").css("display", "block");
+                     var dqyh =window.localStorage.getItem("yhid");
+                     window.location.href='obj-c://getAccessUpdate'+dqyh;
+                 }else{
+                     $("#jzz2").css("display", "block");
+                     window.location.href='obj-c://getAccesslist'+sjid;
+                 }
+             }
+        }
+		 
+		
+		    //提交添加群组成员
+			
+			function inviteUser(){
+				
+				var addMembers = "";
+				var addMemberName = "";
+				$("input[name='member']:checked").each(function(){
+					
+					addMembers += ("," + $(this).val());
+					addMemberName += ("," + $(this).parent().siblings()[1].innerHTML);
+					
+				});
+			
+				//获取组成员列表id和姓名
+				sys_ajaxPost("/jstx/default.do?method=ifInvite2&groupId=" + groupId,function(json){
+					
+					//处理用户id
+					var array1 = addMembers.split(',');
+					var array2 = json.data.split(',');
+					
+					//临时数组存放
+					var tempArray1 = [];//临时数组1
+					var tempArray2 = [];//临时数组2
+
+					for(var i=0;i<array2.length;i++){
+						tempArray1[array2[i]]=true;//将数array2 中的元素值作为tempArray1 中的键，值为true；
+					}
+
+					for(var i=0;i<array1.length;i++){
+						if(!tempArray1[array1[i]]){
+							tempArray2.push(array1[i]);//过滤array1 中与array2 相同的元素；
+						}
+					}
+					if(tempArray2==""||tempArray2==null)
+					{
+						alert("请选择邀请的人员");
+					}else{
+						sys_confirm("确定邀请选中的人员加入该群吗？",function(result){
+							if(result == false){
+								return false;
+							}else{
+// 						if (window.confirm("确定邀请选中的人员加入该群吗？")==false){
+// 							return false;	
+// 						}else{
+							//处理用户姓名
+							addMemberName =addMemberName.replace(/\s+/g,""); 
+							var arrayxm1 = addMemberName.split(',');
+							var arrayxm2 = json.yhxm.split(',');
+							
+							//临时数组存放
+							var tempArrayxm1 = [];//临时数组1
+							var tempArrayxm2 = [];//临时数组2
+
+							for(var i=0;i<arrayxm2.length;i++){
+								tempArrayxm1[arrayxm2[i]]=true;//将数array2 中的元素值作为tempArray1 中的键，值为true；
+							}
+
+							for(var i=0;i<arrayxm1.length;i++){
+								if(!tempArrayxm1[arrayxm1[i]]){
+									tempArrayxm2.push(arrayxm1[i]);//过滤array1 中与array2 相同的元素；
+								}
+							}
+							
+							var message = new Object();
+							
+							//message.inviteMemberId = addMembers;
+							//message.inviteMemberName = addMemberName;
+							message.inviteMemberId = ""+tempArray2;
+							message.inviteMemberName = ","+tempArrayxm2;
+							message.inviterId = currId;
+							message.inviterName = currUsername;
+							message.inviteGroupName = groupName;
+							message.inviteGroupId = groupId;
+							
+				       		websocket.send(JSON.stringify(message));
+				       		//Dumper.alert(message);
+				       		alert("邀请已发送");
+				       		sys_goURL("member.html?groupId=" + groupId + "&groupName=" + groupName + "&currUsername=" + currUsername);
+							
+						}
+							});
+					}
+					
+				});
+				
+			}
+		
+			//websocket对象
+			var websocket = null;
+			//判断当前浏览器是否支持WebSocket
+			if("WebSocket" in window){
+			    websocket = new WebSocket(sys_ctx.replace("http","ws")+"/websocket/"+("mobile" + currId));
+			}else{
+			    alert("Not support websocket");
+			}
+			
+			//连接发生错误的回调方法
+			websocket.onerror = function(){
+			    
+			};
+			 
+			//连接成功建立的回调方法
+			websocket.onopen = function(event){
+				
+			};
+			 
+			//接收到消息的回调方法
+			websocket.onmessage = function(event){
+				var json = JSON.parse(event.data);
+			};
+			 
+			//连接关闭的回调方法
+			websocket.onclose = function(){
+			    
+			};
+			 
+			//监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+			window.onbeforeunload = function(){
+			    websocket.close();
+			};
+			 
+			//将消息显示在网页上
+			function setMessageInnerHTML(json){
+				
+			};
+			 
+			//关闭连接
+			function closeWebSocket(){
+				
+			};
+    </script>
+    <style>
+		.txl_bm img{width:24px;height:24px;margin-top:10px;}
+		.dis_sj{display:-webkit-box;}
+		
+		.child_page_title1
+		{
+			float: left;
+		    width: 46%;
+		    height: 65%;
+		    color: white;
+		    font-size: 12px;
+		    text-align: center;
+		    line-height: 26px;
+		    margin-top: 12px;
+		    margin-left:13%;
+		}
+
+		.child_page_title2
+		{
+			border-radius:6px;
+			width:100%;
+			rules:cols solid #000;
+		}
+    </style>
+</head>
+<body onload="iosload();">
+	 <div class="div_body" style="background-color:#fefefe;">
+<!-- 		<div id="toolbar" class="blue_top"> -->
+<!-- 			<div class="button_multi" > -->
+<!-- 				<img src="img/ztjy/02_06.png" class="img_back_or_xj" onclick="showback()"></img> -->
+<!-- 			</div> -->
+			
+<!-- 			<div id="toolbar_text" class="child_page_title1"> -->
+<!-- 				<table class="child_page_title2"> -->
+<!-- 					<tr> -->
+<!-- 						<td id="lxrtd"><label id="lxrlb" style="font-size:18px">邀请新成员</label></td> -->
+<!-- 					</tr> -->
+<!-- 				</table> -->
+<!-- 			</div> -->
+			
+<!-- 			<div class="button_multi" style="width:20%" > -->
+<!-- 				<span> -->
+<!--   					<img src="./image/right.png" id="showAddUser" onclick="inviteUser()" class="img_back_or_xj" style="float: right;"></img> -->
+<!--   				</span> -->
+<!--   			</div> -->
+		
+<!-- 		</div>	 -->
+
+
+<div id="toolbar">
+		<span class="btn_bak" onclick="showback();"></span>
+		<div id="toolbar_text" class="child_page_title1"></div>
+		<h1 class="toolbar_title">邀请新成员</h1>
+		<span class="btn_toolbar_font" id="showAddUser" onclick="inviteUser()" style="color:#ffffff;">确定</span>  
+		
+		</div>	
+
+		<input type="hidden" id="xzry" name="xzry"></input>
+		
+<!--   		<div id="search_div" class="search_div"> -->
+<!--   			<div class="search_div_inner"> -->
+<!--   				<div style="display:inline-block;"> -->
+<!--   					<input type="text" id="search"  class="cx_input" name="search" placeholder="请输入姓名、号码或拼音首字母"></input> -->
+<!--   				</div> -->
+<!--   				<div class="search_div_img" onclick="search_()"> -->
+<!--   					<img src="img/ztjy/02_11.png" id="c_search_icon" class="cx_img" ></img> -->
+<!--   				</div> -->
+<!--   			</div> -->
+<!--   		</div>		 -->
+ 		
+		<div id="iscr_from" style="background-color:#ezezez;">
+			<div  class="sear">
+		  		
+				<div id="lxr_fz">
+					
+				</div>  				
+				
+				<div id="tabslist">
+		   	   		<div id="datahtml"> 	   
+		   	   			
+		   	   		</div>
+		   	   </div>
+			</div>
+		</div>
+			
+			<div  style="display: none;position:absolute;left:50%;top:50%;margin-left:-100px;margin-top:-100px;" id="jzz" width="100%" height="70%" align="center" valign="middle" text-align="center">
+				&nbsp;
+				<font color="#ADADAD">数据更新中···</font>
+			</div>
+			<div  style="display: none;position:absolute;left:35%;top:50%;" id="jzz2" width="100%" height="70%" align="center" valign="middle" text-align="center">
+				&nbsp;
+				<font color="#ADADAD">数据更新中···</font>
+			</div>			
+	</div>
+	
+	<div id="floatdiv" class="floatdiv"></div>
+</body>
+</html>
