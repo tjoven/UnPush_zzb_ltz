@@ -3461,8 +3461,7 @@ public class WebViewWnd extends Activity implements OnHttpDocDownListener,BDLoca
 	    	client.setCookieStore(myCookieStore);
 	    	final String settingUrl = settings.getString("httpMain", ""); 
 			url = settingUrl  + url+ "&sys_token_khd=" + settings.getString("sys_token_khd", "");
-			print("urllllllllllllllllll="+url);
-			Log.e("url====", url);
+
 			//url = url+"&"+java.net.URLEncoder.encode(data);;
 			//url = url.replaceAll(" ", "%20");
 			//System.out.println("11111111111="+url);
@@ -3488,13 +3487,13 @@ public class WebViewWnd extends Activity implements OnHttpDocDownListener,BDLoca
 				params.put(key, set);
 			}
             //url=java.net.URLEncoder.encode(url);
+			final String finalUrl = url;
 			HttpUtilsSafe2.getInstance().post(this, url, data, new HttpUtilsSafe2.OnRequestCallBack() {
 			
 			@Override
 			public void onSuccess(String response) {
 				// TODO Auto-generated method stub
 				//Log.e("LoginTask", "https请求成功 response="+response);
-		    	print("GGGGG::::::"+response);
 		    	if(!"".equals(callback)){
 		    		//System.out.println("3333333333333333");
 		    		String str="";
@@ -3504,6 +3503,7 @@ public class WebViewWnd extends Activity implements OnHttpDocDownListener,BDLoca
 		    			str=response;
 		    		}
 		    		final String response2=str;
+					Log.e("HTTP url: ", finalUrl +"\n"+"result: "+response2);
 		    		print("WebViewWnd.this.webView.isShown()="+WebViewWnd.this.webView.isShown());
 		    		print("WebViewWnd.this.webView2.isShown()="+WebViewWnd.this.webView2.isShown());
 //		    		if(WebViewWnd.this.webView.isShown()){
