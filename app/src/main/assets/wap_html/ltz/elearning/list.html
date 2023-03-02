@@ -29,17 +29,19 @@ function imgList(){
             if(json.imglist.length>0){
 			           var list=json.imglist;
 						var sspHtml = "";
-						
+						sspHtml=sspHtml+"<div class='row'>";
 				       
 						for (var i = 0; i < list.length; i++) {
 							if(list[i].xh=='45'){
 							 
 								 continue;
 							}
-					        				         
+					        if(i%2==0&&i!=0){
+					          sspHtml=sspHtml+"</div><div class='row'>";
+					          }
 					          sspHtml +=" <div class='item'>";
-				              //sspHtml +=" <div class='item_img block_height' onclick=goUrl('" + list[i].link_url + "','"+list[i].embed+"') style=\"background-image: url('"+getUrl()+list[i].imgurl+"');\"></div>	";               
-				              sspHtml +=" <div class='item_img block_height' onclick=goUrl('" + list[i].link_url + "','"+list[i].embed+"') style=\"background-image: url('"+location.protocol + "//" + location.hostname + ":" + location.port+list[i].imgurl+"');\"></div>	";                
+				              sspHtml +=" <div class='item_img block_height' onclick=goUrl('" + list[i].link_url + "','"+list[i].embed+"') style=\"background-image: url('"+getUrl()+list[i].imgurl+"');\"></div>	";               
+				            //   sspHtml +=" <div class='item_img block_height' onclick=goUrl('" + list[i].link_url + "','"+list[i].embed+"') style=\"background-image: url('"+location.protocol + "//" + location.hostname + ":" + location.port+list[i].imgurl+"');\"></div>	";                
 				              sspHtml +=" </div> ";
 				              					       
 						}
@@ -113,10 +115,10 @@ function imgList(){
 	height: 100px;
 }
 
-.item {
+.row .item{
 	width: 50%;
-	
-	float: left;
+	height: 100%;
+			
 }
 
 .item_img {
