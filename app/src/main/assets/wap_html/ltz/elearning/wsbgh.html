@@ -235,6 +235,21 @@
     		return;
     	}
 
+    	function openUrl16() {
+    		var url = "https://mp.weixin.qq.com/s/MkyN56tUNSlNjx9GxVEOwA" ;
+    		if (isAndriod) {
+    			window.webview.loadurl_embed(url);
+    			//内嵌用window. webview. loadurl_embed(url);
+    		} else if (isIphone) {
+    			window.location.href = 'obj-c://outside//' + url;
+    		} else {
+    			var iTop = (window.screen.availHeight - 30 - 365) / 2;
+    			var iLeft = (window.screen.availWidth - 10 - 700) / 2;
+    			window.open(url, '', 'height=600,innerHeight=600,width=320,innerWidth=320,top=' + iTop + ',left=' + iLeft + ',top=0,left=0,toolbar=no,menubar=no,location=no,scrollbars=no,resizable=no');
+    		}
+    		return;
+    	}
+
         function back(){
             sys_goURL("main.html");
         }
@@ -300,6 +315,22 @@
 
 	<div class="ui-refresh" id="div_table_list">
 		<br>
+
+		<ul class="data-list" id="table_list" style="list-style-type:none">
+			<li onclick="openUrl16()">
+				<div style="display: none;">{guid}</div> <!-- 点击行的参数 -->
+				<div class="list_row_con"
+					 style="height:95px;min-height:95px;background-color: #ffffff;">
+					<div class="list_row_slt"
+						 style="margin-top:10px;margin-left: 10px;">
+						<img src="img/wsbgh16.jpg" style="height: 75px;width:121px" />
+					</div>
+					<div class="list_row_col22">
+						<div class="list_row_col22_1">【专题报告】中央党史和文献研究院副院长黄一兵主讲：深入学习习近平新时代中国特色社会主义思想</div>
+					</div>
+				</div>
+			</li>
+		</ul>
 
 		<ul class="data-list" id="table_list" style="list-style-type:none">
 			<li onclick="openUrl15()">

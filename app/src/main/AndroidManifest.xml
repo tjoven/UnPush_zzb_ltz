@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.unicom.sywq"
     android:versionCode="31"
-    android:versionName="3.1(181)" >
+    android:versionName="3.1(182)" >
 
 
     <uses-permission android:name="android.permission.GET_TASKS" />
