@@ -960,6 +960,7 @@
 	
 	//在相册中选择上传图片后，显示上传图片
 	function showUploadImg(fileName,filePath){
+		console.log("showUploadImg fileName = "+fileName+" filePath"+filePath);
 		common(fileName,filePath);
 	}
 	
@@ -973,8 +974,7 @@
 	
 	function common(fileName,filePath){
 		var guid = getGuid();
-		var breviaryImg = sys_ctx.replace("ltzfwpt","") + "/" + jstxPath + fileName.substring(0,10) + "/breviary" + fileName;
-		
+		var breviaryImg = filePath;
 		var message = new Object();
 		message.senderId = senderId;
 		message.senderName = senderName;
@@ -985,6 +985,7 @@
 			message.sendTime = json.time;
 			
 			message.sendContent = "<img src='"+breviaryImg+"' id='imgzoom' onclick='showRealImage(this)' data-preview-src='' data-preview-group='1'>";
+			console.log("message.sendContent@@ = "+message.sendContent);
 			var mySendMsg = rightTitle + "&nbsp;&nbsp;" + message.sendTime +"</div></div>";
 			if(message.senderId !=receiverId)
 			{

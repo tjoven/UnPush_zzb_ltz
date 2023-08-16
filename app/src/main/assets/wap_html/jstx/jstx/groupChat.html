@@ -1019,7 +1019,8 @@
 
 	function common(fileName,filePath){
 		var guid = getGuid();
-		var breviaryImg = sys_ctx.replace("ltzfwpt","") + "/" + jstxPath + fileName.substring(0,10) + "/breviary" + fileName;
+		var breviaryImg = filePath;
+<!--		var breviaryImg = sys_ctx.replace("ltzfwpt","") + "/" + jstxPath + fileName.substring(0,10) + "/breviary" + fileName;-->
 		var message = new Object();
 		message.senderId = senderId;
 		message.senderName = senderName;

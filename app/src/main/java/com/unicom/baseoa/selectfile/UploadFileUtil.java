@@ -28,6 +28,7 @@ import android.widget.Toast;
  * lwdj 测试完成版
  * @author liuzz
  *
+ * 应该是弃用了
  */
 public class UploadFileUtil {
 	

@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -3217,7 +3219,7 @@ public class WebViewWnd extends Activity implements OnHttpDocDownListener,BDLoca
 				Toast.makeText(WebViewWnd.instance, "文件不能超过"+size_limit+"MB", Toast.LENGTH_LONG).show();
 				return ;
 			}
-			//Log.e("WebViewWnd1", "开始上传文件 parm="+param+" file="+file+" url="+url);
+			Log.e("WebViewWnd1", "开始上传文件 parm="+param+" file="+file+" url="+url);
 			final HttpMultipartPostData post = new HttpMultipartPostData(this, file,url,param);
 			post.execute();
 			//45秒超时
