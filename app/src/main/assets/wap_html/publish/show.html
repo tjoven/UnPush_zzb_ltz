@@ -37,6 +37,8 @@
 	        	if(json.formData){
 		        	var fjhtml = getFj(json.formData);
 		        	//$("#_fujian").html(fjhtml);
+		        	console.log("fjhtml :"+fjhtml);
+		        	console.log("fjhtml boolean :"+(fjhtml==""));
 		        	if(fjhtml==""){
 		        	  $(".c_fujian").hide();
 		        	}else{
@@ -290,9 +292,9 @@
 			<div class="c_item_value2" id="ggnr_content"></div>
 			<div style="height:25px;"></div>
 			<div class="c_item_container c_fujian"><div class="c_item_value" style="font-weight:bold;font-size:.7em;color:#666;"><br>相关附件：</div></div>
-			<div class="c_item_container"><div class="c_item_value" id="_fujian"></div></div>
+			<div class="c_item_container "><div class="c_item_value" id="_fujian"></div></div>
 			<div style="height:5px;"></div>
-			<video id = "video1" class="edui-upload-video video-js vjs-default-skin" controls="" preload="none" width="345" height="240" src="http://localhost:8080/oainfo/kindeditor/pic/20211220/65371639991775191.mp4" data-setup="{}"><source src="http://localhost:8080/oainfo/kindeditor/pic/20211220/65371639991775191.mp4" type="video/mp4"></video>
+<!--			<video id = "video1" class="edui-upload-video video-js vjs-default-skin" controls="" preload="none" width="345" height="240" src="http://localhost:8080/oainfo/kindeditor/pic/20211220/65371639991775191.mp4" data-setup="{}"><source src="http://localhost:8080/oainfo/kindeditor/pic/20211220/65371639991775191.mp4" type="video/mp4"></video>-->
 			<div id="msgList" class="c_message"></div>
 			<div style="height:25px;"></div>
 		 </div>	 
