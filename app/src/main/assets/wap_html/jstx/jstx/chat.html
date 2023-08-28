@@ -1184,6 +1184,7 @@
 	//接收到消息的回调方法
 	websocket.onmessage = function(event){
 		var json = JSON.parse(event.data);
+		console.log("onmessage 接收到来自webSocket的消息 : "+event.data);
 // 		if(json.send_content==$("#inputBox").html()){
 // 			$("#inputBox").empty();
 // 		}
@@ -1217,6 +1218,7 @@
 	
 	function longPolling(){
 		sys_ajaxPost("/pollingMessage/default.do?method=longPolling&senderId="+senderId+"&receiverId="+receiverId,function(json){
+			console.log("longPolling: "+json);
 			if(json.length > 0){
 				for (var i = 0; i < json.length; i++) {
 					var innerHTML = json[i].send_content;
