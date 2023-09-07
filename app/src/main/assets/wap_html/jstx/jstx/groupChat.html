@@ -428,7 +428,7 @@
 									$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px'  id=\""+json[i].sender_id+"\" src='"+sys_ctxStr()+json[i].sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + rightTitle + json[i].sender_name + "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + rightContent+"<div id="+json[i].guid+" ontouchstart='copytouchstart(\""+json[i].guid+"\",\""+json[i].send_content+"\",\"rightflag\")'  ontouchend='copytouchend(\""+json[i].guid+"\",\""+json[i].send_content+"\",\"rightflag\")' style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + json[i].send_content + "</div></div></div><div style='clear:both;'></div>");
 								}
 							}else{
-								$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' id=\""+json[i].sender_id+"\"  src='"+sys_ctxStr()+json[i].sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + rightTitle + json[i].sender_name + "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + rightContent+"<div style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + json[i].send_content + "</div></div></div><div style='clear:both;'></div>");
+								$("#chatContent > div:first-child").before("<div style='width:100%;margin-top:10px;margin-left:-10px'><div style='float:right;width:10%;'><img width='40px' height='40px' id=\""+json[i].sender_id+"\"  src='"+sys_ctxStr()+json[i].sender_photo+"?size=200*' onerror=\"javascript:this.src='./image/user.png'\" onclick='showRealPhoto(this)'></div><div style='float:left;width:90%;'>" + rightTitle + json[i].sender_name + "&nbsp;&nbsp;" + json[i].send_time + "</div></div>" + rightContent+"<div style='float:right;background-color:#A6D4F2;border-radius:5px;padding:5px 12px;font-size:19px;margin-right:-2px;max-width:70%;word-wrap:break-word;'>" + json[i].send_content.replace("float:right","").replace("70%","100%") + "</div></div></div><div style='clear:both;'></div>");
 							}                                               
 
 						}else{//非本人发送的信息
@@ -1238,6 +1238,7 @@
 	//接收到消息的回调方法
 	websocket.onmessage = function(event){
 		var json = JSON.parse(event.data);
+		console.log("onmessage groupChat接收到来自webSocket的消息 : "+event.data);
  		if(json.guid==send_messageid){
  			send_flag = 1;
  		}
