@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.unicom.sywq"
-    android:versionCode="32"
-    android:versionName="3.2(192)" >
+    android:versionCode="35"
+    android:versionName="3.5(192)" >
 
 
     <uses-permission android:name="android.permission.GET_TASKS" />

@@ -23,28 +23,17 @@
     <string name="network_Invalid">不能正常连接网络</string>
     
 
-     <!--
-     <string name="url">http://123.125.127.131:8081</string>
-     <string name="url_new2">http://123.125.127.131:8081</string>  -->
 
     <!-- 正式的 -->
-     <string name="url">https://123.125.127.131:9123</string>
-     <string name="url_new2">https://123.125.127.131:9123</string>
-     <string name="url_playVoice">http://123.125.127.131:8081</string>
+     <string name="url">https://106.74.97.34:9123</string>
+     <string name="url_new2">https://106.74.97.34:9123</string>
+     <string name="url_playVoice">https://106.74.97.34:8081</string>
 
-     <!-- <string name="url">https://10.192.16.141:9123</string>
-     <string name="url_new2">https://10.192.16.141:9123</string> -->
+<!--     <string name="url">https://123.125.127.131:9123</string>-->
+<!--     <string name="url_new2">https://123.125.127.131:9123</string>-->
+<!--     <string name="url_playVoice">http://123.125.127.131:8081</string>-->
 
-    
-   <!--  <string name="url">http://172.16.5.41:8090/ltzfwpt</string>
-    <string name="url_new2">http://172.16.5.41:8090/ltzfwpt</string> -->
-    
-    
-<!--     <string name="url_new2">http://192.168.191.1:8080/ltzfwpt</string> -->
-<!--     <string name="url_new2">http://172.16.5.68:8080/ltzfwpt</string> -->
-<!--     <string name="url_new2">http://172.16.17.24:8080/ltzfwpt</string> -->
-<!--     <string name="url_new2">http://172.16.5.81:8080/</string> -->
- 
+
     
     <!-- 
     http://124.133.15.90:8480/djypt
